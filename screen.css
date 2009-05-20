@@ -1,0 +1,81 @@
+body
+{
+	margin: 130px 0 0 0;
+	padding: 0 7% 0 180px;
+	background-image: url("PageBanner.jpg");
+	background-repeat: no-repeat;
+	background-color: #ffffff;
+	background-position: 9px 5px;
+	color: #000000;
+	font-family: Arial, Helvetica,  sans-serif;
+}
+
+.navbar
+{
+	position: absolute;
+	z-index: 5;
+	width: 150px;
+	top: 120px;
+	left: 9;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+
+.print_logo
+{
+	display: none;
+}
+
+.public_menu_title
+{
+	background-color: #000000;
+	color: #FFFFFF;
+	margin: 10 0 0 0;
+	padding: 2px;
+	font-weight: bold;
+}
+
+.public_menu_entry
+{
+	border-style: none solid solid solid;
+	color: #4B067A;
+	margin: 0;
+	padding: 2px;
+}
+
+
+.priv_menu_title
+{
+	background-color: #237723;
+	color: #FFFFFF;
+	margin: 10 0 0 0;
+	padding: 2px;
+	font-weight: bold;
+}
+
+.priv_menu_entry
+{
+	border-style: none solid solid solid;
+	color: #237723;
+	margin: 0;
+	padding: 2px;
+}
+
+.copyright
+{
+	font-size: small;
+	text-align: center;
+}
+
+.print_copyright
+{
+	display: none;
+}
+
+p.dev_warning
+{
+	font-size: large;
+	color: red;
+	font-weight: bold;
+}

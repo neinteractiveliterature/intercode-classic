@@ -1,0 +1,64 @@
+<HTML>
+<HEAD>
+<TITLE>Intercon HTML Primer</TITLE>
+</HEAD>
+<BODY>
+<H1>Intercon HTML Primer</H1>
+HTML is the &quot;markup language&quot; used to format information for display
+in a web brower.  While there are entire books written on HTML, you'll only
+need a small subset to format information for your game or bid.
+<P>
+HTML uses <i>tags</i> to control the formatting of text.  A tag consists of a
+less than sign (&lt;) followed the tag name and sometimes one or more
+attributes, and then a greater than sign (&gt;).
+<P>
+Most tags apply to a region of text.  The region starts where the tag and it's
+attributes are, and extends to the <i>end tag</i>.  An end tag is the tag name
+preceeded by a forward slash (/).  For example, the word &quot;tags&quot; is
+italicized in the previous paragraph using the following tags:
+<code>&lt;i&gt;tags&lt;/i&gt;</code>.
+<P>
+If you forget to include the end tag, the effected region will extend to the
+end of the page.  So for example, if you forget the <code>&lt;/i&gt;</code>
+to close out the italicized region in your game description, the remainder
+of the page will be italicized.
+
+<H2>Useful HTML Tags</H2>
+<TABLE>
+  <TR>
+   <TD><code>&lt;p&gt;</code></TD>
+   <TD>
+     The paragraph tag.  The paragraph tag separates paragraphs.  The
+     end paragraph tag <code>&lt;/p&gt;</code> is optional.
+   </TD>
+ </TR>
+  <TR>
+   <TD><code>&lt;br&gt;</code></TD>
+   <TD>
+     The break tag.  The break tag forces the following text onto a new line.
+     There is no end tag for <code>&lt;br&gt;</code>.
+   </TD>
+ </TR>
+ <TR>
+   <TD><code>&lt;b&gt; ... &lt;/b&gt;</code></TD>
+   <TD>Bold a region of text</TD>
+ </TR>
+ <TR>
+   <TD><code>&lt;i&gt; ... &lt;/i&gt;</code></TD>
+   <TD>Italicize a region of text</TD>
+ </TR>
+ <TR>
+   <TD><code>&lt;hr&gt;</code></TD>
+   <TD>
+     Insert a horizontal rule.  Insert a line dividing the text before from
+     the text that follows.  There is no end tag for <code>&lt;hr&gt;</code>.
+   </TD>
+ </TR>
+</TABLE>
+<P>
+This is just a small sample of the many HTML tags you can use.  You can get
+more information at one of the many HTML references on the web.  For example,
+the <A HREF=http://www.ncsa.uiuc.edu/General/Internet/WWW/HTMLPrimer.html>NCSA
+(at UIUC) Beginner's Guide to HTML</A> is a good place to start.
+</BODY>
+</HTML>
