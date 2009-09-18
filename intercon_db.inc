@@ -571,7 +571,8 @@ function html_begin ($bShowLogo=true)
     }
     if (THURSDAY_ENABLED)
       navbar_entry (false, 'Thursday Thing', 'Thursday.php');
-    navbar_external_static ('Iron GM Contest', 'http://irongm.rachl.in');
+    if (IRONGM_ENABLED)
+      navbar_external_static ('Iron GM Contest', 'http://irongm.rachl.in');
     navbar_entry (false, 'Logout', 'index.php', LOGOUT_USER);
   }
   else
