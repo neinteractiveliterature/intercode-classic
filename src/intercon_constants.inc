@@ -118,14 +118,14 @@ define (EMAIL_WEBMASTER, 'webmaster@' . CON_DOMAIN);
 
 // Con dates
 
-define (FRI_TEXT, 'Friday, 6-Mar-2010');
-define (SAT_TEXT, 'Saturday, 7-Mar-2010');
-define (SUN_TEXT, 'Sunday, 8-Mar-2010');
+define (FRI_TEXT, 'Friday, 12-Mar-2010');
+define (SAT_TEXT, 'Saturday, 13-Mar-2010');
+define (SUN_TEXT, 'Sunday, 14-Mar-2010');
 
 // Deadlines - Format is YYYY-MM-DD
 
 define (REGISTRATION_CLOSE, '2010-02-24');
-define (CON_OVER, '2010-03-03');
+define (CON_OVER, '2010-03-14');
 define (SHIRT_CLOSE, '2010-02-01');
 define (BIO_CLOSE, '2009-12-25');
 
