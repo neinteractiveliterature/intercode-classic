@@ -1,8 +1,9 @@
 <?
-// Note that PowWeb insists on setting the session save path!  Comment this
-// out, or set it appropriately for your server
 
-session_save_path("/home/users/web/b2078/pow.neilmaster/phpsessions");
+// For site isolation, change the session name below to something appropriate
+// when deploying a new Intercon site.
+
+session_name ('intercon_j');
 session_start ();
 
 // Setting DEVELOPMENT_VERSION turns on additional error checking, as well
@@ -15,7 +16,7 @@ define (DEVELOPMENT_VERSION, 0);
 
 //define (DB_SERVER, 'localhost');
 //define (DB_NAME,   'itest');
-define (DB_SERVER, 'neilmaster.powwebmysql.com');
+define (DB_SERVER, 'mysql.interactiveliterature.org');
 define (DB_NAME,   'intercon_j');
 
 // Database users - These could/should be used to control access to the
@@ -24,14 +25,14 @@ define (DB_NAME,   'intercon_j');
 // from outside the domain, so we should be OK.  And it's not like we've got
 // credit card numbers or other sensative stuff in here anyway...
 
-define (DB_ADMIN_USR, 'interconuser');
-define (DB_ADMIN_PWD, 'LARP');
+define (DB_ADMIN_USR, 'interconneuser');
+define (DB_ADMIN_PWD, 'Thai4IeP');
 
-define (DB_STAFF_USR, 'interconuser');
-define (DB_STAFF_PWD, 'LARP');
+define (DB_STAFF_USR, 'interconneuser');
+define (DB_STAFF_PWD, 'Thai4IeP');
 
-define (DB_USER_USR, 'interconuser');
-define (DB_USER_PWD, 'LARP');
+define (DB_USER_USR, 'interconneuser');
+define (DB_USER_PWD, 'Thai4IeP');
 
 
 // When DEVELOPMENT_VERSION is set to 1, all mail will be diverted to this
