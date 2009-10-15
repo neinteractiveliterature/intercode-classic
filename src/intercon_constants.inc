@@ -82,12 +82,12 @@ define (NAME_ADVERTISING, '');
 define (EMAIL_ADVERTISING, '');
 
 define (NAME_BID_CHAIR, 'Anna Bradley');
-define (EMAIL_BID_CHAIR, 'bidchair@' . CON_DOMAIN);
+define (EMAIL_BID_CHAIR, 'arbradley@gmail.com');
 
-define (NAME_CON_SUITE, 'Renee Cyr');
-define (EMAIL_CON_SUITE, 'consuite@' . CON_DOMAIN);
+define (NAME_CON_SUITE, 'Anna Bradley');
+define (EMAIL_CON_SUITE, 'arbradley@gmail.com');
 
-define (NAME_GM_COORDINATOR, 'Josh Rachlin');
+define (NAME_GM_COORDINATOR, 'Andrew Militello');
 define (EMAIL_GM_COORDINATOR, 'gmcoordinator@' . CON_DOMAIN);
 
 define (NAME_HOTEL_LIAISON, 'Alex Bradley');
@@ -98,7 +98,7 @@ define (EMAIL_OPS, 'operations@' . CON_DOMAIN);
 define (NAME_OPS2, '');
 define (EMAIL_OPS2, '');
 
-define (NAME_OUTREACH, 'Tim Lasko');
+define (NAME_OUTREACH, 'Thorin Tabor');
 define (EMAIL_OUTREACH, 'info@' . CON_DOMAIN);
 
 define (NAME_REGISTRAR, 'Chad Bergeron');
@@ -107,8 +107,6 @@ define (EMAIL_REGISTRAR, 'registrar@' . CON_DOMAIN);
 define (NAME_THURSDAY, 'Joshua Sheena');
 define (EMAIL_THURSDAY, 'thursday@' . CON_DOMAIN);
 
-//define (NAME_TREASURER, 'Mike McAfee');
-//define (EMAIL_TREASURER, 'mdm@haven.org');
 define (NAME_TREASURER, 'Chad Bergeron');
 define (EMAIL_TREASURER, '');
 
