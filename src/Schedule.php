@@ -3890,6 +3890,20 @@ function display_game_form ()
 
 function list_games_alphabetically ()
 {
+  // Always shill for games!
+
+  if (ACCEPTING_BIDS)
+  {
+    echo "<p>\n";
+    echo "We're looking for a wide and varied slate of games to fill\n";
+    echo "this page. Do <em>you</em> have a game for us?  If so,\n";
+    echo "please <a href=\"biddingAGame.php\">bid your game</a>!\n";
+    echo "If you're not sure, then take a look at our ";
+    echo "<a href=\"Static.php?page=bidFAQ\">bidding FAQ</a>, or contact\n";
+    printf ("the <a href=%s>Bid Committee Chair</a>.<p>\n",
+	    mailto_url (EMAIL_BID_CHAIR, 'Bid question'));
+  }
+
   $sql = 'SELECT EventId, Title, Author, ShortBlurb, SpecialEvent,';
   $sql .= ' LENGTH(Description) AS DescLen';
   $sql .= ' FROM Events';
@@ -3901,48 +3915,37 @@ function list_games_alphabetically ()
 
   $n = mysql_num_rows ($result);
 
-  if (0 == $n)
+  if ($n > 0)
   {
-    echo "<B>There are no games currently scheduled</B>\n<P>\n";
-    echo "We're looking for a wide and varied slate of games to fill\n";
-    echo "this page.\n";
-    echo "Do <em>you</em> have a game for us?  If so,\n";
-    echo "please <a href=\"biddingAGame.php\">bid your game</a>!\n";
-    echo "If you're not sure, then take a look at our ";
-    echo "<a href=\"Static.php?page=bidFAQ\">bidding FAQ</a>, or contact\n";
-    echo "the <a href=\"mailto:e-bids@interactiveliterature.org\">Bid\n";
-    echo "Committee Chair</a>.<p>\n";
+    echo "<hr width=\"50%\">\n";
+    echo "<b>Select game to view:</b>\n";
 
-    return true;
-  }
+    while ($row = mysql_fetch_object ($result))
+    {
+      // If this is a special event, and there's no text, skip it
 
-  echo "<B>Select game to view:</B>\n<P>\n";
+      if ((0 != $row->SpecialEvent) &&
+	  ('' == $row->ShortBlurb))
+	continue;
 
-  while ($row = mysql_fetch_object ($result))
-  {
-    // If this is a special event, and there's no text, skip it
+      // If there's no long description, don't offer a link
 
-    if ((0 != $row->SpecialEvent) &&
-	('' == $row->ShortBlurb))
-      continue;
+      echo "<p>\n";
+      if ($row->DescLen > 0)
+	printf ("<a href=\"Schedule.php?action=%d&EventId=%d\">%s</a>\n",
+		SCHEDULE_SHOW_GAME,
+		$row->EventId,
+		$row->Title);
+      else
+	echo "$row->Title\n";
 
-    // If there's no long description, don't offer a link
+      if ('' != $row->Author)
+	echo "<br><i>by $row->Author</i>\n";
 
-    if ($row->DescLen > 0)
-      printf ("<a href=\"Schedule.php?action=%d&EventId=%d\">%s</a>\n",
-	      SCHEDULE_SHOW_GAME,
-	      $row->EventId,
-	      $row->Title);
-    else
-      echo "$row->Title\n";
-
-    if ('' != $row->Author)
-      echo "<BR><I>by $row->Author</I>\n";
-
-    if ('' != $row->ShortBlurb)
-      echo "<BR>\n$row->ShortBlurb\n";
-
-    echo "<P>\n";
+      if ('' != $row->ShortBlurb)
+	echo "<br>\n$row->ShortBlurb\n";
+      echo "</p>\n";
+    }
   }
 
   mysql_free_result ($result);

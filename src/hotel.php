@@ -77,7 +77,8 @@ echo "            the date of expected arrival.\n";
 echo "            <p>\n";
 echo "            If there are any problems or questions, please \n";
 echo "            feel free to send email to our \n";
-echo "            <a href=\"mailto:hotelliaison@interactiveliterature.org\">Hotel Liaison</a>.\n";
+ printf ("            <a href=%s>Hotel Liaison</a>.\n",
+	 mailto_url (EMAIL_HOTEL_LIAISON, 'Hotel question'));
 echo "          </td>\n";
 echo "        </tr>\n";
 echo "      </table>\n";
@@ -175,8 +176,9 @@ echo "		</ul>\n";
 echo "		<p>Should you arrive on Friday before checkin, or for the remainder of \n";
 echo "		the con after Sunday checkout, Intercon and Hotel Staff can provide \n";
 echo "		a secure area for your belongings.\n";
-echo "		<p>If there are any problems or questions before the con, please contact\n";
-echo "		our <a href=\"mailto:hotelliaison@interactiveliterature.org\">Hotel Liaison</a>. The \n";
+echo "		<p>If there are any problems or questions before the con,\n";
+ printf ("            please contact our <a href=%s>Hotel Liaison</a>. The\n",
+	 mailto_url (EMAIL_HOTEL_LIAISON, 'Hotel question'));
 echo "		Hotel Liaison will also be available at the con to solve any problems. \n";
 echo "		Please let the Ops Desk know of any issues; they will know where the \n";
 echo "		Hotel Liaison is at any given time. We are very good at expediting \n";

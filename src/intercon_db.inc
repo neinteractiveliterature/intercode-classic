@@ -2903,6 +2903,9 @@ function include_alumni_form ($action, $code)
 }
 
 /*
+ * OBSOLETE FUNCTION - DO NOT USE!!!
+ * Use mailto_url instead
+ *
  * mailto
  *
  * Generate a mailto URL
@@ -2913,6 +2916,21 @@ function mailto ($addr, $subject='')
   $s = sprintf ('mailto:%s-%s@interactiveliterature.org',
 		$addr,
 		CON_MAIL_LETTER);
+  if ('' != $subject)
+    $s .= '?subject=[' . CON_NAME . '] ' . $subject;
+
+  return '"' . $s . '"';
+}
+
+/*
+ * mailto_url
+ *
+ * Generate a mailto URL
+ */
+
+function mailto_url ($addr, $subject='')
+{
+  $s = "mailto:$addr";
   if ('' != $subject)
     $s .= '?subject=[' . CON_NAME . '] ' . $subject;
 
