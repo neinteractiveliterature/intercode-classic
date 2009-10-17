@@ -3671,6 +3671,9 @@ function load_game_post_array ()
   if ('Y' == $_POST['IsIronGm'])
     $_POST['CheckIsIronGm'] = 1;
 
+  if ('Y' == $_POST['IsSmallGameContestEntry'])
+    $_POST['CheckIsSmallGameContestEntry'] = 1;
+
   return true;
 }
 
@@ -3741,17 +3744,6 @@ function scheduling_priv_option ($name, $field, $check_key)
   if ('N' == $_POST[$field])
     return false;
 
-  // Display the type of event this is and add a hidden key so it's value
-  // won't be lost
-
-  $event_type = 'event';
-  echo "  <tr>\n";
-  echo "    <td colspan=2>\n";
-  echo "      This is $name";
-  echo "      <input type=\"hidden\" name=\"$hidden_key\" value=\"Y\">\n";
-  echo "    </td>\n";
-  echo "  </tr>\n";
-
   // Return true to indicate that this is an event, not a game
 
   return true;
@@ -3771,18 +3763,11 @@ function display_game_form ()
 
   print ("<FORM METHOD=POST ACTION=" . $_SERVER['PHP_SELF'] . ">\n");
   form_add_sequence ();
-  print ("<INPUT TYPE=HIDDEN NAME=action VALUE=" . PROCESS_ADD_GAME . ">\n");
-  printf ("<INPUT TYPE=HIDDEN NAME=EventId VALUE=%d>\n", $EventId);
-  printf ("<INPUT TYPE=HIDDEN NAME=CanPlayConcurrently VALUE=%s>\n",
-	  trim ($_POST['CanPlayConcurrently']));
-  printf ("<input type=\"hidden\" name=\"IsOps\" value=\"%s\">\n",
-	  trim ($_POST['IsOps']));
-  printf ("<input type=\"hidden\" name=\"IsConSuite\" value=\"%s\">\n",
-	  trim ($_POST['IsConSuite']));
-  printf ("<input type=\"hidden\" name=\"IsIronGm\" value=\"%s\">\n",
-	  trim ($_POST['IsIronGm']));
-  printf ("<input type=\"hidden\" name=\"IsSmallGameContestEntry\" value=\"%s\">\n",
-	  trim ($_POST['IsSmallGameContestEntry']));
+  form_hidden_value('action', PROCESS_ADD_GAME);
+  form_hidden_value('EventId', $EventId);
+  form_hidden_value('CanPlayConcurrently',
+		    trim ($_POST['CanPlayConcurrently']));
+
   print ("<TABLE BORDER=0>\n");
   form_text (64, 'Title', '', 128);
   form_text (64, 'Author(s)', 'Author', 128);
@@ -3855,7 +3840,7 @@ function display_game_form ()
 
     echo "  <tr valign=\"top\">\n";
     printf ('    <td colspan="2">This %s lasts %d %s - Contact the <a href="mailto:%s">' .
-	    "GM Coordinator</a> to modify the length of this %s</td>\n",
+	    "GM Coordinator</a> to modify the length of this %s.</td>\n",
 	    $event_type,
 	    $_POST['Hours'],
 	    $period,
