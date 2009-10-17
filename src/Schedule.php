@@ -2287,6 +2287,10 @@ function show_game ()
 
   $volunteer_event = ($game_row->IsOps=='Y') || ($game_row->IsConSuite=='Y');
 
+  // Note if this is a LARPA Small Game Contest entry
+
+  $is_small_game_contest_entry = ('Y' == $game_row->IsSmallGameContestEntry);
+
   // Note if there are 0 players.  We'll use this later
 
   $max_signups = $game_row->MaxPlayersMale +
@@ -2693,6 +2697,13 @@ function show_game ()
   echo "<P>\n";
   echo "<HR>\n";
   echo $game_row->Description;
+  if ($is_small_game_contest_entry)
+  {
+    echo "<p>\n";
+    echo "<img src=\"LittleLARPA.gif\" width=\"61\" height=\"19\" align=\"left\">\n";
+    echo "This is a LARPA Small Game Contest entry.</p>\n";
+  }
+    
   echo "<p>\n<hr>\n";
 
   if ($can_edit_game)
@@ -3485,6 +3496,12 @@ function add_game ()
   else
     $IsIronGm = 'N';
 
+  if (array_key_exists ('CheckIsSmallGameContestEntry', $_POST))
+    $IsSmallGameContestEntry = 'Y';
+  else
+    $IsSmallGameContestEntry = 'N';
+
+
   if ($update)
     $sql = 'UPDATE Events SET ';
   else
@@ -3502,6 +3519,8 @@ function add_game ()
     $sql .= build_sql_string ('IsOps', $IsOps);
     $sql .= build_sql_string ('IsConSuite', $IsConSuite);
     $sql .= build_sql_string ('IsIronGm', $IsIronGm);
+    $sql .= build_sql_string ('IsSmallGameContestEntry',
+			      $IsSmallGameContestEntry);
     $sql .= build_sql_string ('Hours');
   }
 
@@ -3697,7 +3716,7 @@ function can_edit_game_info ()
   return (mysql_num_rows ($result) > 0);
 }
 
-function priv_option ($name, $field, $check_key)
+function scheduling_priv_option ($name, $field, $check_key)
 {
   // If the user has scheduling priv, display a checkbox
 
@@ -3762,6 +3781,8 @@ function display_game_form ()
 	  trim ($_POST['IsConSuite']));
   printf ("<input type=\"hidden\" name=\"IsIronGm\" value=\"%s\">\n",
 	  trim ($_POST['IsIronGm']));
+  printf ("<input type=\"hidden\" name=\"IsSmallGameContestEntry\" value=\"%s\">\n",
+	  trim ($_POST['IsSmallGameContestEntry']));
   print ("<TABLE BORDER=0>\n");
   form_text (64, 'Title', '', 128);
   form_text (64, 'Author(s)', 'Author', 128);
@@ -3810,9 +3831,13 @@ function display_game_form ()
   echo "    </td>\n";
   echo "  </tr>\n";
 
-  $is_event = priv_option ('Ops', 'IsOps', 'CheckIsOps');
-  $is_event |= priv_option ('ConSuite', 'IsConSuite', 'CheckIsConsuite');
-  priv_option ('Iron GM', 'IsIronGm', 'CheckIsIronGm');
+  $is_event = scheduling_priv_option ('Ops', 'IsOps', 'CheckIsOps');
+  $is_event |= scheduling_priv_option ('ConSuite', 'IsConSuite',
+				       'CheckIsConsuite');
+  scheduling_priv_option ('Iron GM', 'IsIronGm', 'CheckIsIronGm');
+  scheduling_priv_option ('a LARPA Small Game Contest Entry',
+			  'IsSmallGameContestEntry',
+			  'CheckIsSmallGameContestEntry');
 
   if ($is_event)
     $event_type = 'event';
@@ -3905,6 +3930,7 @@ function list_games_alphabetically ()
   }
 
   $sql = 'SELECT EventId, Title, Author, ShortBlurb, SpecialEvent,';
+  $sql .= ' IsSmallGameContestEntry,';
   $sql .= ' LENGTH(Description) AS DescLen';
   $sql .= ' FROM Events';
   $sql .= ' ORDER BY Title';
@@ -3944,7 +3970,15 @@ function list_games_alphabetically ()
 
       if ('' != $row->ShortBlurb)
 	echo "<br>\n$row->ShortBlurb\n";
+
       echo "</p>\n";
+
+      if ('Y' == $row->IsSmallGameContestEntry)
+      {
+	echo "<p>\n";
+	echo "<img src=\"LittleLARPA.gif\" width=\"61\" height=\"19\" align=\"left\">\n";
+	echo "This is a LARPA Small Game Contest entry.</p>\n";
+      }
     }
   }
 
