@@ -2736,24 +2736,23 @@ function intercon_mail ($to, $subject, $msg)
     $to = DEVELOPMENT_MAIL_ADDR;
   }
 
-  $headers = sprintf ("From: Intercon Webmaster<%s>\n", EMAIL_WEBMASTER);
-  $headers .= sprintf ("Reply-To: Intercon Webmaster<%s>\n", EMAIL_WEBMASTER);
-  $headers .= "X-Priority: 1\n";
-  $headers .= "X-MSMail-Priority: High\n";
-  $headers .= "X-Mailer: php\n";
-  $headers .= sprintf ("Errors-To: %s\n", EMAIL_WEBMASTER);
-  $headers .= sprintf ("Return-Path: %s\n", EMAIL_WEBMASTER);
+  $headers = sprintf ("From: Intercon Webmaster<%s>\r\n", EMAIL_WEBMASTER);
+  $headers .= sprintf ("Reply-To: Intercon Webmaster<%s>\r\n", EMAIL_WEBMASTER);
+  $headers .= "X-Priority: 1\r\n";
+  $headers .= "X-MSMail-Priority: High\r\n";
+  $headers .= "X-Mailer: php\r\n";
+  $headers .= sprintf ("Errors-To: %s\r\n", EMAIL_WEBMASTER);
+  $headers .= sprintf ("Return-Path: %s\r\n", EMAIL_WEBMASTER);
 
 //  echo "No email sent<p>\n";
 //  return true;
 
-  ini_set ('sendmail_from', EMAIL_WEBMASTER);
+//  ini_set ('sendmail_from', EMAIL_WEBMASTER);
+//  $ret =  mail ($to, $subject, $msg, $headers, '-f' . EMAIL_WEBMASTER);
+//  ini_restore ('sendmail_from');
+//  return $ret;
 
-  $ret =  mail ($to, $subject, $msg, $headers, '-f' . EMAIL_WEBMASTER);
-
-  ini_restore ('sendmail_from');
-
-  return $ret;
+  return mail($to, $subject, $msg, $headers);
 }
 
 /*
