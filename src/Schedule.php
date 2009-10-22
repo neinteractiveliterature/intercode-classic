@@ -914,7 +914,7 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
   
   $block = new ScheduleBlock($blockStart, $max_hour);
   
-  echo "<div style=\"position: relative; border: 1px black solid; ";
+  echo "<div style=\"position: relative; border: 1px black solid; text-align: center; ";
   echo "width: 100%; height: " . ($block->getHours() * 10) ."em;\">\n";
 
   foreach (pcsg_get_run_dimensions($block, $pcsgRuns) as $dimensions) {
