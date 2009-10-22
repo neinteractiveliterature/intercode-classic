@@ -2,21 +2,21 @@
 // Note that PowWeb insists on setting the session save path!  Comment this
 // out, or set it appropriately for your server
 
-session_save_path("/home/users/web/b2078/pow.neilmaster/phpsessions");
+//session_save_path("/home/users/web/b2078/pow.neilmaster/phpsessions");
 session_start ();
 
 // Setting DEVELOPMENT_VERSION turns on additional error checking, as well
 // as diverting all mail to the DEVELOPMENT_MAIL_ADDR
 
-define (DEVELOPMENT_VERSION, 0);
+define (DEVELOPMENT_VERSION, 1);
 
 // Per-con values - The values of all of these should be visible on
 // the status page
 
-//define (DB_SERVER, 'localhost');
-//define (DB_NAME,   'itest');
-define (DB_SERVER, 'neilmaster.powwebmysql.com');
-define (DB_NAME,   'intercon_j');
+define (DB_SERVER, 'localhost');
+define (DB_NAME,   'itest');
+//define (DB_SERVER, 'neilmaster.powwebmysql.com');
+//define (DB_NAME,   'intercon_j');
 
 // Database users - These could/should be used to control access to the
 // database.  In reality, it's handled by the software.  And the password
@@ -37,7 +37,7 @@ define (DB_USER_PWD, 'LARP');
 // When DEVELOPMENT_VERSION is set to 1, all mail will be diverted to this
 // address
 
-define (DEVELOPMENT_MAIL_ADDR, 'barry@tannenbaum.mv.com');
+define (DEVELOPMENT_MAIL_ADDR, 'natbudin@gmail.com');
 
 // Set to 0 to disable the poll
 

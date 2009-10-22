@@ -300,19 +300,6 @@ switch ($action)
     display_user_form_for_others ();
     break;
 
-  case DISPLAY_POLL_FORM:
-    html_begin ();
-    display_poll_form ();
-    break;
-
-  case PROCESS_POLL_FORM:
-    html_begin ();
-    if (! process_poll_form ())
-      display_poll_form ();
-    else
-      show_user_homepage ();
-    break;
-
 /*
  * Already done
   case CONVERT_AGE_TO_YEAR:
@@ -558,15 +545,15 @@ function display_login_form ($error='')
   echo "  <td nowrap><i>Want to contact the con?</i></td>\n";
   echo "  <td>Take a look at the <a href=\"Contacts.php\">contact list</a>, or\n";
   printf ("drop a note to our <a href=%s>Con&nbsp;Chair</a> %s</td>\n",
-	  mailto ('con-chair', 'I have a question'),
+	  mailto_url (EMAIL_CON_CHAIR, 'I have a question'),
 	  NAME_CON_CHAIR);
   echo "</tr>\n";
   echo "<tr valign=top>\n";
   echo "  <td nowrap><i>Want to volunteer?</i></td>\n";
-  printf ("<td>Fantastic! Just <a href=%s>tell us</a>\n",
-	  mailto ('volunteers', 'Volunteer!'));
-  printf ("what you're interested in doing, or just <a href=%s>tell us</a>\n", 
-	  mailto ('volunteers', 'Volunteer!'));
+  printf ("<td>Fantastic! Just <a href=%s>tell us</a> what you're\n",
+	  mailto_url (EMAIL_CON_CHAIR, 'Volunteer!'));
+  printf ("interested in doing, or just <a href=%s>tell us</a>\n", 
+	  mailto_url (EMAIL_CON_CHAIR, 'Volunteer!'));
   echo "that you want to <a href=\"Static.php?page=volunteering\">volunteer</a>!\n";
   echo "NO EXPERIENCE IS NECESSARY!</td>\n";
   echo "</tr>\n</tbody>\n</table>\n";
@@ -1428,153 +1415,6 @@ function mark_user_paid ()
   return login_with_data ($row, $EMail);
 }
 
-/*
- * process_poll_form
- *
- * Process the results of the poll
- */
-
-function process_poll_form ()
-{
-  if (out_of_sequence ())
-    return 'Sequence Error.  Did you use the Back Button?';
-
-  // Extract the entry the user voted for
-
-  $Vote = intval (trim ($_POST['Vote']));
-
-  $sql = "INSERT INTO Poll SET Vote=$Vote, UserId=" . $_SESSION[SESSION_LOGIN_USER_ID];
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    display_mysql_error ('Failed to save vote', $sql);
-
-  return true;
-}
-
-/*
- * display_poll_form
- *
- * Display a form to allow users to vote in the poll
- */
-
-function display_poll_form ()
-{
-  display_header ('Intercon Poll');
-
-  echo "In response to the problems experienced with Intercon E signups\n";
-  echo "we have taken steps to move the website to a hosting service so\n";
-  echo "that last year's overloading problems won't be repeated.\n";
-  echo "<p>\n";
-  echo "In addition, the convention committee has taken a fresh look at how\n";
-  echo "signups are handled.  Many different signup methods were considered.\n";
-  echo "We have narrowed the choices down to the following two options\n";
-  echo "and would like your help in choosing between them.\n";
-  echo "<p>\n";
-  echo "<b>First Come, First Served</b><br>\n";
-  echo "Essentially this is the same signup technique that was used for\n";
-  echo "Intercon D &amp; E.  When signups open you'll be able to signup for\n";
-  echo "any game that has openings and that doesn't conflict with\n";
-  echo "ones you've already chosen.<p>\n";
-  echo "<b>Staggered Over Time</b><br>\n";
-  echo "This system spreads signups over three periods:\n";
-  echo "<ol>\n";
-  echo "<li>For the first week after signups open, you'll only be able to\n";
-  echo "signup for one game.\n";
-  echo "<li>For the second week after signups open, you'll be able to\n";
-  echo "signup for up to two games.\n";
-  echo "<li>After the second week, all restrictions will be removed\n";
-  echo "and you can signup for any game that has openings and that doesn't\n";
-  echo "conflict with games you've already chosen.\n";
-  echo "</ol>GMs will be able to signup for the games that they're\n";
-  echo "running without counting against their totals.\n";
-  echo "<p align=center>\n";
-  echo "<table>\n";
-  echo "  <tr>\n    <td align=left>\n";
-  echo "Please choose one of the options:<br>\n";
-  echo "<form method=post action=index.php>\n";
-  form_add_sequence ();
-  printf ("<input type=hidden name=action value=%d>\n", PROCESS_POLL_FORM);
-  echo "<input type=radio name=Vote Value=1>First Come, First Served<br>\n";
-  echo "<input type=radio name=Vote Value=2>Staggered Over Time<br>\n";
-  echo "    </td>\n  </tr>\n  <tr>\n    <td align=center>\n";
-  echo "<input type=submit value=\"Submit\">\n";
-  echo "</form>\n";
-  echo "    </td>\n  </tr>\n</table>\n";
-  echo "</p><p>\n";
-  echo "Regardless of how we decide to handle signups, all convention\n";
-  echo "attendees will be notified in advance about when signups will open.\n";
-  echo "<p>\n";
-  echo "If you have any comments about this issue, please send them to\n";
-  echo "<a href=\"mailto:info@intercon-f.org?subject=[Intercon F] Poll Comment\">info@intercon-f.org</a>\n";
-  echo "with the subject &quot;[Intercon F] Poll Comment&quot;\n";
-}
-
-/*
- * show_poll_status
- *
- * Show the user the status of the poll
- */
-
-function show_poll_status ()
-{
-  // If the poll is turned off, don't show anything
-
-  if (! POLL_ENABLED)
-    return;
-
-  display_header ('Poll');
-  $sql = 'SELECT Vote FROM Poll WHERE UserId=' . $_SESSION[SESSION_LOGIN_USER_ID];
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Check for poll vote failed', $sql);
-
-  if (0 == mysql_num_rows($result))
-  {
-    echo "<font color=red>";
-    echo "Please help make Intercon's signup process better!</font><p>\n";
-    echo "We're conducting a poll to determine how signups will work for\n";
-    printf ("%s.  Please <a href=index.php?action=%d>vote</a> and help us\n",
-	    CON_NAME,
-	    DISPLAY_POLL_FORM);
-    echo "choose among the alternatives.<p>\n";
-    return;
-  }
-
-  $sql = 'SELECT Vote, COUNT(Vote) AS Count';
-  $sql .= ' FROM Poll';
-  $sql .= ' GROUP BY Vote';
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Attempt to total poll failed', $sql);
-
-  $total = 0;
-  $a = array (1=>0, 2=>0);
-  while ($row = mysql_fetch_object ($result))
-  {
-    $a[$row->Vote] = $row->Count;
-    $total += $row->Count;
-  }
-
-  echo "Thank you for voting.  The results so far with $total votes cast:\n";
-
-  echo "<table>\n";
-  echo "  <tr align=right valign=top>\n";
-  echo "    <td>&nbsp;&nbsp;</td>\n";
-  echo "    <td align=left>First Come, First Served:</td>\n";
-  printf ("    <td>&nbsp;%d&nbsp;votes</td>\n", $a[1]);
-  printf ("    <td>&nbsp;%d%%</td>\n", (100.00 * $a[1])/$total);
-  echo "  </tr>\n";
-  echo "  <tr align=right valign=top>\n";
-  echo "    <td>&nbsp;&nbsp;</td>\n";
-  echo "    <td align=left>Staggered Over Time:</td>\n";
-  printf ("    <td>&nbsp;%d&nbsp;votes</td>\n", $a[2]);
-  printf ("    <td>&nbsp;%d%%</td>\n", (100.0 * $a[2])/$total);
-  echo "  </tr>\n";
-  echo "</table><p>\n";
-}
-
 function display_signup_status ()
 {
   switch ($_SESSION[SESSION_CON_SIGNUPS_ALLOWED])
@@ -1757,10 +1597,6 @@ function show_user_homepage_status ()
 
   show_con_attendence();
 
-  // Show the user what's up with the poll
-
-  //  show_poll_status ();
-
   // Give the user the news, if any
 
   if ('' != $_SESSION[SESSION_CON_NEWS])
@@ -1927,10 +1763,6 @@ function status_unpaid ()
   echo "  </tr>\n";
   echo "</table>\n";
   echo "<p>\n";
-
-  // Show the user what's up with the poll
-
-  show_poll_status ();
 
   // Give the user the news, if any
 
@@ -2978,15 +2810,18 @@ function display_password_form ()
 
   echo "<P>If you cannot access that EMail account or do not receive your\n";
   echo "new password shortly after you request it, contact the\n";
-  echo "<A HREF=mailto:webmaster@interactiveliterature.org>webmaster</A>.\n";
+  printf ("<a href=%s>webmaster</a>.\n", mailto_url(EMAIL_WEBMASTER, ''));
 
   echo "<P><B>AOL Users:</B> We are experiencing difficulties sending\n";
   echo "mail to AOL accounts.  We expect to have this fixed soon, but if\n";
   echo "you do not receive your password shortly after requesting it, send\n";
   echo "mail to the\n";
-  echo "<A href=\"mailto:neil.registrar@gmail.com\">Registrar</A> or the\n";
-  echo "<A href=\"mailto:webmaster@interactiveliterature.org\">Web Master</A> for\n";
-  echo "assistance.\n";
+  
+  printf ("<a href=%s>Registrar</a> or the\n",
+	  mailto_url(EMAIL_REGISTRAR, 'Password reset problem'));
+  printf ("<a href=%s>Webmaster</a>\n",
+	  mailto_url(EMAIL_WEBMASTER, 'Password reset problem'));
+  echo "for assistance.\n";
 }
 
 /*

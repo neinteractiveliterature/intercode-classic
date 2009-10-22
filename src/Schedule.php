@@ -2287,6 +2287,10 @@ function show_game ()
 
   $volunteer_event = ($game_row->IsOps=='Y') || ($game_row->IsConSuite=='Y');
 
+  // Note if this is a LARPA Small Game Contest entry
+
+  $is_small_game_contest_entry = ('Y' == $game_row->IsSmallGameContestEntry);
+
   // Note if there are 0 players.  We'll use this later
 
   $max_signups = $game_row->MaxPlayersMale +
@@ -2693,6 +2697,13 @@ function show_game ()
   echo "<P>\n";
   echo "<HR>\n";
   echo $game_row->Description;
+  if ($is_small_game_contest_entry)
+  {
+    echo "<p>\n";
+    echo "<img src=\"LittleLARPA.gif\" width=\"61\" height=\"19\" align=\"left\">\n";
+    echo "This is a LARPA Small Game Contest entry.</p>\n";
+  }
+    
   echo "<p>\n<hr>\n";
 
   if ($can_edit_game)
@@ -3485,6 +3496,12 @@ function add_game ()
   else
     $IsIronGm = 'N';
 
+  if (array_key_exists ('CheckIsSmallGameContestEntry', $_POST))
+    $IsSmallGameContestEntry = 'Y';
+  else
+    $IsSmallGameContestEntry = 'N';
+
+
   if ($update)
     $sql = 'UPDATE Events SET ';
   else
@@ -3502,6 +3519,8 @@ function add_game ()
     $sql .= build_sql_string ('IsOps', $IsOps);
     $sql .= build_sql_string ('IsConSuite', $IsConSuite);
     $sql .= build_sql_string ('IsIronGm', $IsIronGm);
+    $sql .= build_sql_string ('IsSmallGameContestEntry',
+			      $IsSmallGameContestEntry);
     $sql .= build_sql_string ('Hours');
   }
 
@@ -3652,6 +3671,9 @@ function load_game_post_array ()
   if ('Y' == $_POST['IsIronGm'])
     $_POST['CheckIsIronGm'] = 1;
 
+  if ('Y' == $_POST['IsSmallGameContestEntry'])
+    $_POST['CheckIsSmallGameContestEntry'] = 1;
+
   return true;
 }
 
@@ -3697,7 +3719,7 @@ function can_edit_game_info ()
   return (mysql_num_rows ($result) > 0);
 }
 
-function priv_option ($name, $field, $check_key)
+function scheduling_priv_option ($name, $field, $check_key)
 {
   // If the user has scheduling priv, display a checkbox
 
@@ -3722,17 +3744,6 @@ function priv_option ($name, $field, $check_key)
   if ('N' == $_POST[$field])
     return false;
 
-  // Display the type of event this is and add a hidden key so it's value
-  // won't be lost
-
-  $event_type = 'event';
-  echo "  <tr>\n";
-  echo "    <td colspan=2>\n";
-  echo "      This is $name";
-  echo "      <input type=\"hidden\" name=\"$hidden_key\" value=\"Y\">\n";
-  echo "    </td>\n";
-  echo "  </tr>\n";
-
   // Return true to indicate that this is an event, not a game
 
   return true;
@@ -3752,16 +3763,11 @@ function display_game_form ()
 
   print ("<FORM METHOD=POST ACTION=" . $_SERVER['PHP_SELF'] . ">\n");
   form_add_sequence ();
-  print ("<INPUT TYPE=HIDDEN NAME=action VALUE=" . PROCESS_ADD_GAME . ">\n");
-  printf ("<INPUT TYPE=HIDDEN NAME=EventId VALUE=%d>\n", $EventId);
-  printf ("<INPUT TYPE=HIDDEN NAME=CanPlayConcurrently VALUE=%s>\n",
-	  trim ($_POST['CanPlayConcurrently']));
-  printf ("<input type=\"hidden\" name=\"IsOps\" value=\"%s\">\n",
-	  trim ($_POST['IsOps']));
-  printf ("<input type=\"hidden\" name=\"IsConSuite\" value=\"%s\">\n",
-	  trim ($_POST['IsConSuite']));
-  printf ("<input type=\"hidden\" name=\"IsIronGm\" value=\"%s\">\n",
-	  trim ($_POST['IsIronGm']));
+  form_hidden_value('action', PROCESS_ADD_GAME);
+  form_hidden_value('EventId', $EventId);
+  form_hidden_value('CanPlayConcurrently',
+		    trim ($_POST['CanPlayConcurrently']));
+
   print ("<TABLE BORDER=0>\n");
   form_text (64, 'Title', '', 128);
   form_text (64, 'Author(s)', 'Author', 128);
@@ -3810,9 +3816,13 @@ function display_game_form ()
   echo "    </td>\n";
   echo "  </tr>\n";
 
-  $is_event = priv_option ('Ops', 'IsOps', 'CheckIsOps');
-  $is_event |= priv_option ('ConSuite', 'IsConSuite', 'CheckIsConsuite');
-  priv_option ('Iron GM', 'IsIronGm', 'CheckIsIronGm');
+  $is_event = scheduling_priv_option ('Ops', 'IsOps', 'CheckIsOps');
+  $is_event |= scheduling_priv_option ('ConSuite', 'IsConSuite',
+				       'CheckIsConsuite');
+  scheduling_priv_option ('Iron GM', 'IsIronGm', 'CheckIsIronGm');
+  scheduling_priv_option ('a LARPA Small Game Contest Entry',
+			  'IsSmallGameContestEntry',
+			  'CheckIsSmallGameContestEntry');
 
   if ($is_event)
     $event_type = 'event';
@@ -3830,7 +3840,7 @@ function display_game_form ()
 
     echo "  <tr valign=\"top\">\n";
     printf ('    <td colspan="2">This %s lasts %d %s - Contact the <a href="mailto:%s">' .
-	    "GM Coordinator</a> to modify the length of this %s</td>\n",
+	    "GM Coordinator</a> to modify the length of this %s.</td>\n",
 	    $event_type,
 	    $_POST['Hours'],
 	    $period,
@@ -3890,7 +3900,22 @@ function display_game_form ()
 
 function list_games_alphabetically ()
 {
+  // Always shill for games!
+
+  if (ACCEPTING_BIDS)
+  {
+    echo "<p>\n";
+    echo "We're looking for a wide and varied slate of games to fill\n";
+    echo "this page. Do <em>you</em> have a game for us?  If so,\n";
+    echo "please <a href=\"biddingAGame.php\">bid your game</a>!\n";
+    echo "If you're not sure, then take a look at our ";
+    echo "<a href=\"Static.php?page=bidFAQ\">bidding FAQ</a>, or contact\n";
+    printf ("the <a href=%s>Bid Committee Chair</a>.<p>\n",
+	    mailto_url (EMAIL_BID_CHAIR, 'Bid question'));
+  }
+
   $sql = 'SELECT EventId, Title, Author, ShortBlurb, SpecialEvent,';
+  $sql .= ' IsSmallGameContestEntry,';
   $sql .= ' LENGTH(Description) AS DescLen';
   $sql .= ' FROM Events';
   $sql .= ' ORDER BY Title';
@@ -3901,48 +3926,45 @@ function list_games_alphabetically ()
 
   $n = mysql_num_rows ($result);
 
-  if (0 == $n)
+  if ($n > 0)
   {
-    echo "<B>There are no games currently scheduled</B>\n<P>\n";
-    echo "We're looking for a wide and varied slate of games to fill\n";
-    echo "this page.\n";
-    echo "Do <em>you</em> have a game for us?  If so,\n";
-    echo "please <a href=\"biddingAGame.php\">bid your game</a>!\n";
-    echo "If you're not sure, then take a look at our ";
-    echo "<a href=\"Static.php?page=bidFAQ\">bidding FAQ</a>, or contact\n";
-    echo "the <a href=\"mailto:e-bids@interactiveliterature.org\">Bid\n";
-    echo "Committee Chair</a>.<p>\n";
+    echo "<hr width=\"50%\">\n";
+    echo "<b>Select game to view:</b>\n";
 
-    return true;
-  }
+    while ($row = mysql_fetch_object ($result))
+    {
+      // If this is a special event, and there's no text, skip it
 
-  echo "<B>Select game to view:</B>\n<P>\n";
+      if ((0 != $row->SpecialEvent) &&
+	  ('' == $row->ShortBlurb))
+	continue;
 
-  while ($row = mysql_fetch_object ($result))
-  {
-    // If this is a special event, and there's no text, skip it
+      // If there's no long description, don't offer a link
 
-    if ((0 != $row->SpecialEvent) &&
-	('' == $row->ShortBlurb))
-      continue;
+      echo "<p>\n";
+      if ($row->DescLen > 0)
+	printf ("<a href=\"Schedule.php?action=%d&EventId=%d\">%s</a>\n",
+		SCHEDULE_SHOW_GAME,
+		$row->EventId,
+		$row->Title);
+      else
+	echo "$row->Title\n";
 
-    // If there's no long description, don't offer a link
+      if ('' != $row->Author)
+	echo "<br><i>by $row->Author</i>\n";
 
-    if ($row->DescLen > 0)
-      printf ("<a href=\"Schedule.php?action=%d&EventId=%d\">%s</a>\n",
-	      SCHEDULE_SHOW_GAME,
-	      $row->EventId,
-	      $row->Title);
-    else
-      echo "$row->Title\n";
+      if ('' != $row->ShortBlurb)
+	echo "<br>\n$row->ShortBlurb\n";
 
-    if ('' != $row->Author)
-      echo "<BR><I>by $row->Author</I>\n";
+      echo "</p>\n";
 
-    if ('' != $row->ShortBlurb)
-      echo "<BR>\n$row->ShortBlurb\n";
-
-    echo "<P>\n";
+      if ('Y' == $row->IsSmallGameContestEntry)
+      {
+	echo "<p>\n";
+	echo "<img src=\"LittleLARPA.gif\" width=\"61\" height=\"19\" align=\"left\">\n";
+	echo "This is a LARPA Small Game Contest entry.</p>\n";
+      }
+    }
   }
 
   mysql_free_result ($result);

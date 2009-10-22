@@ -505,6 +505,8 @@ function show_bid ()
 
   show_text ('Genre', $bid_row['Genre']);
   show_text ('Ongoing Campaign', $bid_row['OngoingCampaign']);
+  show_text ('LARPA Small Game<br>Contest Entry',
+	     $bid_row['IsSmallGameContestEntry']);
   show_text ('Basic Premise', $bid_row['Premise']);
   show_text ('Run Before', $bid_row['RunBefore']);
   show_text ('Game System', $bid_row['GameSystem']);
@@ -802,6 +804,17 @@ function display_bid_form ($first_try)
 
   form_text (64, 'Genre', '', 0, TRUE);
   form_yn ('Is this game part of an ongoing campaign?', 'OngoingCampaign');
+
+  echo "  <tr>\n";
+  echo "    <td colspan=2>\n";
+  echo "&nbsp;<br>\n";
+  echo "<a href=\"http://www.larpaweb.net/larpa-contest-mainmenu-35\">The\n";
+  echo "LARPA Small Game Contest</a> is a chance for you to win cash for\n";
+  echo "your game!\n";
+  echo "    </td>\n";
+  echo "  </tr>\n";
+  form_yn ('Is this game entered in the LARPA Small Game Contest?',
+	   'IsSmallGameContestEntry');
 
   $text = "GMs for your game.  Note that the GMs listed here are only for\n";
   $text .= "the purpose of evaluating your bid.  If your bid is accepted,\n";
@@ -1140,6 +1153,7 @@ function process_bid_form ()
   $sql = 'UPDATE Bids SET ';
   $sql .= build_sql_string ('Genre', '', FALSE);
   $sql .= build_sql_string ('OngoingCampaign');
+  $sql .= build_sql_string ('IsSmallGameContestEntry');
   $sql .= build_sql_string ('GMs', '', true, true);
   $sql .= build_sql_string ('Premise', '', true, true);
   $sql .= build_sql_string ('RunBefore');
@@ -2062,6 +2076,8 @@ function add_event ($bid_row)
 
   $sql .= build_sql_string ('Description');
   $sql .= build_sql_string ('ShortBlurb');
+
+  $sql .= build_sql_string ('IsSmallGameContestEntry');
 
   $sql .= build_sql_string ('UpdatedById', $_SESSION[SESSION_LOGIN_USER_ID]);
 
