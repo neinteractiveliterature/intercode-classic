@@ -4,6 +4,7 @@ define (SIGNUP_OK, 1);
 define (SIGNUP_CONFIRM, 2);
 
 include ("intercon_db.inc");
+include ("pcsg.inc");
 
 // Connect to the database
 
@@ -318,7 +319,7 @@ function process_away_form ()
  */
 
 function show_away_schedule_form ()
-{
+{  
   // Arrays for times away for each day
 
   $fri_hours = array ();
@@ -546,7 +547,7 @@ function show_away_schedule_form ()
 }
 
 function display_event ($hour, $away_all_day, $away_hours,
-			$row, $signed_up_runs,
+			$row, $dimensions, $signed_up_runs,
 			$signup_count_male, $signup_count_female,
 			$game_max_male, $game_max_female, $game_max_neutral)
 {
@@ -581,12 +582,16 @@ function display_event ($hour, $away_all_day, $away_hours,
   else
     $females = 0;
 
-  $game_max =
-    $game_max_male[$row->EventId] +
-    $game_max_female[$row->EventId] +
-    $game_max_neutral[$row->EventId];
+  if (array_key_exists($row->EventId, $game_max_male)) {
+    $game_max =
+      $game_max_male[$row->EventId] +
+      $game_max_female[$row->EventId] +
+      $game_max_neutral[$row->EventId];
 
-  $game_full = ($males + $females) >= $game_max;
+    $game_full = ($males + $females) >= $game_max;
+  } else {
+	$game_full = true;
+  }
 
   if (array_key_exists ($row->RunId, $signed_up_runs))
   {
@@ -674,7 +679,11 @@ function display_event ($hour, $away_all_day, $away_hours,
 		       $row->Track,
 		       $row->Span);
   }
-  write_cell ("td", $text, $attrib);
+  
+  echo "<div style=\"position: absolute; border: 1px black solid; ";
+  echo "top: " . $dimensions->top . "%; left: " . $dimensions->left;
+  echo "%; width: " . $dimensions->width . "%; height: " . $dimensions->height . "%;";
+  echo "\">$text</div>\n";
 }
 
 function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
@@ -779,106 +788,111 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
 
   // Start with a header
 
-  echo "<table border>\n";
-  echo "  <tr align=\"center\">\n";
-  write_cell ('th', 'Start Time', '');
+  //echo "  <tr align=\"center\">\n";
+  //write_cell ('th', 'Start Time', '');
+  //
+  //for ($i = 1; $i <= $MaxTracks; $i++)
+  //{
+  //  write_cell ("th", $i, $attrib);
+  //}
+  //
+  //if ($logged_in)
+  //  write_cell ('TH', '<A HREF="#Away">Away</A>', '');
+  //
+  //echo "  </tr>\n";
 
-  for ($i = 1; $i <= $MaxTracks; $i++)
-  {
-    write_cell ("th", $i, $attrib);
-  }
-
-  if ($logged_in)
-    write_cell ('TH', '<A HREF="#Away">Away</A>', '');
-
-  echo "  </tr>\n";
 
   // If we've got leading ConSuite entries, add a "Special Event" to fill
   // the table
-
-  if ((0 != $min_consuite_start) && ($min_consuite_start < $hour))
-  {
-    echo "  <tr align=\"center\">\n";
-    write_24_hour ($min_consuite_start);
-    
-    $attrib = sprintf ('rowspan=%d colspan=%d',
-		       $hour - $min_consuite_start,
-		       $MaxTracks - 1);
-
-    $text = 'Volunteer';
-
-    write_cell ('td', $text, $attrib);
-
-
-    for ($h = $min_consuite_start + 1; $h <= $hour; $h++)
-    {
-      // Read ConSuite entry
-      $row = mysql_fetch_object ($result);
-      display_event ($h, $away_all_day, $away_hours, $row, $signed_up_runs,
-		     $signup_count_male, $signup_count_female,
-		     $game_max_male, $game_max_female, $game_max_neutral);
-      if ($logged_in)
-	write_away_checkbox ($away_hours[$h], $day, $hour, $away_all_day);
-      echo "  </tr>\n";
-      echo "  <tr align=\"center\">\n";
-      write_24_hour ($h);
-    }
-  }
-  else
-  {
-    print ("  <tr align=\"center\">\n");
-    write_24_hour ($hour);
-  }
-
-  echo "<!-- ***** Dropped out of ConSuite loop -->\n";
+	
+  
+//  {
+//    echo "  <tr align=\"center\">\n";
+//    write_24_hour ($min_consuite_start);
+//    
+//    $attrib = sprintf ('rowspan=%d colspan=%d',
+//		       $hour - $min_consuite_start,
+//		       $MaxTracks - 1);
+//
+//    $text = 'Volunteer';
+//
+//    write_cell ('td', $text, $attrib);
+//
+//
+//    for ($h = $min_consuite_start + 1; $h <= $hour; $h++)
+//    {
+//      // Read ConSuite entry
+//      $row = mysql_fetch_object ($result);
+//      display_event ($h, $away_all_day, $away_hours, $row, $signed_up_runs,
+//		     $signup_count_male, $signup_count_female,
+//		     $game_max_male, $game_max_female, $game_max_neutral);
+//      if ($logged_in)
+//	write_away_checkbox ($away_hours[$h], $day, $hour, $away_all_day);
+//      echo "  </tr>\n";
+//      echo "  <tr align=\"center\">\n";
+//      write_24_hour ($h);
+//    }
+//  }
+//  else
+//  {
+//    print ("  <tr align=\"center\">\n");
+//    write_24_hour ($hour);
+//  }
+//
+//  echo "<!-- ***** Dropped out of ConSuite loop -->\n";
 
   // Display the rest of the day's schedule
 
 
+  $eventRuns = array();
+  $pcsgRuns = array();
   $max_hour = $hour;
 
   while ($row = mysql_fetch_object ($result))
   {
+	$eventRuns[$row->RunId] = $row;
+	array_push($pcsgRuns, new EventRun($row->StartHour, $row->Hours, $row->RunId));
+	
     $game_start = $row->StartHour;
-
-    while ($hour < $game_start)
-    {
-      if ($hour > $max_consuite_start)
-	echo "<td>&nbsp;</td>\n";
-
-      if ($logged_in)
-	write_away_checkbox ($away_hours[$hour], $day, $hour, $away_all_day);
-      $hour++;
-      print ("  </tr>\n  <tr align=\"center\">\n");
-      write_24_hour ($hour);
-    }
-
-    // The remaining columns are the games or special events
-
-    if (1 == $row->SpecialEvent)
-    {
-      $attrib = sprintf ('rowspan=%d colspan=%d',
-			 $row->Hours, $row->Span);
-      if ($row->DescLen > 0)
-	$text = sprintf ('<a href="Schedule.php?action=%d&EventId=%d&' .
-			 'RunId=%d">%s</a>',
-			 SCHEDULE_SHOW_GAME,
-			 $row->EventId,
-			 $row->RunId,
-			 $row->Title);
-      else
-	$text = $row->Title;
-      if (user_has_priv (PRIV_SCHEDULING))
-	$text .= sprintf ('<br><font color=red>Track: %d, Span: %d</font>',
-			  $row->Track,
-			  $row->Span);
-      write_cell ("td", $text, $attrib);
-    }
-    else
-      display_event ($hour, $away_all_day, $away_hours, $row, $signed_up_runs,
-		     $signup_count_male, $signup_count_female,
-		     $game_max_male, $game_max_female, $game_max_neutral);
-
+//
+//    while ($hour < $game_start)
+//    {
+//      if ($hour > $max_consuite_start)
+//	echo "<td>&nbsp;</td>\n";
+//
+//      if ($logged_in)
+//	write_away_checkbox ($away_hours[$hour], $day, $hour, $away_all_day);
+//      $hour++;
+//      print ("  </tr>\n  <tr align=\"center\">\n");
+//      write_24_hour ($hour);
+//    }
+//
+//    // The remaining columns are the games or special events
+//
+//    if (1 == $row->SpecialEvent)
+//    {
+//      $attrib = sprintf ('rowspan=%d colspan=%d',
+//			 $row->Hours, $row->Span);
+//      if ($row->DescLen > 0)
+//	$text = sprintf ('<a href="Schedule.php?action=%d&EventId=%d&' .
+//			 'RunId=%d">%s</a>',
+//			 SCHEDULE_SHOW_GAME,
+//			 $row->EventId,
+//			 $row->RunId,
+//			 $row->Title);
+//      else
+//	$text = $row->Title;
+//      if (user_has_priv (PRIV_SCHEDULING))
+//	$text .= sprintf ('<br><font color=red>Track: %d, Span: %d</font>',
+//			  $row->Track,
+//			  $row->Span);
+//      write_cell ("td", $text, $attrib);
+//    }
+//    else
+//      display_event ($hour, $away_all_day, $away_hours, $row, $signed_up_runs,
+//		     $signup_count_male, $signup_count_female,
+//		     $game_max_male, $game_max_female, $game_max_neutral);
+//
     $game_end  = $game_start + $row->Hours;
     if ($max_hour < $game_end)
       $max_hour = $game_end;
@@ -890,42 +904,62 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
 
   mysql_free_result ($result);
 
-  $max_hour--;
+  //$max_hour--;
+  
+  if ((0 != $min_consuite_start) && ($min_consuite_start < $hour)) {
+    $blockStart = $min_consuite_start;
+  } else {
+    $blockStart = $hour;
+  }
+  
+  $block = new ScheduleBlock($blockStart, $max_hour);
+  
+  echo "<div style=\"position: relative; border: 1px black solid; ";
+  echo "width: 100%; height: " . ($block->getHours() * 10) ."em;\">\n";
 
-  while ($hour <  $max_hour)
-  {
-    if ($hour > $max_consuite_start)
-      echo "<td>&nbsp;</td>\n";
-
-    if ($logged_in)
-      write_away_checkbox ($away_hours[$hour], $day, $hour, $away_all_day);
-    $hour++;
-    print ("  </TR>\n  <TR ALIGN=CENTER>\n");
-    write_24_hour ($hour);
+  foreach (pcsg_get_run_dimensions($block, $pcsgRuns) as $dimensions) {
+	$runId = $dimensions->run->id;
+	$row = $eventRuns[$runId];
+	
+	display_event ($hour, $away_all_day, $away_hours, $row, $dimensions,
+				   $signed_up_runs, $signup_count_male, $signup_count_female,
+				   $game_max_male, $game_max_female, $game_max_neutral);
   }
 
-  if ($hour > $max_consuite_start)
-    echo "<td>&nbsp;</td>\n";
-
-  if ($logged_in)
-    write_away_checkbox ($away_hours[$hour], $day, $hour, $away_all_day);
-  echo "  </TR>\n";
-
-  // And end with a header
-
-  echo "  <TR ALIGN=CENTER>\n";
-  write_cell ('TH', 'Start Time', '');
-
-  for ($i = 1; $i <= $MaxTracks; $i++)
-  {
-    write_cell ("TH", $i, '');
-  }
-
-  if ($logged_in)
-    write_cell ('TH', '<A HREF="#Away">Away</A>', '');
-
-  echo "  </TR>\n";
-  echo "</TABLE>";
+  //while ($hour <  $max_hour)
+  //{
+  //  if ($hour > $max_consuite_start)
+  //    echo "<td>&nbsp;</td>\n";
+  //
+  //  if ($logged_in)
+  //    write_away_checkbox ($away_hours[$hour], $day, $hour, $away_all_day);
+  //  $hour++;
+  //  print ("  </TR>\n  <TR ALIGN=CENTER>\n");
+  //  write_24_hour ($hour);
+  //}
+  //
+  //if ($hour > $max_consuite_start)
+  //  echo "<td>&nbsp;</td>\n";
+  //
+  //if ($logged_in)
+  //  write_away_checkbox ($away_hours[$hour], $day, $hour, $away_all_day);
+  //echo "  </TR>\n";
+  //
+  //// And end with a header
+  //
+  //echo "  <TR ALIGN=CENTER>\n";
+  //write_cell ('TH', 'Start Time', '');
+  //
+  //for ($i = 1; $i <= $MaxTracks; $i++)
+  //{
+  //  write_cell ("TH", $i, '');
+  //}
+  //
+  //if ($logged_in)
+  //  write_cell ('TH', '<A HREF="#Away">Away</A>', '');
+  //
+  //echo "  </TR>\n";
+  echo "</div>";
 
   if ($logged_in)
   {
@@ -1749,6 +1783,7 @@ function write_cell ($type, $text, $attribute='')
 	  $type);
 }
 
+
 /*
  * display_schedule
  *
@@ -1757,6 +1792,7 @@ function write_cell ($type, $text, $attribute='')
 
 function display_schedule ()
 {
+  
   $signed_up_runs = array ();
 
   // If the user is logged in, find out what runs he's signed up for

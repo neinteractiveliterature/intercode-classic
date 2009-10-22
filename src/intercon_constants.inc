@@ -47,6 +47,8 @@ define (POLL_ENABLED, 0);
 
 define (THURSDAY_ENABLED, 0);
 
+define(IRONGM_ENABLED, 0);
+
 // Defining the program file prefix enables the links on the ConCom menu
 // which allow users to download the program booklet sections.  The second
 // constant enables the entries on the Ops menu for the .PUB files
