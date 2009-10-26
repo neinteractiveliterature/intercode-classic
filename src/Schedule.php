@@ -670,9 +670,12 @@ function display_event ($hour, $away_all_day, $away_hours,
 	     "&nbsp;N:$avail_neutral";
 
     if (user_has_priv (PRIV_SCHEDULING))
+    {
       $text .= sprintf ('<br><font color=red>Track: %d, Span: %d</font>',
 		       $row->Track,
 		       $row->Span);
+      $text .= "<br>RunId: $row->RunId";
+    }
   }
   write_cell ("td", $text, $attrib);
 }
@@ -711,6 +714,30 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
 
   //  echo "min_consuite_start: $min_consuite_start<p>\n";
 
+  // Get the start time for today's Ops
+
+  $sql = 'SELECT MIN(StartHour) as MinStartHour,';
+  $sql .= ' MAX(StartHour) as MaxStartHour';
+  $sql .= ' FROM Runs, Events';
+  $sql .= " WHERE Day='$day'";
+  $sql .= '   AND Events.EventId=Runs.EventId';
+  $sql .= '   AND Events.IsOps="Y"';
+
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error ("Query for min Ops start time for $day failed", $sql);
+
+  $min_ops_start = 0;
+  $max_ops_start = 99;
+  if (0 != mysql_num_rows($result))
+  {
+    $row = mysql_fetch_object ($result);
+    $min_ops_start = $row->MinStartHour;
+    $max_ops_start = $row->MaxStartHour;
+  }
+
+  //  echo "min_ops_start: $min_ops_start<p>\n";
+
   // Get the start time for the day's schedule and the number of tracks
 
   $sql = 'SELECT MIN(StartHour) AS MinStartHour, MAX(Track) AS MaxTracks';
@@ -732,9 +759,13 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
   // excluded in the select statement above so they could be forced into the
   // leftmost column
 
+  echo "<!-- MaxTracks w/o Ops and ConSuite: $row->MaxTracks -->\n";
+
   $MaxTracks = $row->MaxTracks + 1;  // Add column for Ops
   if (0 != $min_consuite_start)      // Add column for ConSuite, if scheduled
     $MaxTracks++;
+
+  echo "<!-- MaxTracks w/ Ops and ConSuite: $MaxTracks -->\n";
 
   $hour = $row->MinStartHour;
 
@@ -817,6 +848,14 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
       display_event ($h, $away_all_day, $away_hours, $row, $signed_up_runs,
 		     $signup_count_male, $signup_count_female,
 		     $game_max_male, $game_max_female, $game_max_neutral);
+      if ($min_ops_start < $h)
+      {
+	// Read Ops entry
+	$row = mysql_fetch_object ($result);
+	display_event ($h, $away_all_day, $away_hours, $row, $signed_up_runs,
+		       $signup_count_male, $signup_count_female,
+		       $game_max_male, $game_max_female, $game_max_neutral);
+      }
       if ($logged_in)
 	write_away_checkbox ($away_hours[$h], $day, $hour, $away_all_day);
       echo "  </tr>\n";
@@ -2457,9 +2496,38 @@ function show_game ()
 	    $game_row->MaxPlayersNeutral);
     echo "  </tr>\n";
   }
-  echo "    </TD>\n";
-  echo "  </TR>\n";
-  echo "</TABLE>\n";
+
+  if (user_has_priv(PRIV_SCHEDULING))
+  {
+    if ('Y' == $game_row->IsOps)
+    {
+      echo "  <tr>\n";
+      echo "    <td colspan=\"2\">This event <b>is</b> Ops</td>\n";
+      echo "  </tr>\n";
+    }
+
+    if ('Y' == $game_row->IsConSuite)
+    {
+      echo "  <tr>\n";
+      echo "    <td colspan=\"2\">This event <b>is</b> ConSuite</td>\n";
+      echo "  </tr>\n";
+    }
+
+    if ('Y' == $game_row->IsIronGm)
+    {
+      echo "  <tr>\n";
+      echo "    <td colspan=\"2\">This event <b>is</b> Iron GM</td>\n";
+      echo "  </tr>\n";
+    }
+
+    if ('Y' == $game_row->IsSmallGameContestEntry)
+    {
+      echo "  <tr>\n";
+      echo "    <td colspan=\"2\">This event <b>is</b> a LARPA small game contest entry</td>\n";
+      echo "  </tr>\n";
+    }
+  }
+  echo "</table>\n";
 
   if ($max_signups > 0)
   {
@@ -3818,7 +3886,7 @@ function display_game_form ()
 
   $is_event = scheduling_priv_option ('Ops', 'IsOps', 'CheckIsOps');
   $is_event |= scheduling_priv_option ('ConSuite', 'IsConSuite',
-				       'CheckIsConsuite');
+				       'CheckIsConSuite');
   scheduling_priv_option ('Iron GM', 'IsIronGm', 'CheckIsIronGm');
   scheduling_priv_option ('a LARPA Small Game Contest Entry',
 			  'IsSmallGameContestEntry',
