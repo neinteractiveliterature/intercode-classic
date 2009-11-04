@@ -916,11 +916,11 @@ function build_order_string ($n, $size, &$s, &$count, $type)
 
 function show_user_homepage_thursday ($UserId)
 {
-  // Display the header for the user's TShirt order
+  // Display the header for the Pre-Convention
 
-  display_header (CON_NAME . ' Thursday Thing');
+  display_header (CON_NAME . ' Pre-Convention Events');
 
-  // Count up the number of shirts the user has ordered
+  // Check whether the user has registered for the PreCon
 
   $sql = 'SELECT * FROM Thursday';
   $sql .= " WHERE UserId=$UserId";
@@ -932,13 +932,14 @@ function show_user_homepage_thursday ($UserId)
 
   if (0 == mysql_num_rows($result))
   {
-    printf ("You're not signed up for the %s Thursday Thing.\n", CON_NAME);
-    echo "What is the Thurday Thing?  Click <a href=\"Thursday.php\">here</a>";
-    echo " to find out.\n";
+    printf ("You're not signed up for the %s Pre-Convention.\n", CON_NAME);
+    echo "What is the Pre-Convention?  Click <a href=\"Thursday.php\">here</a>";
+    echo " to find out.<br><br>\n";
     return;
   }
 
-  printf ("You are signed up and paid for the %s Thursday Thing.\n", CON_NAME);
+  printf ("You are signed up and paid for the %s Pre-Convention.<br><br>\n",
+	  CON_NAME);
 }
 
 /*

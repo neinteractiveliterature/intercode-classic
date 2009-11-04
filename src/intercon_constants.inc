@@ -44,9 +44,9 @@ define (DEVELOPMENT_MAIL_ADDR, 'barry@tannenbaum.mv.com');
 
 define (POLL_ENABLED, 0);
 
-// Set to 0 to disable the Thursday Thing stuff (needs to be implemented)
+// Set to 0 to disable the Thursday Thing
 
-define (THURSDAY_ENABLED, 0);
+define (THURSDAY_ENABLED, 1);
 
 // Set to 0 to disable the Iron GM contest
 

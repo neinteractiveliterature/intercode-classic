@@ -27,6 +27,8 @@ define (PRIV_REGISTRAR, 'Registrar');
 define (PRIV_SCHEDULING, 'Scheduling');
 define (PRIV_VENDORS, 'Vendors');
 define (PRIV_DONORS, 'Donors');
+define (PRIV_PRECON_BID_CHAIR, 'PreConBidChair');
+define (PRIV_PRECON_SCHEDULING, 'PreConScheduling');
 
 // Mail privileges
 
@@ -238,6 +240,13 @@ define (PLUGS_PROCESS_FORM, 191);
 define (PLUGS_SHOW_PAGE, 192);
 define (PLUGS_MANAGE_PLUGS, 193);
 
+// Action values for PreConEvents
+
+define (PRECON_SHOW_EVENT_FORM, 210);
+define (PRECON_PROCESS_EVENT_FORM, 211);
+define (PRECON_MANAGE_EVENTS, 212);
+define (PRECON_SHOW_STATUS_FORM, 213);
+define (PRECON_PROCESS_STATUS_FORM, 214);
 
 // List types
 
@@ -570,7 +579,7 @@ function html_begin ($bShowLogo=true)
 	navbar_entry (false, CON_NAME . ' <NOBR>Shirts</NOBR>', 'TShirts.php');
     }
     if (THURSDAY_ENABLED)
-      navbar_entry (false, 'Thursday Thing', 'Thursday.php');
+      navbar_entry (false, 'Pre-Convention Events', 'Thursday.php');
     if (IRONGM_ENABLED)
       navbar_external_static ('Iron GM Contest', 'http://irongm.rachl.in');
     navbar_entry (false, 'Logout', 'index.php', LOGOUT_USER);
@@ -590,6 +599,8 @@ function html_begin ($bShowLogo=true)
       navbar_entry (false, 'Con Schedule', 'Schedule.php');
     if (ACCEPTING_BIDS)
       navbar_entry (false, 'Bid a Game', 'biddingAGame.php');
+    if (THURSDAY_ENABLED)
+      navbar_entry (false, 'Pre-Convention Events', 'Thursday.php');
   }
 
   // Add the GM menu, if this user is a GM
@@ -712,7 +723,7 @@ function html_begin ($bShowLogo=true)
     navbar_entry (true, 'Users CSV', 'Reports.php', REPORT_USERS_CSV);
     navbar_entry (true, 'Registration Report', 'Reports.php', REPORT_REGISTRATION);
     if (THURSDAY_ENABLED)
-      navbar_entry (true, 'Thursday Report', 'Thursday.php', THURSDAY_REPORT);
+      navbar_entry (true, 'PreCon Events Report', 'Thursday.php', THURSDAY_REPORT);
   }
 
   // Add this menu if the user has Registrar privilege
@@ -729,7 +740,7 @@ function html_begin ($bShowLogo=true)
     navbar_entry (true, 'Shirt Order Report',
 		  'TShirts.php', SHOW_TSHIRT_REPORT);
     if (THURSDAY_ENABLED)
-      navbar_entry (true, 'Edit User Thursday Info', 'Thursday.php',
+      navbar_entry (true, 'Edit User PreCon Event Info', 'Thursday.php',
 		    THURSDAY_SELECT_USER);
   }
 
@@ -768,6 +779,16 @@ function html_begin ($bShowLogo=true)
 */
   }
 
+  // Add this menu if user has PRECON_SCHEDULING priv
+
+/*
+  if (user_has_priv (PRIV_PRECON_SCHEDULING))
+  {
+    navbar_title (true, 'PreCon Event Scheduling');
+    navbar_entry (true, 'Manage PreCon Event Schedule',
+		  'Thursday.php', PRECON_MANAGE_EVENTS);
+  }
+*/
   // Add the static pages
 
   navbar_title (false, 'Information');
