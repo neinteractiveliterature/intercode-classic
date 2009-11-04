@@ -808,7 +808,7 @@ function display_bid_form ($first_try)
   echo "  <tr>\n";
   echo "    <td colspan=2>\n";
   echo "&nbsp;<br>\n";
-  echo "<a href=\"http://www.larpaweb.net/larpa-contest-mainmenu-35\">The\n";
+  echo "<a href=\"http://www.larpaweb.net/larpa-contest-mainmenu-35\" target=\"_blank\">The\n";
   echo "LARPA Small Game Contest</a> is a chance for you to win cash for\n";
   echo "your game!\n";
   echo "    </td>\n";
