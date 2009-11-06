@@ -571,6 +571,7 @@ function display_event ($hour, $away_all_day, $away_hours,
       echo "<!-- GameMax: $the_max -->\n";
 */
 
+  $bgcolor = "#FFFFFF";
   $game_full = false;
   if (array_key_exists ($row->RunId, $signup_count_male))
     $males = $signup_count_male[$row->RunId];
@@ -596,12 +597,12 @@ function display_event ($hour, $away_all_day, $away_hours,
   if (array_key_exists ($row->RunId, $signed_up_runs))
   {
     if ('Confirmed' == $signed_up_runs[$row->RunId])
-      $attrib .= get_bgcolor ('Confirmed');
+      $bgcolor = get_bgcolor_hex ('Confirmed');
     elseif ('Waitlisted' == $signed_up_runs[$row->RunId])
-      $attrib .= get_bgcolor ('Waitlisted');
+      $bgcolor = get_bgcolor_hex ('Waitlisted');
   }
   elseif ($game_full)
-    $attrib .= get_bgcolor ('Full');
+    $bgcolor = get_bgcolor_hex ('Full');
   else
   {
     $away_for_game = ('CHECKED' == $away_all_day);
@@ -618,9 +619,9 @@ function display_event ($hour, $away_all_day, $away_hours,
     }
 
     if ($away_for_game)
-      $attrib .= get_bgcolor ('Away');
+      $bgcolor = get_bgcolor_hex ('Away');
     elseif ('Y' == $row->CanPlayConcurrently)
-      $attrib .= get_bgcolor ('CanPlayConcurrently');
+      $bgcolor = get_bgcolor_hex ('CanPlayConcurrently');
   }
 
   // Add the game title (and run suffix) with a link to the game page
@@ -671,19 +672,74 @@ function display_event ($hour, $away_all_day, $away_hours,
       $avail_female -= $females;
 
     $text .= "<p>Open Slots<br>M:$avail_male" .
-             "&nbsp;F:$avail_female" .
-	     "&nbsp;N:$avail_neutral";
+             " F:$avail_female" .
+	     " N:$avail_neutral";
 
-    if (user_has_priv (PRIV_SCHEDULING))
-      $text .= sprintf ('<br><font color=red>Track: %d, Span: %d</font>',
-		       $row->Track,
-		       $row->Span);
+//    if (user_has_priv (PRIV_SCHEDULING))
+//      $text .= sprintf ('<br><font color=red>Track: %d, Span: %d</font>',
+//		       $row->Track,
+//		       $row->Span);
   }
   
-  echo "<div style=\"position: absolute; border: 1px black solid; ";
-  echo "top: " . $dimensions->top . "%; left: " . $dimensions->left;
-  echo "%; width: " . $dimensions->width . "%; height: " . $dimensions->height . "%;";
-  echo "\">$text</div>\n";
+  echo "<div style=\"border: 1px black solid; background-color: $bgcolor; ".$dimensions->getCSS()."\">";
+  write_centering_table($text);
+  echo "</div>\n";
+}
+
+function write_centering_table($content) {
+  echo "<div style=\"padding: 1px;\">";
+  echo "<table style=\"width: 100%; height: 100%;\"><tr>";
+  echo "<td style=\"text-align: center; vertical-align: center;\">$content</td>";
+  echo "</tr></table></div>";
+}
+
+function display_special_event($row, $dimensions) {
+  if ($row->DescLen > 0) {
+	$text = sprintf ('<a href="Schedule.php?action=%d&EventId=%d&' .
+			 'RunId=%d">%s</a>',
+			 SCHEDULE_SHOW_GAME,
+			 $row->EventId,
+			 $row->RunId,
+			 $row->Title);
+  } else {
+	$text = $row->Title;
+  }
+  
+//      if (user_has_priv (PRIV_SCHEDULING))
+//	$text .= sprintf ('<br><font color=red>Track: %d, Span: %d</font>',
+//			  $row->Track,
+//			  $row->Span);
+//      write_cell ("td", $text, $attrib);
+
+  echo "<div style=\"border: 1px black solid; ".$dimensions->getCSS()."\">";
+  write_centering_table($text);
+  echo "</div>\n";
+}
+
+function display_schedule_runs_in_div($block, $pcsgRuns, $eventRuns, $css,
+									  $hour, $away_all_day, $away_hours,
+									  $signed_up_runs, $signup_count_male, $signup_count_female,
+									  $game_max_male, $game_max_female, $game_max_neutral) {
+  
+  $runDimensions = pcsg_get_run_dimensions($block, $pcsgRuns);
+  
+  echo "<div style=\"position: absolute; $css\">";
+  echo "<div style=\"position: relative; height: 100%; width: 100%;\">";
+
+  foreach ($runDimensions as $dimensions) {
+	$runId = $dimensions->run->id;
+	$row = $eventRuns[$runId];
+	
+	if (1 == $row->SpecialEvent) {
+	  display_special_event($row, $dimensions);
+    } else {
+	  display_event ($hour, $away_all_day, $away_hours, $row, $dimensions,
+					 $signed_up_runs, $signup_count_male, $signup_count_female,
+					 $game_max_male, $game_max_female, $game_max_neutral);
+	}
+  }
+  
+  echo "</div></div>";
 }
 
 function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
@@ -726,8 +782,6 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
   $sql .= ' FROM Runs, Events';
   $sql .= " WHERE Day='$day'";
   $sql .= '   AND Events.EventId=Runs.EventId';
-  $sql .= '   And Events.IsOps<>"Y"';
-  $sql .= '   And Events.IsConSuite<>"Y"';
 
   $result = mysql_query ($sql);
   if (! $result)
@@ -761,10 +815,11 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
   $sql = 'SELECT Runs.RunId, Runs.Track, Runs.TitleSuffix, Runs.StartHour,';
   $sql .= ' Runs.Span, Runs.ScheduleNote, Runs.Venue, Runs.Track,';
   $sql .= ' Events.EventId, Events.SpecialEvent, Events.Hours, Events.Title,';
-  $sql .= ' Events.CanPlayConcurrently, LENGTH(Events.Description) AS DescLen';
+  $sql .= ' Events.CanPlayConcurrently, LENGTH(Events.Description) AS DescLen,';
+  $sql .= ' Events.IsOps, Events.IsConSuite ';
   $sql .= ' FROM Events, Runs';
   $sql .= " WHERE Events.EventId=Runs.EventId AND Day='$day'";
-  $sql .= ' ORDER BY StartHour, Track';
+  $sql .= ' ORDER BY StartHour, Hours DESC, Events.Title';
 
   $result = mysql_query ($sql);
   if (! $result)
@@ -844,14 +899,23 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
   // Display the rest of the day's schedule
 
 
+  $volunteerRuns = array();
   $eventRuns = array();
-  $pcsgRuns = array();
+  $pcsgVolunteerRuns = array();
+  $pcsgEventRuns = array();
   $max_hour = $hour;
 
   while ($row = mysql_fetch_object ($result))
   {
-	$eventRuns[$row->RunId] = $row;
-	array_push($pcsgRuns, new EventRun($row->StartHour, $row->Hours, $row->RunId));
+	$pcsgRun = new EventRun($row->StartHour, $row->Hours, $row->RunId);
+	
+	if ($row->IsOps == "Y" || $row->IsConSuite == "Y") {
+	  $volunteerRuns[$row->RunId] = $row;
+	  array_push($pcsgVolunteerRuns, $pcsgRun);
+	} else {
+	  $eventRuns[$row->RunId] = $row;
+	  array_push($pcsgEventRuns, $pcsgRun);
+	}
 	
     $game_start = $row->StartHour;
 //
@@ -916,15 +980,49 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
   
   echo "<div style=\"position: relative; border: 1px black solid; text-align: center; ";
   echo "width: 100%; height: " . ($block->getHours() * 10) ."em;\">\n";
-
-  foreach (pcsg_get_run_dimensions($block, $pcsgRuns) as $dimensions) {
-	$runId = $dimensions->run->id;
-	$row = $eventRuns[$runId];
+  
+  echo "<div style=\"position: absolute; left: 0%; width: 10%; top: 0%; height: 100%;\">";
+  echo "<div style=\"position: relative; height: 100%; width: 100%;\">";
+  for ($hour = $block->startHour; $hour < $block->endHour; $hour++) {
+	echo "<div style=\"position: absolute; border: 1px black solid; font-weight: bold; ";
+	echo "width: 100%; left: 0%; ";
+	echo "top: " . ((($hour - $block->startHour) / $block->getHours()) * 100.0) . "%; ";
+	echo "height: " . (100.0 / $block->getHours()) . "%;";
+	echo "\">";
 	
-	display_event ($hour, $away_all_day, $away_hours, $row, $dimensions,
-				   $signed_up_runs, $signup_count_male, $signup_count_female,
-				   $game_max_male, $game_max_female, $game_max_neutral);
+	write_24_hour($hour);
+	
+	echo "</div>";
   }
+  echo "</div></div>";
+  
+  display_schedule_runs_in_div($block, $pcsgEventRuns, $eventRuns,
+							   "left: 10%; width: 70%; top: 0%; height: 100%;",
+							   $hour, $away_all_day, $away_hours,
+							   $signed_up_runs, $signup_count_male, $signup_count_female,
+							   $game_max_male, $game_max_female, $game_max_neutral);
+  
+  display_schedule_runs_in_div($block, $pcsgVolunteerRuns, $volunteerRuns,
+							   "left: 80%; width: 15%; top: 0%; height: 100%;",
+							   $hour, $away_all_day, $away_hours,
+							   $signed_up_runs, $signup_count_male, $signup_count_female,
+							   $game_max_male, $game_max_female, $game_max_neutral);
+
+  echo "<div style=\"position: absolute; left: 95%; width: 5%; top: 0%; height: 100%;\">";
+  echo "<div style=\"position: relative; height: 100%; width: 100%;\">";
+  for ($hour = $block->startHour; $hour < $block->endHour; $hour++) {
+	echo "<div style=\"position: absolute; border: 1px black solid; font-weight: bold; ";
+	echo "width: 100%; left: 0%; ";
+	echo "top: " . ((($hour - $block->startHour) / $block->getHours()) * 100.0) . "%; ";
+	echo "height: " . (100.0 / $block->getHours()) . "%;";
+	echo "\">";
+	
+	if ($logged_in)
+      write_away_checkbox ($away_hours[$hour], $day, $hour, $away_all_day);
+  	
+	echo "</div>";
+  }
+  echo "</div></div>";
 
   //while ($hour <  $max_hour)
   //{
@@ -979,7 +1077,7 @@ function write_away_checkbox ($cur_state, $day, $hour, $away_all_day)
 		      $day,
 		      $hour);
 
-  write_cell ('TD', $input, '');
+  write_centering_table ($input);
 }
 
 /*
@@ -1765,8 +1863,8 @@ function write_24_hour ($hour)
 {
   $hour_start = start_hour_to_24_hour ($hour);
   $hour_end = start_hour_to_24_hour ($hour + 1);
-  $txt = $hour_start . '<BR>--<BR>' . $hour_end;
-  write_cell ('TH', $txt);
+  $txt = "<b>" . $hour_start . '<BR>--<BR>' . $hour_end . "</b>";
+  write_centering_table($txt);
 }
 
 /*
