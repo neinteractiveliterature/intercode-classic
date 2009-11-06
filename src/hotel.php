@@ -209,7 +209,7 @@ echo "					for the con suite, and to cover the other costs that go \n";
 echo "					into the convention. We try to break even. It's a tough \n";
 echo "					balance; we have to guess a year in advance if we can \n";
 echo "					meet our budget if we still let you sign up for as \n";
-echo "					little as $20. You can help us to keep <b>your own</b> \n";
+echo "					little as $25. You can help us to keep <b>your own</b> \n";
 echo "					registration costs down by reserving your room early, \n";
 echo "					through the Radisson reservation process.</td>\n";
 echo "				</tr>\n";
