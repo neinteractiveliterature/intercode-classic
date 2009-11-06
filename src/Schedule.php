@@ -681,16 +681,17 @@ function display_event ($hour, $away_all_day, $away_hours,
 //		       $row->Span);
   }
   
-  echo "<div style=\"border: 1px black solid; background-color: $bgcolor; ".$dimensions->getCSS()."\">";
-  write_centering_table($text);
+  echo "<div style=\"".$dimensions->getCSS()."\">";
+  write_centering_table($text, $bgcolor);
   echo "</div>\n";
 }
 
-function write_centering_table($content) {
-  echo "<div style=\"padding: 1px;\">";
-  echo "<table style=\"width: 100%; height: 100%;\"><tr>";
-  echo "<td style=\"text-align: center; vertical-align: center;\">$content</td>";
-  echo "</tr></table></div>";
+function write_centering_table($content, $bgcolor="#FFFFFF") {
+  echo "<table style=\"width: 100%; height: 100%; border: 1px #777 solid; ";
+  echo "background-color: $bgcolor;\"><tr>";
+  echo "<td style=\"text-align: center; vertical-align: center; \">";
+  echo "<div style=\"margin-left: -1px; margin-top: -1px;\">$content</div></td>";
+  echo "</tr></table>";
 }
 
 function display_special_event($row, $dimensions) {
@@ -711,7 +712,7 @@ function display_special_event($row, $dimensions) {
 //			  $row->Span);
 //      write_cell ("td", $text, $attrib);
 
-  echo "<div style=\"border: 1px black solid; ".$dimensions->getCSS()."\">";
+  echo "<div style=\"".$dimensions->getCSS()."\">";
   write_centering_table($text);
   echo "</div>\n";
 }
@@ -984,7 +985,7 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
   echo "<div style=\"position: absolute; left: 0%; width: 10%; top: 0%; height: 100%;\">";
   echo "<div style=\"position: relative; height: 100%; width: 100%;\">";
   for ($hour = $block->startHour; $hour < $block->endHour; $hour++) {
-	echo "<div style=\"position: absolute; border: 1px black solid; font-weight: bold; ";
+	echo "<div style=\"position: absolute; ";
 	echo "width: 100%; left: 0%; ";
 	echo "top: " . ((($hour - $block->startHour) / $block->getHours()) * 100.0) . "%; ";
 	echo "height: " . (100.0 / $block->getHours()) . "%;";
@@ -1011,7 +1012,7 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
   echo "<div style=\"position: absolute; left: 95%; width: 5%; top: 0%; height: 100%;\">";
   echo "<div style=\"position: relative; height: 100%; width: 100%;\">";
   for ($hour = $block->startHour; $hour < $block->endHour; $hour++) {
-	echo "<div style=\"position: absolute; border: 1px black solid; font-weight: bold; ";
+	echo "<div style=\"position: absolute; font-weight: bold; ";
 	echo "width: 100%; left: 0%; ";
 	echo "top: " . ((($hour - $block->startHour) / $block->getHours()) * 100.0) . "%; ";
 	echo "height: " . (100.0 / $block->getHours()) . "%;";
