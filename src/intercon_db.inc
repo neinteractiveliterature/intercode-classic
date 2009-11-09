@@ -27,6 +27,8 @@ define (PRIV_REGISTRAR, 'Registrar');
 define (PRIV_SCHEDULING, 'Scheduling');
 define (PRIV_VENDORS, 'Vendors');
 define (PRIV_DONORS, 'Donors');
+define (PRIV_PRECON_BID_CHAIR, 'PreConBidChair');
+define (PRIV_PRECON_SCHEDULING, 'PreConScheduling');
 
 // Mail privileges
 
@@ -238,6 +240,13 @@ define (PLUGS_PROCESS_FORM, 191);
 define (PLUGS_SHOW_PAGE, 192);
 define (PLUGS_MANAGE_PLUGS, 193);
 
+// Action values for PreConEvents
+
+define (PRECON_SHOW_EVENT_FORM, 210);
+define (PRECON_PROCESS_EVENT_FORM, 211);
+define (PRECON_MANAGE_EVENTS, 212);
+define (PRECON_SHOW_STATUS_FORM, 213);
+define (PRECON_PROCESS_STATUS_FORM, 214);
 
 // List types
 
@@ -329,25 +338,16 @@ function user_has_any_mail_priv ()
 
 function get_bgcolor ($state)
 {
-  return ' BGCOLOR="'.get_bgcolor_hex($state).'"';
-}
-
-/*
- * get_bgcolor_hex
- *
- * Returns just the hex color code as in get_bgcolor
- */
-function get_bgcolor_hex ($state)
-{
   switch ($state)
   {
-    case 'Full':                return '#FFCCCC';  // Light red
-    case 'Confirmed':           return '#CCFFCC';  // Light green
-    case 'Waitlisted':          return '#FFFFCC';  // Light yellow
-    case 'CanPlayConcurrently': return '#CCCCFF';  // Light blue
-    case 'Away':                return '#CCCCCC';  // Light gray
+    case 'Full':                return ' BGCOLOR="#FFCCCC"';  // Light red
+    case 'Confirmed':           return ' BGCOLOR="#CCFFCC"';  // Light green
+    case 'Waitlisted':          return ' BGCOLOR="#FFFFCC"';  // Light yellow
+    case 'CanPlayConcurrently': return ' BGCOLOR="#CCCCFF"';  // Light blue
+    case 'Away':                return ' BGCOLOR="#CCCCCC"';  // Light gray
   }
-  return "#FFFFFF";
+
+  return '';
 }
 
 /*
@@ -579,7 +579,7 @@ function html_begin ($bShowLogo=true)
 	navbar_entry (false, CON_NAME . ' <NOBR>Shirts</NOBR>', 'TShirts.php');
     }
     if (THURSDAY_ENABLED)
-      navbar_entry (false, 'Thursday Thing', 'Thursday.php');
+      navbar_entry (false, 'Pre-Convention Events', 'Thursday.php');
     if (IRONGM_ENABLED)
       navbar_external_static ('Iron GM Contest', 'http://irongm.rachl.in');
     navbar_entry (false, 'Logout', 'index.php', LOGOUT_USER);
@@ -599,6 +599,8 @@ function html_begin ($bShowLogo=true)
       navbar_entry (false, 'Con Schedule', 'Schedule.php');
     if (ACCEPTING_BIDS)
       navbar_entry (false, 'Bid a Game', 'biddingAGame.php');
+    if (THURSDAY_ENABLED)
+      navbar_entry (false, 'Pre-Convention Events', 'Thursday.php');
   }
 
   // Add the GM menu, if this user is a GM
@@ -721,7 +723,7 @@ function html_begin ($bShowLogo=true)
     navbar_entry (true, 'Users CSV', 'Reports.php', REPORT_USERS_CSV);
     navbar_entry (true, 'Registration Report', 'Reports.php', REPORT_REGISTRATION);
     if (THURSDAY_ENABLED)
-      navbar_entry (true, 'Thursday Report', 'Thursday.php', THURSDAY_REPORT);
+      navbar_entry (true, 'PreCon Events Report', 'Thursday.php', THURSDAY_REPORT);
   }
 
   // Add this menu if the user has Registrar privilege
@@ -738,7 +740,7 @@ function html_begin ($bShowLogo=true)
     navbar_entry (true, 'Shirt Order Report',
 		  'TShirts.php', SHOW_TSHIRT_REPORT);
     if (THURSDAY_ENABLED)
-      navbar_entry (true, 'Edit User Thursday Info', 'Thursday.php',
+      navbar_entry (true, 'Edit User PreCon Event Info', 'Thursday.php',
 		    THURSDAY_SELECT_USER);
   }
 
@@ -777,6 +779,16 @@ function html_begin ($bShowLogo=true)
 */
   }
 
+  // Add this menu if user has PRECON_SCHEDULING priv
+
+/*
+  if (user_has_priv (PRIV_PRECON_SCHEDULING))
+  {
+    navbar_title (true, 'PreCon Event Scheduling');
+    navbar_entry (true, 'Manage PreCon Event Schedule',
+		  'Thursday.php', PRECON_MANAGE_EVENTS);
+  }
+*/
   // Add the static pages
 
   navbar_title (false, 'Information');
@@ -2745,24 +2757,23 @@ function intercon_mail ($to, $subject, $msg)
     $to = DEVELOPMENT_MAIL_ADDR;
   }
 
-  $headers = sprintf ("From: Intercon Webmaster<%s>\n", EMAIL_WEBMASTER);
-  $headers .= sprintf ("Reply-To: Intercon Webmaster<%s>\n", EMAIL_WEBMASTER);
-  $headers .= "X-Priority: 1\n";
-  $headers .= "X-MSMail-Priority: High\n";
-  $headers .= "X-Mailer: php\n";
-  $headers .= sprintf ("Errors-To: %s\n", EMAIL_WEBMASTER);
-  $headers .= sprintf ("Return-Path: %s\n", EMAIL_WEBMASTER);
+  $headers = sprintf ("From: Intercon Webmaster<%s>\r\n", EMAIL_WEBMASTER);
+  $headers .= sprintf ("Reply-To: Intercon Webmaster<%s>\r\n", EMAIL_WEBMASTER);
+  $headers .= "X-Priority: 1\r\n";
+  $headers .= "X-MSMail-Priority: High\r\n";
+  $headers .= "X-Mailer: php\r\n";
+  $headers .= sprintf ("Errors-To: %s\r\n", EMAIL_WEBMASTER);
+  $headers .= sprintf ("Return-Path: %s\r\n", EMAIL_WEBMASTER);
 
 //  echo "No email sent<p>\n";
 //  return true;
 
-  ini_set ('sendmail_from', EMAIL_WEBMASTER);
+//  ini_set ('sendmail_from', EMAIL_WEBMASTER);
+//  $ret =  mail ($to, $subject, $msg, $headers, '-f' . EMAIL_WEBMASTER);
+//  ini_restore ('sendmail_from');
+//  return $ret;
 
-  $ret =  mail ($to, $subject, $msg, $headers, '-f' . EMAIL_WEBMASTER);
-
-  ini_restore ('sendmail_from');
-
-  return $ret;
+  return mail($to, $subject, $msg, $headers);
 }
 
 /*
