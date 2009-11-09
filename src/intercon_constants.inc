@@ -1,22 +1,23 @@
 <?
-// Note that PowWeb insists on setting the session save path!  Comment this
-// out, or set it appropriately for your server
 
-//session_save_path("/home/users/web/b2078/pow.neilmaster/phpsessions");
+// For site isolation, change the session name below to something appropriate
+// when deploying a new Intercon site.
+
+session_name ('intercon_j');
 session_start ();
 
 // Setting DEVELOPMENT_VERSION turns on additional error checking, as well
 // as diverting all mail to the DEVELOPMENT_MAIL_ADDR
 
-define (DEVELOPMENT_VERSION, 1);
+define (DEVELOPMENT_VERSION, 0);
 
 // Per-con values - The values of all of these should be visible on
 // the status page
 
-define (DB_SERVER, 'localhost');
-define (DB_NAME,   'itest');
-//define (DB_SERVER, 'neilmaster.powwebmysql.com');
-//define (DB_NAME,   'intercon_j');
+//define (DB_SERVER, 'localhost');
+//define (DB_NAME,   'itest');
+define (DB_SERVER, 'mysql.interactiveliterature.org');
+define (DB_NAME,   'intercon_j');
 
 // Database users - These could/should be used to control access to the
 // database.  In reality, it's handled by the software.  And the password
@@ -24,30 +25,32 @@ define (DB_NAME,   'itest');
 // from outside the domain, so we should be OK.  And it's not like we've got
 // credit card numbers or other sensative stuff in here anyway...
 
-define (DB_ADMIN_USR, 'interconuser');
-define (DB_ADMIN_PWD, 'LARP');
+define (DB_ADMIN_USR, 'interconneuser');
+define (DB_ADMIN_PWD, 'Thai4IeP');
 
-define (DB_STAFF_USR, 'interconuser');
-define (DB_STAFF_PWD, 'LARP');
+define (DB_STAFF_USR, 'interconneuser');
+define (DB_STAFF_PWD, 'Thai4IeP');
 
-define (DB_USER_USR, 'interconuser');
-define (DB_USER_PWD, 'LARP');
+define (DB_USER_USR, 'interconneuser');
+define (DB_USER_PWD, 'Thai4IeP');
 
 
 // When DEVELOPMENT_VERSION is set to 1, all mail will be diverted to this
 // address
 
-define (DEVELOPMENT_MAIL_ADDR, 'natbudin@gmail.com');
+define (DEVELOPMENT_MAIL_ADDR, 'barry@tannenbaum.mv.com');
 
 // Set to 0 to disable the poll
 
 define (POLL_ENABLED, 0);
 
-// Set to 0 to disable the Thursday Thing stuff (needs to be implemented)
+// Set to 0 to disable the Thursday Thing
 
-define (THURSDAY_ENABLED, 0);
+define (THURSDAY_ENABLED, 1);
 
-define(IRONGM_ENABLED, 0);
+// Set to 0 to disable the Iron GM contest
+
+define (IRONGM_ENABLED, 0);
 
 // Defining the program file prefix enables the links on the ConCom menu
 // which allow users to download the program booklet sections.  The second
@@ -79,12 +82,12 @@ define (NAME_ADVERTISING, '');
 define (EMAIL_ADVERTISING, '');
 
 define (NAME_BID_CHAIR, 'Anna Bradley');
-define (EMAIL_BID_CHAIR, 'bidchair@' . CON_DOMAIN);
+define (EMAIL_BID_CHAIR, 'arbradley@gmail.com');
 
-define (NAME_CON_SUITE, 'Renee Cyr');
-define (EMAIL_CON_SUITE, 'consuite@' . CON_DOMAIN);
+define (NAME_CON_SUITE, 'Anna Bradley');
+define (EMAIL_CON_SUITE, 'arbradley@gmail.com');
 
-define (NAME_GM_COORDINATOR, 'Josh Rachlin');
+define (NAME_GM_COORDINATOR, 'Andrew Militello');
 define (EMAIL_GM_COORDINATOR, 'gmcoordinator@' . CON_DOMAIN);
 
 define (NAME_HOTEL_LIAISON, 'Alex Bradley');
@@ -95,7 +98,7 @@ define (EMAIL_OPS, 'operations@' . CON_DOMAIN);
 define (NAME_OPS2, '');
 define (EMAIL_OPS2, '');
 
-define (NAME_OUTREACH, 'Tim Lasko');
+define (NAME_OUTREACH, 'Thorin Tabor');
 define (EMAIL_OUTREACH, 'info@' . CON_DOMAIN);
 
 define (NAME_REGISTRAR, 'Chad Bergeron');
@@ -104,8 +107,6 @@ define (EMAIL_REGISTRAR, 'registrar@' . CON_DOMAIN);
 define (NAME_THURSDAY, 'Joshua Sheena');
 define (EMAIL_THURSDAY, 'thursday@' . CON_DOMAIN);
 
-//define (NAME_TREASURER, 'Mike McAfee');
-//define (EMAIL_TREASURER, 'mdm@haven.org');
 define (NAME_TREASURER, 'Chad Bergeron');
 define (EMAIL_TREASURER, '');
 
@@ -116,14 +117,14 @@ define (EMAIL_WEBMASTER, 'webmaster@' . CON_DOMAIN);
 
 // Con dates
 
-define (FRI_TEXT, 'Friday, 6-Mar-2010');
-define (SAT_TEXT, 'Saturday, 7-Mar-2010');
-define (SUN_TEXT, 'Sunday, 8-Mar-2010');
+define (FRI_TEXT, 'Friday, 12-Mar-2010');
+define (SAT_TEXT, 'Saturday, 13-Mar-2010');
+define (SUN_TEXT, 'Sunday, 14-Mar-2010');
 
 // Deadlines - Format is YYYY-MM-DD
 
 define (REGISTRATION_CLOSE, '2010-02-24');
-define (CON_OVER, '2010-03-03');
+define (CON_OVER, '2010-03-14');
 define (SHIRT_CLOSE, '2010-02-01');
 define (BIO_CLOSE, '2009-12-25');
 
