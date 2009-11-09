@@ -92,10 +92,10 @@ function display_special_event_form ()
 
     $EventId = $row['EventId'];
 
-    echo "<H2>Update a special event for Intercon D</H2>\n";
+    echo "<H2>Update a special event for ".CON_NAME."</H2>\n";
   }
   else
-    echo "<H2>Add a special event for Intercon D</H2>\n";
+    echo "<H2>Add a special event for ".CON_NAME."</H2>\n";
 
   echo "<FORM METHOD=POST ACTION=SpecialEvents.php>\n";
   form_add_sequence ();
@@ -109,8 +109,9 @@ function display_special_event_form ()
   echo "<TABLE BORDER=0>\n";
 
   form_text (64, 'Event Text', 'Title');
-  form_track_day ('Track', 'Day');
-  form_text (2, 'Tracks Spanned', 'Span');
+  form_day ('Day');
+//  form_track_day ('Track', 'Day');
+//  form_text (2, 'Tracks Spanned', 'Span');
   form_start_hour ('Start Hour', 'StartHour');
   form_text (2, 'Hours');
 
@@ -209,8 +210,8 @@ function process_special_event_form ()
 
   // Validate the track
 
-  if (! validate_int ('Track', 1, MAX_TRACKS))
-    return FALSE;
+//  if (! validate_int ('Track', 1, MAX_TRACKS))
+//    return FALSE;
 
   if (! validate_day_time ('StartHour', 'Day'))
     return FALSE;
@@ -233,8 +234,8 @@ function process_special_event_form ()
     $EventId = mysql_insert_id ();
 
   $sql = "$verb Runs SET EventId=$EventId";
-  $sql .= build_sql_string ('Track');
-  $sql .= build_sql_string ('Span');
+//  $sql .= build_sql_string ('Track');
+//  $sql .= build_sql_string ('Span');
   $sql .= build_sql_string ('Day');
   $sql .= build_sql_string ('StartHour');
   $sql .= build_sql_string ('UpdatedById', $_SESSION[SESSION_LOGIN_USER_ID]);
@@ -283,9 +284,9 @@ function list_special_events ()
   echo "    <TH>Special Event</TH>\n";
   echo "    <TH>Day</TH>\n";
   echo "    <TH>Start Time</TH>\n";
-  echo "    <TH>Track</TH>\n";
+//  echo "    <TH>Track</TH>\n";
   echo "    <TH>Hours</TH>\n";
-  echo "    <TH>Columns Spanned</TH>\n";
+//  echo "    <TH>Columns Spanned</TH>\n";
   echo "  </TR>\n";
 
   while ($row = mysql_fetch_object ($result))
@@ -299,9 +300,9 @@ function list_special_events ()
 	    $row->Title);
     echo "    <TD ALIGN=CENTER>$row->Day</TD>\n";
     echo "    <TD ALIGN=CENTER>$start_time</TD>\n";
-    echo "    <TD ALIGN=CENTER>$row->Track</TD>\n";
+//    echo "    <TD ALIGN=CENTER>$row->Track</TD>\n";
     echo "    <TD VALIGN=TOP ALIGN=CENTER>$row->Hours</TD>\n";
-    echo "    <TD ALIGN=CENTER>$row->Span</TD>\n";
+//    echo "    <TD ALIGN=CENTER>$row->Span</TD>\n";
     echo "  </TR>\n";
   }
   echo "</TABLE>\n";

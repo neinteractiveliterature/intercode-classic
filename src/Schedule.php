@@ -439,47 +439,6 @@ function show_away_schedule_form ()
     }
   }
 
-  // Count the number of confirmed players as a rough estimate of "fullness"
-  // of each game
-
-  $sql = 'SELECT RunId, Gender, COUNT(*) AS Count';
-  $sql .= ' FROM Signup';
-  $sql .= ' WHERE State="Confirmed"';
-  $sql .= '   AND Counted="Y"';
-  $sql .= ' GROUP BY RunId, Gender';
-
-  //  echo $sql . "<p>\n";
-  
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Query for signup counts failed');
-
-  while ($row = mysql_fetch_object ($result))
-  {
-    if ('Male' == $row->Gender)
-      $signup_count_male[$row->RunId] = $row->Count;
-    else
-      $signup_count_female[$row->RunId] = $row->Count;
-  }
-
-  // Get the maximum number of players per game
-
-  $sql = "SELECT EventId, MaxPlayersMale, MaxPlayersFemale, MaxPlayersNeutral";
-  $sql .= " FROM Events WHERE SpecialEvent=0";
-
-  //  echo $sql . "<p>\n";
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Query for game maxes failed');
-
-  while ($row = mysql_fetch_object ($result))
-  {
-    $game_max_male[$row->EventId] = $row->MaxPlayersMale;
-    $game_max_female[$row->EventId] = $row->MaxPlayersFemale;
-    $game_max_neutral[$row->EventId] = $row->MaxPlayersNeutral;
-  }
-
   // Add the form boilerplate
 
   echo "<FORM METHOD=POST ACTION=Schedule.php>\n";
@@ -490,18 +449,15 @@ function show_away_schedule_form ()
 
   // Display the schedule for each day
 
-  schedule_day_away ('Fri', $away_fri, $fri_hours, $logged_in,
+  schedule_day ('Fri', $away_fri, $fri_hours,
 		     $signed_up_runs,
-		     $signup_count_male, $signup_count_female,
-		     $game_max_male, $game_max_female, $game_max_neutral);
-  schedule_day_away ('Sat', $away_sat, $sat_hours, $logged_in,
+			 $logged_in, false);
+  schedule_day ('Sat', $away_sat, $sat_hours,
 		     $signed_up_runs,
-		     $signup_count_male, $signup_count_female,
-		     $game_max_male, $game_max_female, $game_max_neutral);
-  schedule_day_away ('Sun', $away_sun, $sun_hours, $logged_in,
+			 $logged_in, false);
+  schedule_day ('Sun', $away_sun, $sun_hours,
 		     $signed_up_runs,
-		     $signup_count_male, $signup_count_female,
-		     $game_max_male, $game_max_female, $game_max_neutral);
+			 $logged_in, false);
 
   // Display the color key
 
@@ -548,50 +504,19 @@ function show_away_schedule_form ()
 
 function display_event ($hour, $away_all_day, $away_hours,
 			$row, $dimensions, $signed_up_runs,
-			$signup_count_male, $signup_count_female,
-			$game_max_male, $game_max_female, $game_max_neutral)
+			$signup_counts)
 {
-  // This event spans as many rows as it's hours long
-
-  $attrib = sprintf ("rowspan=%d colspan=%d", $row->Hours, $row->Span);
-
-  // Set the background color.
-  // - If the user is confirmed for the game, color it green.
-  // - If the user is waitlisted for the game, color it yellow.
-  // - If the game is full, color it red
-
-/*
-      echo "<!-- RunId: $row->RunId, CanPlayConcurrently: $row->CanPlayConcurrently -->\n";
-      $status = $signed_up_runs[$row->RunId];
-      echo "<!-- Status: $status -->\n";
-      $count = $signup_count[$row->RunId];
-      echo "<!-- SignedUp: $count -->\n";
-      echo "<!-- EventId: $row->EventId -->\n";
-      $the_max = $game_max[$row->EventId];
-      echo "<!-- GameMax: $the_max -->\n";
-*/
-
   $bgcolor = "#FFFFFF";
   $game_full = false;
-  if (array_key_exists ($row->RunId, $signup_count_male))
-    $males = $signup_count_male[$row->RunId];
-  else
-    $males = 0;
+  $males = $signup_counts["Male"];
+  $females = $signup_counts["Female"];
 
-  if (array_key_exists ($row->RunId, $signup_count_female))
-    $females = $signup_count_female[$row->RunId];
-  else
-    $females = 0;
-
-  if (array_key_exists($row->EventId, $game_max_male)) {
-    $game_max =
-      $game_max_male[$row->EventId] +
-      $game_max_female[$row->EventId] +
-      $game_max_neutral[$row->EventId];
+  if ($row->Max == null) {
+	$game_full = true;
+  } else {
+    $game_max = $row->Max;
 
     $game_full = ($males + $females) >= $game_max;
-  } else {
-	$game_full = true;
   }
 
   if (array_key_exists ($row->RunId, $signed_up_runs))
@@ -643,9 +568,9 @@ function display_event ($hour, $away_all_day, $away_hours,
     $text .= '<P><I>Full</I>';
   else
   {
-    $avail_male = $game_max_male[$row->EventId];
-    $avail_female = $game_max_female[$row->EventId];
-    $avail_neutral = $game_max_neutral[$row->EventId];
+    $avail_male = $row->MaxPlayersMale;
+    $avail_female = $row->MaxPlayersFemale;
+    $avail_neutral = $row->MaxPlayersNeutral;
 
     echo "<!-- $row->Title EventId: $row->EventId, RunId: $row->RunId -->\n";
     echo "<!-- StartHour: $row->StartHour, Hours: $row->Hours -->\n";
@@ -686,15 +611,72 @@ function display_event ($hour, $away_all_day, $away_hours,
   echo "</div>\n";
 }
 
-function write_centering_table($content, $bgcolor="#FFFFFF") {
-  echo "<table style=\"width: 100%; height: 100%; border: 1px #777 solid; ";
-  echo "background-color: $bgcolor;\"><tr>";
-  echo "<td style=\"text-align: center; vertical-align: center; \">";
-  echo "<div style=\"margin-left: -1px; margin-top: -1px;\">$content</div></td>";
-  echo "</tr></table>";
+function display_event_with_counts($hour, $row, $dimensions,
+				   $signup_counts)
+{
+
+  $confirmed_for_run = $signup_counts["Male"] + $signup_counts["Female"];
+  $not_counted_for_run = $signup_counts["Uncounted"];
+  $waitlisted_for_run = $signup_counts["Waitlisted"];
+
+  // Color the cells:
+  // If we're less than the minimum, it's light yellow.
+  // If we're above the minimum, but less than max, it's light green
+  // If we're at max, it's dark green
+
+  if ($confirmed_for_run < $row->Min)
+    $bgcolor = get_bgcolor_hex ('Full');       // Light red
+  elseif ($confirmed_for_run < $row->Pref)
+    $bgcolor = get_bgcolor_hex ('Waitlisted'); // Light yellow
+  elseif ($confirmed_for_run < $row->Max)
+    $bgcolor = get_bgcolor_hex ('Confirmed');  // Light green
+  else
+    $bgcolor = get_bgcolor_hex ('CanPlayConcurrently'); // Light blue
+
+  // Add the game title (and run suffix) with a link to the game page
+
+  $text = sprintf ('<a href="Schedule.php?action=%d&EventId=%d&RunId=%d">%s',
+		   SCHEDULE_SHOW_GAME,
+		   $row->EventId,
+		   $row->RunId,
+		   $row->Title);
+  if ('' != $row->TitleSuffix)
+    $text .= "<p>$row->TitleSuffix";
+  $text .= '</a>';
+
+  if ('' != $row->ScheduleNote)
+    $text .= "<p>$row->ScheduleNote";
+  if ('' != $row->Venue)
+    $text .= "<p>$row->Venue\n";
+
+  // Add the available slots for this game
+
+  $text .= sprintf ('<P><NOBR>%d/%d/%d</NOBR><BR>' .
+		    '<NOBR><FONT COLOR=green>%d</FONT>/' .
+		    '<FONT COLOR=blue>%d</FONT>/' . 
+		    '<FONT COLOR=red>%d</FONT></NOBR>',
+		    $row->Min,
+		    $row->Pref,
+		    $row->Max,
+		    $confirmed_for_run,
+		    $not_counted_for_run,
+		    $waitlisted_for_run);
+
+  echo "<div style=\"".$dimensions->getCSS()."\">";
+  write_centering_table($text, $bgcolor);
+  echo "</div>\n";
 }
 
-function display_special_event($row, $dimensions) {
+function write_centering_table($content, $bgcolor="#FFFFFF") {
+  echo "<table style=\"width: 100%; height: 100%; border: 1px #777 solid; ";
+  echo "background-color: $bgcolor; overflow: hidden;\">";
+  echo "<tr>";
+  echo "<td style=\"text-align: center; vertical-align: middle; overflow: hidden;\">";
+  echo "<div style=\"margin-left: -1px; margin-top: -1px;\">$content</div>";
+  echo "</td></tr></table>";
+}
+
+function display_special_event($row, $dimensions, $bgcolor) {
   if ($row->DescLen > 0) {
 	$text = sprintf ('<a href="Schedule.php?action=%d&EventId=%d&' .
 			 'RunId=%d">%s</a>',
@@ -713,18 +695,18 @@ function display_special_event($row, $dimensions) {
 //      write_cell ("td", $text, $attrib);
 
   echo "<div style=\"".$dimensions->getCSS()."\">";
-  write_centering_table($text);
+  write_centering_table($text, $bgcolor);
   echo "</div>\n";
 }
 
-function display_schedule_runs_in_div($block, $pcsgRuns, $eventRuns, $css,
+function display_schedule_runs_in_div($block, $eventRuns, $css,
 									  $hour, $away_all_day, $away_hours,
-									  $signed_up_runs, $signup_count_male, $signup_count_female,
-									  $game_max_male, $game_max_female, $game_max_neutral) {
+									  $signed_up_runs, $signup_counts,
+									  $show_counts) {
   
-  $runDimensions = pcsg_get_run_dimensions($block, $pcsgRuns);
+  $runDimensions = $block->getRunDimensions();
   
-  echo "<div style=\"position: absolute; $css\">";
+  echo "<div style=\"$css\">";
   echo "<div style=\"position: relative; height: 100%; width: 100%;\">";
 
   foreach ($runDimensions as $dimensions) {
@@ -732,91 +714,77 @@ function display_schedule_runs_in_div($block, $pcsgRuns, $eventRuns, $css,
 	$row = $eventRuns[$runId];
 	
 	if (1 == $row->SpecialEvent) {
-	  display_special_event($row, $dimensions);
+	  display_special_event($row, $dimensions, $show_counts ? "#cccccc" : "#ffffff");
     } else {
-	  display_event ($hour, $away_all_day, $away_hours, $row, $dimensions,
-					 $signed_up_runs, $signup_count_male, $signup_count_female,
-					 $game_max_male, $game_max_female, $game_max_neutral);
+	  if ($show_counts) {
+		display_event_with_counts ($hour, $row, $dimensions,
+				 $signup_counts[$row->RunId]);
+	  } else {
+		display_event ($hour, $away_all_day, $away_hours, $row, $dimensions,
+					 $signed_up_runs, $signup_counts[$row->RunId]);		
+	  }
 	}
   }
   
   echo "</div></div>";
 }
 
-function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
-			    $signed_up_runs,
-			    $signup_count_male, $signup_count_female,
-			    $game_max_male, $game_max_female, $game_max_neutral)
-{
-  $show_debug_info = user_has_priv (PRIV_SCHEDULING);
-
-//  dump_array ('signup_count_male', $signup_count_male);
-//  dump_array ('signup_count_female', $signup_count_female);
-
-  // Get the start time for today's ConSuite
-
-  $sql = 'SELECT MIN(StartHour) as MinStartHour,';
-  $sql .= ' MAX(StartHour) as MaxStartHour';
-  $sql .= ' FROM Runs, Events';
-  $sql .= " WHERE Day='$day'";
-  $sql .= '   AND Events.EventId=Runs.EventId';
-  $sql .= '   AND Events.IsConSuite="Y"';
-
-  $result = mysql_query($sql);
-  if (! $result)
-    return display_mysql_error ("Query for min ConSuite start time for $day failed", $sql);
-
-  $min_consuite_start = 0;
-  $max_consuite_start = 99;
-  if (0 != mysql_num_rows($result))
-  {
-    $row = mysql_fetch_object ($result);
-    $min_consuite_start = $row->MinStartHour;
-    $max_consuite_start = $row->MaxStartHour;
+function get_signup_counts($run_ids) {
+  $signup_counts = array();
+  
+  if (count($run_ids) == 0) {
+	return $signup_counts;
   }
-
-  //  echo "min_consuite_start: $min_consuite_start<p>\n";
-
-  // Get the start time for the day's schedule and the number of tracks
-
-  $sql = 'SELECT MIN(StartHour) AS MinStartHour, MAX(Track) AS MaxTracks';
-  $sql .= ' FROM Runs, Events';
-  $sql .= " WHERE Day='$day'";
-  $sql .= '   AND Events.EventId=Runs.EventId';
+  
+  foreach ($run_ids as $run_id) {
+	$signup_counts[$run_id] = array(
+		  "Male" => 0,
+		  "Female" => 0,
+		  "Uncounted" => 0,
+		  "Waitlisted" => 0
+		  );
+  }
+  
+  $sql = 'SELECT RunId, State, Counted, Gender, COUNT(*) AS Count';
+  $sql .= ' FROM Signup';
+  $sql .= ' WHERE RunId IN ('.implode(",", $run_ids).')';
+  $sql .= ' GROUP BY RunId, State, Gender, Counted';
 
   $result = mysql_query ($sql);
   if (! $result)
-    return display_mysql_error ("Query for limits for $day failed");
-  if (1 != mysql_num_rows ($result))
-    return display_error ("Invalid number of rows for $day");
+    return display_mysql_error ('Query for male signups failed');
 
-  $row = mysql_fetch_object ($result);
+  while ($row = mysql_fetch_object ($result)) {	
+	if ($row->Counted == "Y") {
+	  if ($row->State == "Waitlisted") {
+		$signup_counts[$row->RunId]["Waitlisted"] += $row->Count;
+	  } else if ($row->State == "Confirmed") {
+		$signup_counts[$row->RunId][$row->Gender] += $row->Count;
+	  }
+	} else {
+	  $signup_counts[$row->RunId]["Uncounted"] += $row->Count;
+	}
+  }
+  
+  return $signup_counts;
+}
 
-  // Don't forget to add columns for Ops & ConSuite - they were deliberately
-  // excluded in the select statement above so they could be forced into the
-  // leftmost column
-
-  $MaxTracks = $row->MaxTracks + 1;  // Add column for Ops
-  if (0 != $min_consuite_start)      // Add column for ConSuite, if scheduled
-    $MaxTracks++;
-
-  $hour = $row->MinStartHour;
-
-  mysql_free_result ($result);
-
-  // Calculate the column percentage, adding one for the time column
-
-  if ($logged_in)
-    $col_pct = 100 / ($MaxTracks + 2);
-  else
-    $col_pct = 100 / ($MaxTracks + 1);
-
+function schedule_day ($day, $away_all_day, $away_hours,
+			    $signed_up_runs,
+				$show_away_column, $show_counts)
+{
+  $show_debug_info = user_has_priv (PRIV_SCHEDULING);
+  
   // Get the day's events
 
   $sql = 'SELECT Runs.RunId, Runs.Track, Runs.TitleSuffix, Runs.StartHour,';
   $sql .= ' Runs.Span, Runs.ScheduleNote, Runs.Venue, Runs.Track,';
   $sql .= ' Events.EventId, Events.SpecialEvent, Events.Hours, Events.Title,';
   $sql .= ' Events.CanPlayConcurrently, LENGTH(Events.Description) AS DescLen,';
+  $sql .= ' MaxPlayersMale, MaxPlayersFemale, MaxPlayersNeutral, ';
+  $sql .= ' MinPlayersMale+MinPlayersFemale+MinPlayersNeutral AS Min,';
+  $sql .= ' MaxPlayersMale+MaxPlayersFemale+MaxPlayersNeutral AS Max,';
+  $sql .= ' PrefPlayersMale+PrefPlayersFemale+PrefPlayersNeutral AS Pref,';
   $sql .= ' Events.IsOps, Events.IsConSuite ';
   $sql .= ' FROM Events, Runs';
   $sql .= " WHERE Events.EventId=Runs.EventId AND Day='$day'";
@@ -837,74 +805,14 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
   // automatically
 
   echo "<h2>" . day_to_date ($day) . "</h2>\n";
-  if (('Hidden' != $away_all_day) && $logged_in)
+  if (('Hidden' != $away_all_day) && $show_away_column)
     echo "<input type=checkbox $away_all_day name=$day value=1> Away all day\n";
-
-  $attrib = sprintf ("width=\"%d%%\"", $col_pct);
-
-  // Start with a header
-
-  //echo "  <tr align=\"center\">\n";
-  //write_cell ('th', 'Start Time', '');
-  //
-  //for ($i = 1; $i <= $MaxTracks; $i++)
-  //{
-  //  write_cell ("th", $i, $attrib);
-  //}
-  //
-  //if ($logged_in)
-  //  write_cell ('TH', '<A HREF="#Away">Away</A>', '');
-  //
-  //echo "  </tr>\n";
-
-
-  // If we've got leading ConSuite entries, add a "Special Event" to fill
-  // the table
 	
-  
-//  {
-//    echo "  <tr align=\"center\">\n";
-//    write_24_hour ($min_consuite_start);
-//    
-//    $attrib = sprintf ('rowspan=%d colspan=%d',
-//		       $hour - $min_consuite_start,
-//		       $MaxTracks - 1);
-//
-//    $text = 'Volunteer';
-//
-//    write_cell ('td', $text, $attrib);
-//
-//
-//    for ($h = $min_consuite_start + 1; $h <= $hour; $h++)
-//    {
-//      // Read ConSuite entry
-//      $row = mysql_fetch_object ($result);
-//      display_event ($h, $away_all_day, $away_hours, $row, $signed_up_runs,
-//		     $signup_count_male, $signup_count_female,
-//		     $game_max_male, $game_max_female, $game_max_neutral);
-//      if ($logged_in)
-//	write_away_checkbox ($away_hours[$h], $day, $hour, $away_all_day);
-//      echo "  </tr>\n";
-//      echo "  <tr align=\"center\">\n";
-//      write_24_hour ($h);
-//    }
-//  }
-//  else
-//  {
-//    print ("  <tr align=\"center\">\n");
-//    write_24_hour ($hour);
-//  }
-//
-//  echo "<!-- ***** Dropped out of ConSuite loop -->\n";
-
-  // Display the rest of the day's schedule
-
-
   $volunteerRuns = array();
   $eventRuns = array();
-  $pcsgVolunteerRuns = array();
-  $pcsgEventRuns = array();
-  $max_hour = $hour;
+  
+  $mainBlock = new ScheduleBlock();
+  $volunteerBlock = new ScheduleBlock();
 
   while ($row = mysql_fetch_object ($result))
   {
@@ -912,83 +820,129 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
 	
 	if ($row->IsOps == "Y" || $row->IsConSuite == "Y") {
 	  $volunteerRuns[$row->RunId] = $row;
-	  array_push($pcsgVolunteerRuns, $pcsgRun);
+	  $volunteerBlock->addEventRun($pcsgRun);
 	} else {
 	  $eventRuns[$row->RunId] = $row;
-	  array_push($pcsgEventRuns, $pcsgRun);
+	  $mainBlock->addEventRun($pcsgRun);
 	}
-	
-    $game_start = $row->StartHour;
-//
-//    while ($hour < $game_start)
-//    {
-//      if ($hour > $max_consuite_start)
-//	echo "<td>&nbsp;</td>\n";
-//
-//      if ($logged_in)
-//	write_away_checkbox ($away_hours[$hour], $day, $hour, $away_all_day);
-//      $hour++;
-//      print ("  </tr>\n  <tr align=\"center\">\n");
-//      write_24_hour ($hour);
-//    }
-//
-//    // The remaining columns are the games or special events
-//
-//    if (1 == $row->SpecialEvent)
-//    {
-//      $attrib = sprintf ('rowspan=%d colspan=%d',
-//			 $row->Hours, $row->Span);
-//      if ($row->DescLen > 0)
-//	$text = sprintf ('<a href="Schedule.php?action=%d&EventId=%d&' .
-//			 'RunId=%d">%s</a>',
-//			 SCHEDULE_SHOW_GAME,
-//			 $row->EventId,
-//			 $row->RunId,
-//			 $row->Title);
-//      else
-//	$text = $row->Title;
-//      if (user_has_priv (PRIV_SCHEDULING))
-//	$text .= sprintf ('<br><font color=red>Track: %d, Span: %d</font>',
-//			  $row->Track,
-//			  $row->Span);
-//      write_cell ("td", $text, $attrib);
-//    }
-//    else
-//      display_event ($hour, $away_all_day, $away_hours, $row, $signed_up_runs,
-//		     $signup_count_male, $signup_count_female,
-//		     $game_max_male, $game_max_female, $game_max_neutral);
-//
-    $game_end  = $game_start + $row->Hours;
-    if ($max_hour < $game_end)
-      $max_hour = $game_end;
-
-    //    echo "<!-- tGame: $tGame (" . strftime ('%H:%M', $tGame) . ") -->\n";
-    //    echo "<!-- tGameEnd: $tGameEnd (" . strftime ('%H:%M', $tGameEnd) . ") -->\n";
-    //    echo "<!-- tMax: $tMax (" . strftime ('%H:%M', $tMax) . ") -->\n";
   }
 
   mysql_free_result ($result);
-
-  //$max_hour--;
   
-  if ((0 != $min_consuite_start) && ($min_consuite_start < $hour)) {
-    $blockStart = $min_consuite_start;
-  } else {
-    $blockStart = $hour;
+  $signup_counts = get_signup_counts(array_merge(array_keys($eventRuns), array_keys($volunteerRuns)));
+  
+  // expand both blocks to match start/end times
+  $blockStart = min(array($mainBlock->startHour, $volunteerBlock->startHour));
+  $blockEnd = max(array($mainBlock->endHour, $volunteerBlock->endHour));
+  
+  $mainBlock->startHour = $blockStart;
+  $mainBlock->endHour = $blockEnd;
+  $volunteerBlock->startHour = $blockStart;
+  $volunteerBlock->endHour = $blockEnd;
+  
+  $mainBlock->computeRunDimensions();
+  $volunteerBlock->computeRunDimensions();
+  
+  $maxColumns = ($mainBlock->maxColumns + $volunteerBlock->maxColumns);
+  
+  if ($show_counts) {
+	// calculate the totals for the right column if we're looking at counts
+	
+	$avail_min = array ();
+	$avail_max = array ();
+	$avail_pref = array ();
+  
+	$total_confirmed = array ();
+	$total_not_counted = array ();
+	$total_waitlisted = array ();
+	
+	foreach (array_merge($eventRuns, $volunteerRuns) as $row) {
+	  $run_counts = $signup_counts[$row->RunId];
+	  
+	  // Add to the totals for all hours covered by this game
+	  for ($h = $row->StartHour; $h < $row->StartHour + $row->Hours; $h++)
+	  {
+		if (! array_key_exists ($h, $avail_min))
+		{
+		  $avail_min[$h] = 0;
+		  $avail_pref[$h] = 0;
+		  $avail_max[$h] = 0;
+		  $total_confirmed[$h] = 0;
+		  $total_not_counted[$h] = 0;
+		  $total_waitlisted[$h] = 0;
+		}
+	
+		$avail_min[$h] += $row->Min;
+		$avail_pref[$h] += $row->Pref;
+		$avail_max[$h] += $row->Max;
+	
+		$total_confirmed[$h] += $run_counts["Male"];
+		$total_confirmed[$h] += $run_counts["Female"];
+		$total_not_counted[$h] += $run_counts["Uncounted"];
+		$total_waitlisted[$h] += $run_counts["Waitlisted"];
+	  }
+	}
+	
+	// count the number of people away each hour
+    $away = array ();
+  
+	// Number of people away by hour
+  
+	away_init ($away, 'Fri', FRI_MIN, FRI_MAX, 0);
+	away_init ($away, 'Sat', SAT_MIN, SAT_MAX, 0);
+	away_init ($away, 'Sun', SUN_MIN, SUN_MAX, 0);
+  
+	$sql = 'SELECT * FROM Away';
+	$result = mysql_query ($sql);
+	if (! $result)
+	  return display_mysql_error ('Query for away records failed', $sql);
+  
+	while ($row = mysql_fetch_array ($result))
+	{
+	  away_add ($away, $row, 'Fri', FRI_MIN, FRI_MAX);
+	  away_add ($away, $row, 'Sat', SAT_MIN, SAT_MAX);
+	  away_add ($away, $row, 'Sun', SUN_MIN, SUN_MAX);
+	}
   }
   
-  $block = new ScheduleBlock($blockStart, $max_hour);
+  $time_width = 70;
+  $away_width = 70;
+  $totals_width = 125;
   
-  echo "<div style=\"position: relative; border: 1px black solid; text-align: center; ";
-  echo "width: 100%; height: " . ($block->getHours() * 10) ."em;\">\n";
+  // calculate the minimum schedule width in pixels
+  $full_width = $maxColumns * 90;
+  $full_width += $time_width;
+  if ($show_away_column) {
+    $full_width += $away_width;
+  }
+  if ($show_counts) {
+	$full_width += $totals_width;
+  }
+  $full_width .= "px";
+  $time_width .= "px";
+  $away_width .= "px";
+  $totals_width .= "px";
   
-  echo "<div style=\"position: absolute; left: 0%; width: 10%; top: 0%; height: 100%;\">";
-  echo "<div style=\"position: relative; height: 100%; width: 100%;\">";
-  for ($hour = $block->startHour; $hour < $block->endHour; $hour++) {
+  $full_height = ($mainBlock->getHours() * 10) . "em";
+
+  $events_width = ($mainBlock->maxColumns / $maxColumns) * 100 . "%";
+  $volunteer_width = ($volunteerBlock->maxColumns / $maxColumns) * 100 . "%";
+  
+  // main wrapper for the whole schedule
+  echo "<div style=\"position: relative; border: 1px black solid; min-width: $full_width;\">";
+  
+  // left column: times
+  echo "<div style=\"position: relative; width: $time_width; float: left;\">";
+  echo "<div style=\"width: 100%; height: 30px;\">";
+  write_centering_table("<b>Time</b>");
+  echo "</div>";
+  
+  echo "<div style=\"position: relative; width: 100%; height: $full_height;\">";
+  for ($hour = $blockStart; $hour < $blockEnd; $hour++) {
 	echo "<div style=\"position: absolute; ";
 	echo "width: 100%; left: 0%; ";
-	echo "top: " . ((($hour - $block->startHour) / $block->getHours()) * 100.0) . "%; ";
-	echo "height: " . (100.0 / $block->getHours()) . "%;";
+	echo "top: " . ((($hour - $blockStart) / $mainBlock->getHours()) * 100.0) . "%; ";
+	echo "height: " . (100.0 / $mainBlock->getHours()) . "%;";
 	echo "\">";
 	
 	write_24_hour($hour);
@@ -997,74 +951,84 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
   }
   echo "</div></div>";
   
-  display_schedule_runs_in_div($block, $pcsgEventRuns, $eventRuns,
-							   "left: 10%; width: 70%; top: 0%; height: 100%;",
-							   $hour, $away_all_day, $away_hours,
-							   $signed_up_runs, $signup_count_male, $signup_count_female,
-							   $game_max_male, $game_max_female, $game_max_neutral);
-  
-  display_schedule_runs_in_div($block, $pcsgVolunteerRuns, $volunteerRuns,
-							   "left: 80%; width: 15%; top: 0%; height: 100%;",
-							   $hour, $away_all_day, $away_hours,
-							   $signed_up_runs, $signup_count_male, $signup_count_female,
-							   $game_max_male, $game_max_female, $game_max_neutral);
+  // right column: away checkboxes or totals
+  if ($show_away_column || $show_counts) {
+	echo "<div style=\"position: relative; width: ";
+	if ($show_away_column) {
+	  echo $away_width;
+	} else {
+	  echo $totals_width;
+	}
+	echo "; float: right;\">";
+    echo "<div style=\"height: 30px; width: 100%;\">";
+	if ($show_away_column) {
+      write_centering_table("<b><a href=\"#Away\">Away</a></b>");
+	} else {
+	  write_centering_table("<b>Totals</b>");
+	}
+    echo "</div>";
 
-  echo "<div style=\"position: absolute; left: 95%; width: 5%; top: 0%; height: 100%;\">";
-  echo "<div style=\"position: relative; height: 100%; width: 100%;\">";
-  for ($hour = $block->startHour; $hour < $block->endHour; $hour++) {
-	echo "<div style=\"position: absolute; font-weight: bold; ";
-	echo "width: 100%; left: 0%; ";
-	echo "top: " . ((($hour - $block->startHour) / $block->getHours()) * 100.0) . "%; ";
-	echo "height: " . (100.0 / $block->getHours()) . "%;";
-	echo "\">";
-	
-	if ($logged_in)
-      write_away_checkbox ($away_hours[$hour], $day, $hour, $away_all_day);
-  	
-	echo "</div>";
+	echo "<div style=\"position: relative; height: $full_height; width: 100%;\">";
+	for ($hour = $blockStart; $hour < $blockEnd; $hour++) {
+	  echo "<div style=\"position: absolute; font-weight: bold; ";
+	  echo "width: 100%; left: 0%; ";
+	  echo "top: " . ((($hour - $blockStart) / $mainBlock->getHours()) * 100.0) . "%; ";
+	  echo "height: " . (100.0 / $mainBlock->getHours()) . "%;";
+	  echo "\">";
+	  
+	  if ($show_away_column) {
+		write_away_checkbox ($away_hours[$hour], $day, $hour, $away_all_day);
+	  } else if ($show_counts) {
+        $k = sprintf ('%s%02d', $day, $hour);
+		write_totals ($avail_min[$hour], $avail_pref[$hour], $avail_max[$hour],
+		    $total_confirmed[$hour],
+		    $total_not_counted[$hour],
+		    $total_waitlisted[$hour],
+		    $away[$k] + $away[$day]);
+	  }
+	  
+	  echo "</div>";
+	}
+	echo "</div></div>";
   }
-  echo "</div></div>";
-
-  //while ($hour <  $max_hour)
-  //{
-  //  if ($hour > $max_consuite_start)
-  //    echo "<td>&nbsp;</td>\n";
-  //
-  //  if ($logged_in)
-  //    write_away_checkbox ($away_hours[$hour], $day, $hour, $away_all_day);
-  //  $hour++;
-  //  print ("  </TR>\n  <TR ALIGN=CENTER>\n");
-  //  write_24_hour ($hour);
-  //}
-  //
-  //if ($hour > $max_consuite_start)
-  //  echo "<td>&nbsp;</td>\n";
-  //
-  //if ($logged_in)
-  //  write_away_checkbox ($away_hours[$hour], $day, $hour, $away_all_day);
-  //echo "  </TR>\n";
-  //
-  //// And end with a header
-  //
-  //echo "  <TR ALIGN=CENTER>\n";
-  //write_cell ('TH', 'Start Time', '');
-  //
-  //for ($i = 1; $i <= $MaxTracks; $i++)
-  //{
-  //  write_cell ("TH", $i, '');
-  //}
-  //
-  //if ($logged_in)
-  //  write_cell ('TH', '<A HREF="#Away">Away</A>', '');
-  //
-  //echo "  </TR>\n";
+  
+  // main column: events and volunteer track
+  echo "<div style=\"position: relative; margin-left: $time_width;";
+  if ($show_away_column) {
+	echo " margin-right: $away_width;";
+  } else if ($show_counts) {
+	echo " margin-right: $totals_width;";
+  }
+  echo "\">";  
+  echo "<div style=\"height: 30px; width: $events_width;\">";
+  write_centering_table("<b>Events</b>");
   echo "</div>";
 
-  if ($logged_in)
+  display_schedule_runs_in_div($mainBlock, $eventRuns,
+							   "width: $events_width; height: $full_height;",
+							   $hour, $away_all_day, $away_hours,
+							   $signed_up_runs, $signup_counts,
+							   $show_counts);
+  
+  echo "<div style=\"position: absolute; height: 30px; right: 0px; top: 0px; width: $volunteer_width;\">";
+  write_centering_table("<b>Volunteer</b>");
+  echo "</div>";
+  
+  display_schedule_runs_in_div($volunteerBlock, $volunteerRuns,
+							   "position: absolute; right: 0px; top: 30px; width: $volunteer_width; height: $full_height;",
+							   $hour, $away_all_day, $away_hours,
+							   $signed_up_runs, $signup_counts,
+							   $show_counts);
+
+  echo "</div>";
+
+  echo "</div>";
+
+  if ($show_away_column)
   {
-    echo "<DIV ALIGN=CENTER>\n";
-    echo "<INPUT TYPE=SUBMIT VALUE=\"Update Away Settings\">\n";
-    echo "<DIV ALIGN=LEFT>\n";
+    echo "<div style=\"text-align: center;\"\n";
+    echo "<INPUT TYPE=SUBMIT VALUE=\"Update Away Settings\"/>\n";
+    echo "</div>\n";
   }
 }
 
@@ -1123,76 +1087,6 @@ function display_schedule_with_counts ()
 
   echo "<H2>Schedule with Counts</H2>\n";
 
-  // Get signup counts
-
-  $confirmed = array ();
-  $waitlisted = array ();
-  $not_counted = array ();
-  $away = array ();
-
-  // Number of players confirmed per run
-
-  $sql = 'SELECT RunId, COUNT(*) AS Count';
-  $sql .= ' FROM Signup';
-  $sql .= ' WHERE State="Confirmed"';
-  $sql .= '   AND Counted="Y"';
-  $sql .= ' GROUP BY RunId';
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Query for male signups failed');
-
-  while ($row = mysql_fetch_object ($result))
-    $confirmed[$row->RunId] = $row->Count;
-
-  // Number of GMs not counted per run
-
-  $sql = 'SELECT RunId, COUNT(*) AS Count';
-  $sql .= ' FROM Signup';
-  $sql .= ' WHERE State="Confirmed"';
-  $sql .= '   AND Counted="N"';
-  $sql .= ' GROUP BY RunId';
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Query for not counted signups failed');
-
-  while ($row = mysql_fetch_object ($result))
-    $not_counted[$row->RunId] = $row->Count;
-
-  // Number of players waitlisted per run
-
-  $sql = 'SELECT RunId, COUNT(*) AS Count';
-  $sql .= ' FROM Signup';
-  $sql .= ' WHERE State="Waitlisted"';
-  $sql .= '   AND Counted="Y"';
-  $sql .= ' GROUP BY RunId';
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Query for female signups failed');
-
-  while ($row = mysql_fetch_object ($result))
-    $waitlisted[$row->RunId] = $row->Count;
-
-  // Number of people away by hour
-
-  away_init ($away, 'Fri', FRI_MIN, FRI_MAX, 0);
-  away_init ($away, 'Sat', SAT_MIN, SAT_MAX, 0);
-  away_init ($away, 'Sun', SUN_MIN, SUN_MAX, 0);
-
-  $sql = 'SELECT * FROM Away';
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Query for away records failed', $sql);
-
-  while ($row = mysql_fetch_array ($result))
-  {
-    away_add ($away, $row, 'Fri', FRI_MIN, FRI_MAX);
-    away_add ($away, $row, 'Sat', SAT_MIN, SAT_MAX);
-    away_add ($away, $row, 'Sun', SUN_MIN, SUN_MAX);
-  }
-
   // Display key
 
   echo "The numbers shown for each game and the hourly totals have the following ";
@@ -1202,9 +1096,9 @@ function display_schedule_with_counts ()
   echo "/<FONT COLOR=red>&lt;waitlisted&gt</FONT>/&lt;away&gt; players for this game or hour<P>\n";
   echo "The Totals column includes an extra entry for the number of players who\n";
   echo "have indicated that they will be away that hour<p>\n";
-  schedule_day_with_counts ('Fri', $confirmed, $waitlisted, $not_counted, $away);
-  schedule_day_with_counts ('Sat', $confirmed, $waitlisted, $not_counted, $away);
-  schedule_day_with_counts ('Sun', $confirmed, $waitlisted, $not_counted, $away);
+  schedule_day ('Fri', array(), array(), array(), false, true);
+  schedule_day ('Sat', array(), array(), array(), false, true);
+  schedule_day ('Sun', array(), array(), array(), false, true);
 
   $spaces = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 
@@ -1223,314 +1117,6 @@ function display_schedule_with_counts ()
   echo "</TABLE>\n";
 }
 
-function schedule_day_with_counts ($day,
-				   $confirmed,
-				   $waitlisted,
-				   $not_counted,
-				   $away)
-{
-  // Get the start time for today's ConSuite
-
-  $sql = 'SELECT MIN(StartHour) as MinStartHour,';
-  $sql .= ' MAX(StartHour) as MaxStartHour';
-  $sql .= ' FROM Runs, Events';
-  $sql .= " WHERE Day='$day'";
-  $sql .= '   AND Events.EventId=Runs.EventId';
-  $sql .= '   AND Events.IsConSuite="Y"';
-
-  $result = mysql_query($sql);
-  if (! $result)
-    return display_mysql_error ("Query for min ConSuite start time for $day failed", $sql);
-
-  $min_consuite_start = 0;
-  $max_consuite_start = 99;
-  if (0 != mysql_num_rows($result))
-  {
-    $row = mysql_fetch_object ($result);
-    $min_consuite_start = $row->MinStartHour;
-    $max_consuite_start = $row->MaxStartHour;
-  }
-
-  //  dump_array ('Signed_Up_Runs', $signed_up_runs);
-
-  $sql = 'SELECT MIN(StartHour) AS MinStartHour, MAX(Track) AS MaxTracks';
-  $sql .= ' FROM Runs, Events';
-  $sql .= " WHERE Day='$day'";
-  $sql .= '   AND Events.EventId=Runs.EventId';
-  $sql .= '   And Events.IsOps<>"Y"';
-  $sql .= '   And Events.IsConSuite<>"Y"';
-
-  //  echo $sql . '<P>';
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ("Query for limits for $day failed");
-  if (1 != mysql_num_rows ($result))
-    return display_error ("Invalid number of rows for $day");
-
-  $row = mysql_fetch_object ($result);
-
-  // Don't forget to add columns for Ops & ConSuite - they were deliberately
-  // excluded in the select statement above so they could be forced into the
-  // leftmost column
-
-  $MaxTracks = $row->MaxTracks + 1;  // Add column for Ops
-  if (0 != $min_consuite_start)      // Add column for ConSuite, if scheduled
-    $MaxTracks++;
-
-  $hour = $row->MinStartHour;
-
-  $avail_min = array ();
-  $avail_max = array ();
-  $avail_pref = array ();
-
-  $total_confirmed = array ();
-  $total_not_counted = array ();
-  $total_waitlisted = array ();
-
-  mysql_free_result ($result);
-
-  //  echo "Max Tracks: $MaxTracks<br>Start Time: $row->MinStartHour<br>Hour: $hour<p>\n";
-
-  $col_pct = 100 / ($MaxTracks + 2);
-
-  $sql = 'SELECT Runs.RunId, Runs.Track, Runs.TitleSuffix, Runs.StartHour,';
-  $sql .= ' Runs.Span, Runs.ScheduleNote, Runs.Venue, Runs.Track,';
-  $sql .= ' Events.EventId, Events.SpecialEvent, Events.Hours, Events.Title,';
-  $sql .= ' Events.CanPlayConcurrently,Events.IsOps,Events.IsConSuite,';
-  $sql .= ' LENGTH(Events.Description) AS DescLen,';
-  $sql .= ' MinPlayersMale+MinPlayersFemale+MinPlayersNeutral AS Min,';
-  $sql .= ' MaxPlayersMale+MaxPlayersFemale+MaxPlayersNeutral AS Max,';
-  $sql .= ' PrefPlayersMale+PrefPlayersFemale+PrefPlayersNeutral AS Pref';
-  $sql .= ' FROM Events, Runs';
-  $sql .= " WHERE Events.EventId=Runs.EventId AND Day='$day'";
-  $sql .= ' ORDER BY StartHour, Track';
-
-  /* Dump the query results
-  $result = mysql_query ($sql);
-  echo "<TABLE BORDER=1>\n";
-  echo "  <TR>\n";
-  write_cell ('TH', 'Title');
-  write_cell ('TH', 'Run Suffix');
-  write_cell ('TH', 'Start Time');
-  write_cell ('TH', 'Hours');
-  write_cell ('TH', 'Track');
-  echo "  </TR>\n";
-  while ($row = mysql_fetch_object ($result))
-  {
-    $start_time = start_hour_to_24_hour ($row->StartHour);
-    echo "  <TR>\n";
-    write_cell ('TD', $row->Title);
-    write_cell ('TD', $row->TitleSuffix);
-    write_cell ('TD', $start_time);
-    write_cell ('TD', $row->Hours);
-    write_cell ('TD', $row->Track);
-    echo "  </TR>\n";
-  }
-  echo "</TABLE>\n";
-  */
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ("Schedule query for $day failed", $sql);
-
-  if (0 == mysql_num_rows ($result))
-  {
-    echo "No games scheduled for $day<P>";
-    return TRUE;
-  }
-
-  // Display the result as a table.  Only the header row should specify
-  // the width attribute since it will be applied to the other rows
-  // automatically
-
-  echo "<H2>" . day_to_date ($day) . "</H2>\n";
-
-  $attrib = sprintf ("WIDTH=\"%d%%\"", $col_pct);
-
-  // Start with a header
-
-  echo "<TABLE BORDER>\n";
-  echo "  <TR ALIGN=CENTER>\n";
-  write_cell ("TH", "Start Time", $attrib);
-  for ($i = 1; $i <= $MaxTracks; $i++)
-  {
-    write_cell ("TH", $i, $attrib);
-  }
-  write_cell ('TH', 'Totals', $attrib);
-  echo "  </TR>\n";
-
-  // If we've got leading ConSuite entries, add a "Special Event" to fill
-  // the table
-
-  if ((0 != $min_consuite_start) && ($min_consuite_start < $hour))
-  {
-    echo "  <tr align=\"center\">\n";
-    write_24_hour ($min_consuite_start);
-    
-    $attrib = sprintf ('rowspan=%d colspan=%d',
-		       $hour - $min_consuite_start,
-		       $MaxTracks - 1);
-
-    write_cell ("td", 'Volunteer', $attrib);
-
-
-    for ($h = $min_consuite_start + 1; $h <= $hour; $h++)
-    {
-      // Read ConSuite entry
-      $row = mysql_fetch_object ($result);
-
-      display_event_with_counts ($h, $row,
-				 $confirmed, $not_counted, $waitlisted,
-				 $avail_min, $avail_pref, $avail_max,
-				 $total_confirmed, $total_not_counted,
-				 $total_waitlisted);
-
-
-      $k = sprintf ('%s%02d', $day, $hour);
-      write_totals ($avail_min[$h], $avail_pref[$h], $avail_max[$h],
-		    $total_confirmed[$h],
-		    $total_not_counted[$h],
-		    $total_waitlisted[$h],
-		    $away[$k] + $away[$day]);
-
-      echo "  </tr>\n";
-      echo "  <tr align=\"center\">\n";
-      write_24_hour ($h);
-    }
-  }
-  else
-  {
-    print ("  <tr align=\"center\">\n");
-    write_24_hour ($hour);
-  }
-
-  echo "<!-- ***** Dropped out of ConSuite loop -->\n";
-  echo "<!-- max_consuite_start: $max_consuite_start -->\n";
-
-  // Display the rest of the day's schedule
-
-  //  print ("  <TR ALIGN=CENTER>\n");
-  //  write_24_hour ($hour);
-
-  $max_hour = $hour;
-
-  while ($row = mysql_fetch_object ($result))
-  {
-    $game_start = $row->StartHour;
-    while ($hour < $game_start)
-    {
-      if ($hour > $max_consuite_start)
-	echo "<td>&nbsp;</td>\n";
-
-      $k = sprintf ('%s%02d', $day, $hour);
-      write_totals ($avail_min[$hour], $avail_pref[$hour], $avail_max[$hour],
-		    $total_confirmed[$hour],
-		    $total_not_counted[$hour],
-		    $total_waitlisted[$hour],
-		    $away[$k] + $away[$day]);
-      $hour++;
-      print ("  </TR>\n  <TR ALIGN=CENTER>\n");
-      write_24_hour ($hour);
-    }
-
-    // The remaining columns are the games or special events
-
-    if (1 == $row->SpecialEvent)
-    {
-      $attrib = sprintf ('ROWSPAN=%d COLSPAN=%d BGCOLOR=#CCCCCC',
-			 $row->Hours, $row->Span);
-      if ($row->DescLen > 0)
-	$text = sprintf ('<a href="Schedule.php?action=%d&EventId=%d&' .
-			 'RunId=%d">%s</a>',
-			 SCHEDULE_SHOW_GAME,
-			 $row->EventId,
-			 $row->RunId,
-			 $row->Title);
-      else
-	$text = $row->Title;
-      if (user_has_priv (PRIV_SCHEDULING))
-	$text .= sprintf ('<br><font color=red>Track: %d, Span: %d</font>',
-			  $row->Track,
-			  $row->Span);
-      write_cell ("td", $text, $attrib);
-    }
-    else
-    {
-      display_event_with_counts ($hour, $row,
-				 $confirmed, $not_counted, $waitlisted,
-				 $avail_min, $avail_pref, $avail_max,
-				 $total_confirmed, $total_not_counted,
-				 $total_waitlisted);
-    }
-
-    $game_end  = $game_start + $row->Hours;
-    if ($max_hour < $game_end)
-      $max_hour = $game_end;
-
-    //    echo "<!-- tGame: $tGame (" . strftime ('%H:%M', $tGame) . ") -->\n";
-    //    echo "<!-- tGameEnd: $tGameEnd (" . strftime ('%H:%M', $tGameEnd) . ") -->\n";
-    //    echo "<!-- tMax: $tMax (" . strftime ('%H:%M', $tMax) . ") -->\n";
-  }
-
-  mysql_free_result ($result);
-
-  $max_hour--;
-
-  if (! array_key_exists ($max_hour, $avail_min))
-  {
-    $avail_min[$max_hour] = 0;
-    $avail_pref[$max_hour] = 0;
-    $avail_max[$max_hour] = 0;
-    $total_confirmed[$max_hour] = 0;
-    $total_not_counted[$max_hour] = 0;
-    $total_waitlisted[$max_hour] = 0;
-  }
-
-  while ($hour <  $max_hour)
-  {
-    if ($hour > $max_consuite_start)
-      echo "<td>&nbsp;</td>\n";
-
-    if (! array_key_exists ($hour, $avail_min))
-    {
-      $avail_min[$hour] = 0;
-      $avail_pref[$hour] = 0;
-      $avail_max[$hour] = 0;
-      $total_confirmed[$hour] = 0;
-      $total_not_counted[$hour] = 0;
-      $total_waitlisted[$hour] = 0;
-    }
-
-    $k = sprintf ('%s%02d', $day, $hour);
-    write_totals ($avail_min[$hour], $avail_pref[$hour], $avail_max[$hour],
-		  $total_confirmed[$hour],
-		  $total_not_counted[$max_hour],
-		  $total_waitlisted[$max_hour],
-		  $away[$k] + $away[$day]);
-
-    $hour++;
-    print ("  </TR>\n  <TR ALIGN=CENTER>\n");
-    write_24_hour ($hour);
-  }
-
-  // Finish up the final row
-
-  if ($hour > $max_consuite_start)
-    echo "<td>&nbsp;</td>\n";
-
-  $k = sprintf ('%s%02d', $day, $max_hour);
-  write_totals ($avail_min[$max_hour], $avail_pref[$max_hour],
-		$avail_max[$max_hour],
-		$total_confirmed[$max_hour],
-		$total_not_counted[$max_hour],
-		$total_waitlisted[$max_hour],
-		$away[$k] + $away[$day]);
-
-  print ("  </TR>\n");
-  print ("</TABLE>");
-}
-
 function write_totals ($min, $pref, $max,
 		       $confirmed, $not_counted, $waitlisted, $away)
 {
@@ -1543,299 +1129,7 @@ function write_totals ($min, $pref, $max,
 		  $confirmed, $not_counted, $waitlisted, $away,
 		  $confirmed + $not_counted + $waitlisted + $away);
 
-  write_cell ('TD', $txt, '');
-}
-
-function display_event_with_counts($hour, $row,
-				   $confirmed, $not_counted, $waitlisted,
-				   &$avail_min, &$avail_pref, &$avail_max,
-				   &$total_confirmed, &$total_not_counted,
-				   &$total_waitlisted)
-{
-  // This game spans as many rows as it's hours long
-
-  $attrib = sprintf ("rowspan=\"%d\" colspan=\"%d\"", $row->Hours, $row->Span);
-
-  // Set the background color.
-  // - If the user is confirmed for the game, color it green.
-  // - If the user is waitlisted for the game, color it yellow.
-  // - If the game is full, color it red
-
-/*
-      echo "<!-- RunId: $row->RunId, CanPlayConcurrently: $row->CanPlayConcurrently -->\n";
-      $status = $signed_up_runs[$row->RunId];
-      echo "<!-- Status: $status -->\n";
-      $count = $signup_count[$row->RunId];
-      echo "<!-- SignedUp: $count -->\n";
-      echo "<!-- EventId: $row->EventId -->\n";
-      $the_max = $game_max[$row->EventId];
-      echo "<!-- GameMax: $the_max -->\n";
-*/
-
-  if (array_key_exists ($row->RunId, $confirmed))
-    $confirmed_for_run = $confirmed[$row->RunId];
-  else
-    $confirmed_for_run = 0;
-
-/*
-      printf ("<!-- Min: %d, Pref: %d, Max: %d, Conf: %d, %s -->\n",
-	      $row->Min,
-	      $row->Pref,
-	      $row->Max,
-	      $confirmed_for_run,
-	      $row->Title);
-*/
-
-  // Color the cells:
-  // If we're less than the minimum, it's light yellow.
-  // If we're above the minimum, but less than max, it's light green
-  // If we're at max, it's dark green
-
-  if ($confirmed_for_run < $row->Min)
-    $attrib .= get_bgcolor ('Full');       // Light red
-  elseif ($confirmed_for_run < $row->Pref)
-    $attrib .= get_bgcolor ('Waitlisted'); // Light yellow
-  elseif ($confirmed_for_run < $row->Max)
-    $attrib .= get_bgcolor ('Confirmed');  // Light green
-  else
-    $attrib .= get_bgcolor ('CanPlayConcurrently'); // Light blue
-
-  // Add the game title (and run suffix) with a link to the game page
-
-  $text = sprintf ('<a href="Schedule.php?action=%d&EventId=%d&RunId=%d">%s',
-		   SCHEDULE_SHOW_GAME,
-		   $row->EventId,
-		   $row->RunId,
-		   $row->Title);
-  if ('' != $row->TitleSuffix)
-    $text .= "<p>$row->TitleSuffix";
-  $text .= '</a>';
-
-  if ('' != $row->ScheduleNote)
-    $text .= "<p>$row->ScheduleNote";
-  if ('' != $row->Venue)
-    $text .= "<p>$row->Venue\n";
-
-  // Add the available slots for this game
-
-  if (array_key_exists ($row->RunId, $not_counted))
-    $not_counted_for_run = $not_counted[$row->RunId];
-  else
-    $not_counted_for_run = 0;
-
-  if (array_key_exists ($row->RunId, $waitlisted))
-    $waitlisted_for_run = $waitlisted[$row->RunId];
-  else
-    $waitlisted_for_run = 0;
-
-  $text .= sprintf ('<P><NOBR>%d/%d/%d</NOBR><BR>' .
-		    '<NOBR><FONT COLOR=green>%d</FONT>/' .
-		    '<FONT COLOR=blue>%d</FONT>/' . 
-		    '<FONT COLOR=red>%d</FONT></NOBR>',
-		    $row->Min,
-		    $row->Pref,
-		    $row->Max,
-		    $confirmed_for_run,
-		    $not_counted_for_run,
-		    $waitlisted_for_run);
-
-  if (user_has_priv (PRIV_SCHEDULING))
-    $text .= sprintf ('<br><font color=red>Track: %d, Span: %d</font>',
-		      $row->Track,
-		      $row->Span);
-
-  // Add to the totals for all hours covered by this game
-
-  //      if ("N" == $row->IsOps)
-  for ($h = $hour; $h < $hour + $row->Hours; $h++)
-  {
-    if (! array_key_exists ($h, $avail_min))
-    {
-      $avail_min[$h] = 0;
-      $avail_pref[$h] = 0;
-      $avail_max[$h] = 0;
-      $total_confirmed[$h] = 0;
-      $total_not_counted[$h] = 0;
-      $total_waitlisted[$h] = 0;
-    }
-
-    $avail_min[$h] += $row->Min;
-    $avail_pref[$h] += $row->Pref;
-    $avail_max[$h] += $row->Max;
-
-    $total_confirmed[$h] += $confirmed_for_run;
-    $total_not_counted[$h] += $not_counted_for_run;
-    $total_waitlisted[$h] += $waitlisted_for_run;
-  }
-
-  write_cell ("td", $text, $attrib);
-}
-
-/*
- * build_day_table
- *
- * Build the HTML table for a day
- */
-
-function schedule_day ($day, $signed_up_runs, $signup_count, $game_max)
-{
-  //  dump_array ('Signed_Up_Runs', $signed_up_runs);
-
-  $sql = 'SELECT MIN(StartHour) AS MinStartHour, MAX(Track) AS MaxTracks';
-  $sql .= " FROM Runs WHERE Day='$day'";
-
-  //  echo $sql . '<P>';
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ("Query for limits for $day failed");
-  if (1 != mysql_num_rows ($result))
-    return display_error ("Invalid number of rows for $day");
-
-  $row = mysql_fetch_object ($result);
-
-  $MaxTracks = $row->MaxTracks;
-  $hour = $row->MinStartHour;
-
-  mysql_free_result ($result);
-
-  //  echo "Max Tracks: $MaxTracks<br>Start Time: $row->MinStartHour<p>\n";
-
-  $col_pct = 100 / ($MaxTracks + 1);
-
-  $sql = 'SELECT Runs.RunId, Runs.Track, Runs.TitleSuffix, Runs.StartHour,';
-  $sql .= ' Runs.Span, Runs.ScheduleNote,';
-  $sql .= ' Events.EventId, Events.SpecialEvent, Events.Hours, Events.Title,';
-  $sql .= ' Events.CanPlayConcurrently';
-  $sql .= ' FROM Events, Runs';
-  $sql .= " WHERE Events.EventId=Runs.EventId AND Day='$day'";
-  $sql .= ' ORDER BY StartHour, Track';
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ("Schedule query for $day failed", $sql);
-
-  if (0 == mysql_num_rows ($result))
-  {
-    echo "No games scheduled for $day<P>";
-    return TRUE;
-  }
-
-  // Display the result as a table.  Only the header row should specify
-  // the width attribute since it will be applied to the other rows
-  // automatically
-
-  echo "<H2>" . day_to_date ($day) . "</H2>\n";
-
-  $attrib = sprintf ("WIDTH=\"%d%%\"", $col_pct);
-
-  // Start with a header
-
-  echo "<TABLE BORDER>\n";
-  echo "  <TR ALIGN=CENTER>\n";
-  write_cell ("TH", "Start Time", $attrib);
-  for ($i = 1; $i <= $MaxTracks; $i++)
-  {
-    write_cell ("TH", $i, $attrib);
-  }
-  echo "  </TR>\n";
-
-  // Display the rest of the day's schedule
-
-  print ("  <TR ALIGN=CENTER>\n");
-  write_hour ($tHour);
-
-  $tMax = $tHour;
-
-  while ($row = mysql_fetch_object ($result))
-  {
-    $hour = $row->StartHour;
-    while ($hour < $tGame)
-    {
-      $hour++;
-      print ("  </TR>\n  <TR ALIGN=CENTER>\n");
-      write_hour ($hour);
-    }
-
-    // The remaining columns are the games or special events
-
-    if (1 == $row->SpecialEvent)
-    {
-      $attrib = sprintf ('ROWSPAN=%d COLSPAN=%d', $row->Hours, $row->Span);
-      write_cell ("TD", $row->Title, $attrib);
-    }
-    else
-    {
-      // This game spans as many rows as it's hours long
-
-      $attrib = sprintf ("ROWSPAN=%d COLSPAN=%d", $row->Hours, $row->Span);
-
-      // Set the background color.
-      // - If the user is confirmed for the game, color it green.
-      // - If the user is waitlisted for the game, color it yellow.
-      // - If the game is full, color it red
-
-/*
-      echo "<!-- RunId: $row->RunId, CanPlayConcurrently: $row->CanPlayConcurrently -->\n";
-      $status = $signed_up_runs[$row->RunId];
-      echo "<!-- Status: $status -->\n";
-      $count = $signup_count[$row->RunId];
-      echo "<!-- SignedUp: $count -->\n";
-      echo "<!-- EventId: $row->EventId -->\n";
-      $the_max = $game_max[$row->EventId];
-      echo "<!-- GameMax: $the_max -->\n";
-*/
-
-      $game_full = false;
-      if (array_key_exists ($row->RunId, $signup_count))
-	$game_full = $signup_count[$row->RunId] >= $game_max[$row->EventId];
-
-      if (array_key_exists ($row->RunId, $signed_up_runs))
-      {
-	if ('Confirmed' == $signed_up_runs[$row->RunId])
-	  $attrib .= get_bgcolor ('Confirmed');
-	elseif ('Waitlisted' == $signed_up_runs[$row->RunId])
-	  $attrib .= get_bgcolor ('Waitlisted');
-      }
-      elseif ($game_full)
-	$attrib .= get_bgcolor ('Full');
-      elseif ('Y' == $row->CanPlayConcurrently)
-	$attrib .= get_bgcolor ('CanPlayConcurrently');
-
-      $text = "<A HREF=Schedule.php?action=" . SCHEDULE_SHOW_GAME .
-	      "&EventId=$row->EventId>$row->Title";
-      if ('' != $row->TitleSuffix)
-	$text .= "<P>$row->TitleSuffix";
-      $text .= '</A>';
-      if ('' != $row->ScheduleNote)
-	$text .= "<P>$row->ScheduleNote";
-      if ($game_full)
-	$text .= '<P><I>Full</I>';
-      write_cell ("TD", $text, $attrib);
-    }
-
-    $tGameEnd = $tGame + ($row->Hours * 60 * 60);
-    if ($tMax < $tGameEnd)
-      $tMax = $tGameEnd;
-
-    //    echo "<!-- tGame: $tGame (" . strftime ('%H:%M', $tGame) . ") -->\n";
-    //    echo "<!-- tGameEnd: $tGameEnd (" . strftime ('%H:%M', $tGameEnd) . ") -->\n";
-    //    echo "<!-- tMax: $tMax (" . strftime ('%H:%M', $tMax) . ") -->\n";
-  }
-
-  mysql_free_result ($result);
-
-  $tMax -= 60 * 60;
-
-  while ($tHour <  $tMax)
-  {
-    $tHour += 60 * 60;
-    print ("  </TR>\n  <TR ALIGN=CENTER>\n");
-    write_hour ($tHour);
-  }
-
-  print ("  </TR>\n");
-  print ("</TABLE>");
+  write_centering_table($txt);
 }
 
 /*
@@ -1880,93 +1174,6 @@ function write_cell ($type, $text, $attribute='')
 	  $type, $attribute,
 	  $text,
 	  $type);
-}
-
-
-/*
- * display_schedule
- *
- * Build a schedule from the database
- */
-
-function display_schedule ()
-{
-  
-  $signed_up_runs = array ();
-
-  // If the user is logged in, find out what runs he's signed up for
-
-  if (is_logged_in ())
-  {
-    $sql = 'SELECT RunId, State FROM Signup ';
-    $sql .= ' WHERE UserId=' . $_SESSION[SESSION_LOGIN_USER_ID];
-    $sql .= ' AND State<>"Withdrawn"';
-
-    //    echo $sql . "<p>\n";
-
-    $result = mysql_query ($sql);
-    if (! $result)
-      return display_mysql_error ('Query for signup list failed');
-
-    while ($row = mysql_fetch_object ($result))
-    {
-      $signed_up_runs[$row->RunId] = $row->State;
-    }
-  }
-
-  $sql = 'SELECT RunId, COUNT(*) AS Count';
-  $sql .= ' FROM Signup';
-  $sql .= ' WHERE State="Confirmed"';
-  $sql .= '   AND Counted="Y"';
-  $sql .= ' GROUP BY RunId';
-
-  //  echo $sql . "<p>\n";
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Query for signup counts failed');
-
-  while ($row = mysql_fetch_object ($result))
-  {
-    $signup_count[$row->RunId] = $row->Count;
-  }
-
-  $sql = "SELECT EventId, MaxPlayersMale + MaxPlayersFemale + MaxPlayersNeutral AS Max";
-  $sql .= " FROM Events WHERE SpecialEvent=0";
-
-  //  echo $sql . "<p>\n";
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Query for game maxes failed');
-
-  while ($row = mysql_fetch_object ($result))
-  {
-    $game_max[$row->EventId] = $row->Max;
-  }
-
-  schedule_day ('Fri', $signed_up_runs, $signup_count, $game_max);
-  schedule_day ('Sat', $signed_up_runs, $signup_count, $game_max);
-  schedule_day ('Sun', $signed_up_runs, $signup_count, $game_max);
-
-  $spaces = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-
-  echo "<P>\n";
-  echo "<TABLE CELLSPACING=3>\n";
-  echo "  <TR>\n";
-  if (is_logged_in ())
-  {
-    echo "    <TD" . get_bgcolor ('Confirmed') . ">$spaces</TD>\n";
-    echo "    <TD>Scheduled for Game$spaces</TD>\n";
-    echo "    <TD" . get_bgcolor ('Waitlisted') . ">$spaces</TD>\n";
-    echo "    <TD>Waitlisted for Game$spaces</TD>\n";
-  }
-  echo "    <TD" . get_bgcolor ('Full') . ">$spaces</TD>\n";
-  echo "    <TD>Game Full$spaces</TD>\n";
-  echo "    <TD" . get_bgcolor ('CanPlayConcurrently') . ">$spaces</TD>\n";
-  echo "    <TD>Can Play At Same Time As Other Games</TD>\n";
-  echo "  </TR>\n";
-  echo "</TABLE>\n";
 }
 
 /*
