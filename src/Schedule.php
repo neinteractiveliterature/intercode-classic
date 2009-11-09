@@ -993,7 +993,9 @@ function schedule_day ($day, $away_all_day, $away_hours,
   }
   
   // main column: events and volunteer track
-  echo "<div style=\"position: relative; margin-left: $time_width;";
+  echo "<div style=\"position: relative; margin-left: $time_width; ";
+  // ie6 and 7 hacks to give this div hasLayout=true
+  echo "_height: 0; min-height: 0;";
   if ($show_away_column) {
 	echo " margin-right: $away_width;";
   } else if ($show_counts) {
