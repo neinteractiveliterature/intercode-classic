@@ -1669,100 +1669,24 @@ function show_user_homepage_status ()
 
 function status_unpaid ()
 {
-  $sql = 'SELECT CanSignup, COUNT(*) AS Count FROM Users';
-  $sql .= ' WHERE CanSignup<>"Alumni"';
-  $sql .= '   AND CanSignup<>"Unpaid"';
-  $sql .= ' GROUP BY CanSignup ORDER BY CanSignup';
-  $result = mysql_query($sql);
-  if (! $result)
-    return display_mysql_error('Failed to get user summary');
+  
+  echo "<div style=\"border: 3px red solid; padding: 1ex; margin: 2ex;\">";
+  
+  echo "<b>You are currently unpaid for ".CON_NAME.".</b><br/>";
 
-  $attendees = 0;
-  while ($row = mysql_fetch_object($result))
+  if (attendees_at_max())
   {
-    if (('Alumni' <> $row->CanSignup) && ('Unpaid' <> $row->CanSignup))
-      $attendees += $row->Count;
-  }
-
-  if ($attendees >= CON_MAX)
-  {
-    printf ("We're sorry, but %s has reached it's attendance limit.\n",
+    printf ("<p>Unfortunately, %s has reached its attendance limit.\n",
 	    CON_NAME);
-    echo "We cannot accept any more registrations at this time.\n";
-    echo "Registrations for next Intercon J will open in February, 2009\n";
+    echo "We cannot accept any more registrations at this time.</p>\n";
+	echo "<p>".NEXT_CON_INFO."</p>";
+	echo "</div>";
     return false;
+  } else {
+	echo "Until you pay, you won't be able to sign up for any games. ";
+	echo "<a href=\"PaymentStatus.php\">Click here to pay!</a>\n";
   }
-
-  $now = time();
-
-  // Figure out where we are in the sequence
-
-  $k = 0;
-  while (get_con_price ($k++, $price, $start_date, $end_date))
-  {
-    if (0 == $end_date)
-      break;
-    if ($now < $end_date)
-      break;
-  }
-
-  $cost = "$price.00";
-
-  // If this is a development installation, force the price down to a nickle.
-  // I'm willing to spend 5 cents/test, but no full price
-
-  if (DEVELOPMENT_VERSION)
-    $cost = '0.05';
-
-  // Build the URL for the PayPal links
-
-  $return_url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
-  $cancel_url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
-
-  $url = 'https://www.paypal.com/cgi-bin/webscr?';
-  $url .= build_url_string ('cmd', '_xclick');
-  $url .= build_url_string ('business', 'InteractiveLit@yahoo.com');
-  $url .= build_url_string ('item_name', PAYPAL_ITEM_CON);
-  $url .= build_url_string ('no_note', '0');
-  $url .= build_url_string ('cn', 'Any notes about your payment?');
-  $url .= build_url_string ('no_shipping', '1');
-  $url .= build_url_string ('custom', $_SESSION[SESSION_LOGIN_USER_ID]);
-  $url .= build_url_string ('currency_code', 'USD');
-  $url .= build_url_string ('amount', $cost);
-  $url .= build_url_string ('rm', '2');
-  $url .= build_url_string ('cancel_return', $cancel_url);
-  $url .= build_url_string ('return', $return_url, FALSE);
-
-  //  echo "Encoded URL: $url<p>\n";
-  //  printf ("%d characters<p>\n", strlen ($url));
-
-  echo "You must complete your registration by paying the \$$cost\n";
-  echo "convention fee before you can register for any games.<P>\n";
-
-  echo "<A HREF=$url><IMG\n";
-  echo "SRC=http://images.paypal.com/images/x-click-but3.gif BORDER=0\n";
-  echo "ALIGN=LEFT ALT=\"Click to pay for Intercon D membership\"></A>";
-  echo "You can <A HREF=$url>pay now</A> through\n";
-  echo "PayPal.  If you sign up for PayPal, please be sure to say that\n";
-  echo "you were referred by <A HREF=mailto:InteractiveLit@yahoo.com>InteractiveLit@yahoo.com</A>\n";
-  echo "and PayPal will give an extra $5 to the con!<P>\n";
-  echo "If you pay for multiple people using PayPal, please tell us what\n";
-  echo "you're doing in the Note field on the PayPal site so we can\n";
-  echo "correlate the payments to the users.<P>\n";
-  echo "If you don't want to join PayPal, you can send a check or money\n";
-  echo "order made out to\n";
-  echo "&quot<B>New&nbsp;England&nbsp;Interactive&nbsp;Literature</B>&quot;\n";
-  echo "to<br>\n";
-  echo "<table>\n";
-  echo "  <tr>\n";
-  echo "    <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>\n";
-  printf ("    <td><b>%s<br>c/o %s<br>%s</b></td>\n",
-	  CON_NAME,
-	  NAME_CON_CHAIR,
-	  ADDR_CON_CHAIR);
-  echo "  </tr>\n";
-  echo "</table>\n";
-  echo "<p>\n";
+  echo "</div>";
 
   // Give the user the news, if any
 

@@ -128,6 +128,9 @@ define (CON_OVER, '2010-03-14');
 define (SHIRT_CLOSE, '2010-02-01');
 define (BIO_CLOSE, '2009-12-25');
 
+// Information about the next convention for people who can't sign up for this one
+define (NEXT_CON_INFO, "Registration for Intercon K will open in March 2010.");
+
 // Shirt stuff
 
 define (SHIRT_IMG_AVAILABLE, 0);
