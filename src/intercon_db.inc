@@ -883,6 +883,25 @@ function con_signups_allowed ()
   return 0;
 }
 
+function attendees_at_max() {
+  $sql = 'SELECT CanSignup, COUNT(*) AS Count FROM Users';
+  $sql .= ' WHERE CanSignup<>"Alumni"';
+  $sql .= '   AND CanSignup<>"Unpaid"';
+  $sql .= ' GROUP BY CanSignup ORDER BY CanSignup';
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Failed to get user summary');
+
+  $attendees = 0;
+  while ($row = mysql_fetch_object($result))
+  {
+    if (('Alumni' <> $row->CanSignup) && ('Unpaid' <> $row->CanSignup))
+      $attendees += $row->Count;
+  }
+  
+  return $attendees >= CON_MAX;
+}
+
 /*
  * form_section
  *
