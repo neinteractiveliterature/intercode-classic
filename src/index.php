@@ -951,7 +951,7 @@ function show_user_homepage_shirts ($UserId)
 {
   // Display the header for the user's TShirt order
 
-  display_header (CON_NAME . ' Shirts Ordered');
+  display_header ('<P>' . CON_NAME . ' Shirts Ordered');
 
   // Count up the number of shirts the user has ordered
 
