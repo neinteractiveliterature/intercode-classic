@@ -3131,8 +3131,8 @@ function process_signup_request ()
     $type = 'Waitlist';
 
     echo "If you are at the head of the waitlist and a player withdraws\n";
-    echo "from the game, you will automatically be signed up for this game\n";
-    echo "and withdrawn from the waitlists for any conflicting games.<P>\n";
+    echo "from the game, you will automatically be signed up for this\n";
+    echo "game<P>\n";
   }
 
   notify_gms ($EventId, $game_title, $game_day, $game_start_hour,
