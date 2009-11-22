@@ -4437,6 +4437,7 @@ function who_is_who ()
     $sql = 'SELECT Events.Title FROM GMs, Events';
     $sql .= ' WHERE Events.EventId=GMs.EventId';
     $sql .= "   AND GMs.UserId=$user_id";
+    $sql .= '   AND GMs.DisplayAsGM="Y"';
     $sql .= '   AND Events.IsConSuite="N"';
     $sql .= '   AND Events.IsOps="N"';
 

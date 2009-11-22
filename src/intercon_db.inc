@@ -247,6 +247,8 @@ define (PRECON_PROCESS_EVENT_FORM, 211);
 define (PRECON_MANAGE_EVENTS, 212);
 define (PRECON_SHOW_STATUS_FORM, 213);
 define (PRECON_PROCESS_STATUS_FORM, 214);
+define (PRECON_SHOW_ADD_RUN_FORM, 215);
+define (PRECON_PROCESS_ADD_RUN_FORM, 216);
 
 // List types
 
@@ -781,14 +783,14 @@ function html_begin ($bShowLogo=true)
 
   // Add this menu if user has PRECON_SCHEDULING priv
 
-/*
+
   if (user_has_priv (PRIV_PRECON_SCHEDULING))
   {
     navbar_title (true, 'PreCon Event Scheduling');
     navbar_entry (true, 'Manage PreCon Event Schedule',
 		  'Thursday.php', PRECON_MANAGE_EVENTS);
   }
-*/
+
   // Add the static pages
 
   navbar_title (false, 'Information');
