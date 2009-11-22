@@ -1,7 +1,5 @@
 <?
 
-define (MAX_PRECON_TRACK, 4);
-
 include ("intercon_db.inc");
 
 // Connect to the database
@@ -70,24 +68,6 @@ switch ($action)
 
   case PRECON_SHOW_STATUS_FORM:
     show_status_form();
-    break;
-
-  case PRECON_PROCESS_STATUS_FORM:
-    if (! process_status_form())
-      show_status_form();
-    else
-      display_event_summary();
-    break;
-
-  case PRECON_SHOW_ADD_RUN_FORM:
-    show_precon_add_run_form();
-    break;
-
-  case PRECON_PROCESS_ADD_RUN_FORM:
-    if (! process_precon_add_run_form(false))
-      show_precon_add_run_form();
-    else
-      display_event_summary();
     break;
 
   default:
@@ -901,10 +881,6 @@ function process_precon_event_form()
 function display_event_summary()
 {
   display_header ('PreCon Events');
-  
-  echo "<p>\nClick <b>Status</b> to change event status<br>\n";
-  echo "Click <b>Title</b> to add an event run<br>\n";
-  echo "Click <b>Track</b> to modify or delete a run</p>\n";
 
   $sql = 'SELECT PreConEventId, Title, Hours, Status FROM PreConEvents';
   $sql .= ' ORDER BY Status, Title';
@@ -926,9 +902,9 @@ function display_event_summary()
   echo "    <th colspan=\"3\">Runs</th>\n";
   echo "  </tr>\n";
   echo "  <tr>\n";
-  echo "    <th>&nbsp;Track&nbsp;</th>\n";
-  echo "    <th>&nbsp;Day&nbsp;</th>\n";
-  echo "    <th>&nbsp;Start&nbsp;Hour&nbsp;</th>\n";
+  echo "    <th>Track</th>\n";
+  echo "    <th>Day</th>\n";
+  echo "    <th>Start&nbsp;Time</th>\n";
   echo "  </tr>\n";
 
   while ($row = mysql_fetch_object($result))
@@ -941,25 +917,18 @@ function display_event_summary()
     if (! $run_result)
       return display_mysql_error ('Query for PreCon Event Runs failed', $sql);
 
-    $rows = mysql_num_rows($run_result);
-    if (0 == $rows)
-      $rows = 1;
-
-    $td = "<td rowspan=\"$rows\">";
+    $rowspan = mysql_num_rows($run_result);
+    if (0 == $rowspan)
+      $rowspan = 1;
 
     echo "  <tr>\n";
-    printf ('    %s&nbsp;<a href="Thursday.php?action=%d&Event=%d">' .
-	    "%s</a>&nbsp;</td>\n",
-	    $td,
+    printf ('    <td rowspan="%d"><a href="Thursday.php?action=%d&Event=%d">' .
+	    "%s</a></td>\n",
+	    $rowspan,
 	    PRECON_SHOW_STATUS_FORM,
 	    $row->PreConEventId,
 	    $row->Status);
-    printf ('    %s&nbsp;<a href="Thursday.php?action=%d&Event=%d">' .
-	    "%s</a>&nbsp;</td>\n",
-	    $td,
-	    PRECON_SHOW_ADD_RUN_FORM,
-	    $row->PreConEventId,
-	    $row->Title);
+    echo "    <td rowspan=\"$rowspan\">$row->Title</td>\n";
 
     if (0 == mysql_num_rows($run_result))
       echo "    <td colspan=\"3\">&nbsp;</td>\n";
@@ -967,95 +936,15 @@ function display_event_summary()
     {
       while ($run_row = mysql_fetch_object($run_result))
       {
-	echo "    <td align=\"center\">$run_row->Track</td>\n";
-	echo "    <td align=\"center\">$run_row->Day</td>\n";
-	echo "    <td align=\"center\">$run_row->StartHour:00</td>\n";
+	echo "    <td>$row_run->Track</td>\n";
+	echo "    <td>$row_run->Day</td>\n";
+	echo "    <td>$row_run->StartTime</td>\n";
       }
     }
     echo "  </tr>\n";
   }
 
   echo "</table>\n";
-}
-
-function select_track_droplist($key, $include_0=false)
-{
-  $track0 = '';
-  $track1 = '';
-  $track2 = '';
-  $track3 = '';
-  $track4 = '';
-
-  if (! array_key_exists($key, $_REQUEST))
-  {
-    if ($include_0)
-      $track0 = 'selected';
-    else
-      $track1 = 'selected';
-  }
-  else
-  {
-    switch ($_REQUEST[$key])
-    {
-      case '0': $track0 = 'selected'; break;
-      case '1': $track1 = 'selected'; break;
-      case '2': $track2 = 'selected'; break;
-      case '3': $track3 = 'selected'; break;
-      case '4': $track4 = 'selected'; break;
-    }
-  }
-
-  echo "      <select name=\"$key\">\n";
-  if ($include_0)
-    echo "        <option value=\"0\" $track0>Do not schedule</option>\n";
-  echo "        <option value=\"1\" $track1>1</option>\n";
-  echo "        <option value=\"2\" $track2>2</option>\n";
-  echo "        <option value=\"3\" $track3>3</option>\n";
-  echo "        <option value=\"4\" $track4>4</option>\n";
-  echo "      </select>\n";
-}
-
-function select_start_day_time_droplist($key)
-{
-  $thu21 = '';
-  $thu22 = '';
-  $thu23 = '';
-  $fri12 = '';
-  $fri13 = '';
-  $fri14 = '';
-  $fri15 = '';
-  $fri16 = '';
-  $fri17 = '';
-
-  if (! array_key_exists($key, $_REQUEST))
-    $thu12 = 'selected';
-  else
-  {
-    switch ($_REQUEST[$key])
-    {
-      case 'Thu21': $thu21 = 'selected'; break;
-      case 'Thu22': $thu22 = 'selected'; break;
-      case 'Thu23': $thu23 = 'selected'; break;
-      case 'Fri12': $fri12 = 'selected'; break;
-      case 'Fri13': $fri13 = 'selected'; break;
-      case 'Fri14': $fri14 = 'selected'; break;
-      case 'Fri15': $fri15 = 'selected'; break;
-      case 'Fri16': $fri16 = 'selected'; break;
-      case 'Fri17': $fri17 = 'selected'; break;
-    }
-  }
-
-  echo "      <select name=\"$key\">\n";
-  echo "        <option value=\"Thu21\" $thu21>Thursday 21:00</option>\n";
-  echo "        <option value=\"Thu22\" $thu22>Thursday 22:00</option>\n";
-  echo "        <option value=\"Thu23\" $thu23>Thursday 23:00</option>\n";
-  echo "        <option value=\"Fri12\" $thu12>Friday 12:00</option>\n";
-  echo "        <option value=\"Fri13\" $thu13>Friday 13:00</option>\n";
-  echo "        <option value=\"Fri14\" $thu14>Friday 14:00</option>\n";
-  echo "        <option value=\"Fri15\" $thu15>Friday 15:00</option>\n";
-  echo "        <option value=\"Fri16\" $thu16>Friday 16:00</option>\n";
-  echo "        <option value=\"Fri17\" $thu17>Friday 17:00</option>\n";
-  echo "      </select>\n";
 }
 
 function show_status_form()
@@ -1112,12 +1001,11 @@ function show_status_form()
 
   echo "<form method=\"POST\" action=\"Thursday.php\">\n";
   form_add_sequence();
-  form_hidden_value('action', PRECON_PROCESS_STATUS_FORM);
-  form_hidden_value('PreConEventId', $PreConEventId);
+  form_hidden_value('action', PRECON_PROCESS_STATUS_CHANGE);
   echo "<table>\n";
 
   echo "  <tr>\n";
-  echo "    <th align=\"right\">Status:&nbsp;</th>\n";
+  echo "    <td>Status:</td>\n";
   echo "    <td>\n";
   echo "      <select name=\"Status\">\n";
   echo "        <option value=\"Pending\" $pending>Pending</option>\n";
@@ -1136,205 +1024,10 @@ function show_status_form()
   }
 
   form_section ('Schedule Run (Only if Accepting)');
-  echo "  <tr>\n";
-  echo "    <th align=\"right\">Track:&nbsp;</th>\n";
-  echo "    <td>\n";
-  select_track_droplist ('Track', true);
-  echo "    </td>\n";
-  echo "  <tr>\n";
-
-  echo "  <tr>\n";
-  echo "    <th align=\"right\">Start Day/Time:&nbsp</th>\n";
-  echo "    <td>\n";
-  select_start_day_time_droplist('Start');
-  echo "    </td>\n";
-  echo "  <tr>\n";
-
-
-  form_submit ('Submit');
+  
   echo "</table>\n";
   echo "</form>\n";
-}
-
-function process_status_form()
-{
-  if (! array_key_exists('PreConEventId', $_REQUEST))
-    return display_error ('Missing PreConEventId');
-
-  $PreConEventId = intval(trim($_REQUEST['PreConEventId']));
-  if ($PreConEventId < 1)
-    return display_error ('Invalid PreConEventId');
-
-  if (! array_key_exists('Status', $_REQUEST))
-    return display_error ('Missing Status');
-
-  $Status = trim($_REQUEST['Status']);
-  switch ($Status)
-  {
-    case 'Pending':
-    case 'Accepted':
-    case 'Rejected':
-    case 'Dropped':
-      break;
-
-    default:
-      return display_error ('Invalid Status');
-  }
-
-  if ('Accepted' == $Status)
-    return accept_event($PreConEventId, $Status);
-  else
-    return change_event_status($PreConEventId, $Status);
-}
-
-function change_event_status ($PreConEventId, $Status)
-{
-  // Clean out any runs for this PreConEventId
-
-  $sql = 'DELETE FROM PreConRuns';
-  $sql .= " WHERE PreConEventId=$PreConEventId";
-
-  $result = mysql_query($sql);
-  if (! $result)
-    return display_mysql_error('Deletion from PreConRun for PreConEventId '.
-			       "$PreConEventId failed",
-			       $sql);
-
-  $sql = 'UPDATE PreConEvents';
-  $sql .= " SET Status='$Status'";
-  $sql .= " WHERE PreConEventId=$PreConEventId";
-
-  $result = mysql_query($sql);
-  if (! $result)
-    return display_mysql_error('Status update for PreConEventId '.
-			       "$PreConEventId failed",
-			       $sql);
-  else
-    return true;
-}
-
-function accept_event($PreConEventId, $Status)
-{
-  // Update the status
-  $sql = 'UPDATE PreConEvents';
-  $sql .= " SET Status='$Status'";
-  $sql .= " WHERE PreConEventId=$PreConEventId";
-
-  $result = mysql_query($sql);
-  if (! $result)
-    return display_mysql_error('Status update for PreConEventId '.
-			       "$PreConEventId failed",
-			       $sql);
-
-  return process_precon_add_run_form(true);
-}
-
-function show_precon_add_run_form()
-{
-  // Fetch the PreConEventId
-
-  $PreConEventId = intval (trim ($_REQUEST['Event']));
-  if (0 == $PreConEventId)
-    return display_error ('Invalid PreConEventId');
-
-  $sql = 'SELECT Title, Hours FROM PreConEvents';
-  $sql .= " WHERE PreConEventId=$PreConEventId";
-
-  $result = mysql_query($sql);
-  if (! $result)
-    return display_mysql_error("Query for PreConEventId $PreConEventId failed",
-			       $sql);
-
-  if (0 == mysql_num_rows($result))
-    return display_error ("Failed to find PreConEventId $PreConEventId");
-
-  if (1 != mysql_num_rows($result))
-    return display_error ("Found multiple rows for PreConEventId $PreConEventId");
-
-  $row = mysql_fetch_object($result);
-  $Title = $row->Title;
-  $Hours = $row->Hours;
-
-  display_header ("Schedule a run of <i>$Title</i>\n");
-
-  echo "<form method=\"POST\" action=\"Thursday.php\">\n";
-  form_add_sequence();
-  form_hidden_value('action', PRECON_PROCESS_ADD_RUN_FORM);
-  form_hidden_value('PreConEventId', $PreConEventId);
-
-  echo "<table>\n";
-
-  echo "  <tr>\n";
-  echo "    <th align=\"right\">Track:&nbsp;</th>\n";
-  echo "    <td>\n";
-  select_track_droplist ('Track', true);
-  echo "    </td>\n";
-  echo "  <tr>\n";
-
-  echo "  <tr>\n";
-  echo "    <th align=\"right\">Start Day/Time:&nbsp</th>\n";
-  echo "    <td>\n";
-  select_start_day_time_droplist('Start');
-  echo "    </td>\n";
-  echo "  <tr>\n";
-
-
-  form_submit ('Submit');
-  echo "</table>\n";
-  echo "</form>\n";
-}
-
-function process_precon_add_run_form($allow_track_0)
-{
-  if ($allow_track_0)
-    $min_track = 0;
-  else
-    $min_track = 1;
-
-  if (! array_key_exists('PreConEventId', $_REQUEST))
-    return display_error ('Missing PreConEventId');
-
-  $PreConEventId = intval(trim($_REQUEST['PreConEventId']));
-  if ($PreConEventId < 1)
-    return display_error ('Invalid PreConEventId');
-
-  // Fetch and validate the track
-  if (! array_key_exists('Track', $_REQUEST))
-    return display_error ('Missing Track');
-
-  $Track = intval(trim($_REQUEST['Track']));
-  if (($Track < $min_track) || ($Track > MAX_PRECON_TRACK))
-    return display_error ('Invalid Track');
-
-  // If the track# is 0, we're done - This happen when the user
-  // accepts an event and optionally schedules a run
-  if (0 == $Track)
-    return true;
-
-  // Fetch and validate the start day/time
-  if (! array_key_exists('Start', $_REQUEST))
-    return display_error ('Missing Start');
-
-  $Start = trim($_REQUEST['Start']);
-  if (2 != sscanf ($Start, '%3s%d', $Day, $StartHour))
-    return display_error ("Invalid Start \"$Start\"");
-
-  if (('Thu' != $Day) && ('Fri' != $Day))
-    return display_error ("Invalid Start \"$Start\"");
-
-  $sql = 'INSERT INTO PreConRuns SET ';
-  $sql .= build_sql_string ('PreConEventId', $PreConEventId, false);
-  $sql .= build_sql_string ('Track', $Track);
-  $sql .= build_sql_string ('Day', $Day);
-  $sql .= build_sql_string ('StartHour', $StartHour);
-  $sql .= build_sql_string ('UpdatedById', $_SESSION[SESSION_LOGIN_USER_ID]);
-  $sql .= ', LastUpdated=NULL';
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('PreCon Run creation failed', $sq);
-  else
-    return true;
+  
 }
 
 ?>
