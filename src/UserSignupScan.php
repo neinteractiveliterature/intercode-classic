@@ -37,10 +37,10 @@ function display_all_signups ()
 
   // Gather the list of all users who are able to signup
 
-  $sql = 'SELECT UserId, FirstName, LastName';
+  $sql = 'SELECT UserId, FirstName, LastName, Nickname';
   $sql .= ' FROM Users';
   $sql .= ' WHERE (CanSignup!="Unpaid" AND CanSignup!="Alumni")';
-  $sql .= ' ORDER BY LastName, FirstName';
+  $sql .= ' ORDER BY LastName, FirstName, Nickname';
 
   $result = mysql_query ($sql);
   if (! $result)
@@ -49,7 +49,12 @@ function display_all_signups ()
   while ($row = mysql_fetch_object ($result))
   {
     if ('Admin != $row->LastName')
-      $users["$row->LastName, $row->FirstName"] = $row->UserId;
+    {
+      $name = "$row->LastName, $row->FirstName";
+      if (($row->Nickname != '') && ($row->FirstName != $row->Nickname))
+	$name .= " ($row->Nickname)";
+      $users[$name] = $row->UserId;
+    }
   }
 
   $users_count = count($users);
@@ -87,25 +92,25 @@ function display_all_signups ()
 
   // Display the list of anchors
 
-  echo "<TABLE WIDTH=\"100%\">\n";
-  echo "  <TR>\n";
+  echo "<table width=\"100%\">\n";
+  echo "  <tr>\n";
 
   foreach ($anchors as $key => $value)
   {
     if ($value)
-      echo "    <TD><A HREF=\"#$key\">$key</A></TD>\n";
+      echo "    <td><a href=\"#$key\">$key</a></td>\n";
     else
-      echo "    <TD>$key</TD>\n";
+      echo "    <td>$key</td>\n";
   }
 
-  echo "  </TR>\n";
-  echo "</TABLE>\n";
-  echo "<P>\n";
+  echo "  </tr>\n";
+  echo "</table>\n";
+  echo "<p>\n";
 
   // Now gather the list of users who've signed up for games
 
   $sql = 'SELECT Users.UserId, Users.FirstName, Users.LastName';
-  $sql .= ', Users.CanSignup, Users.EMail';
+  $sql .= ', Users.Nickname, Users.CanSignup, Users.EMail';
   $sql .= ', Events.Title, Events.Hours, Events.CanPlayConcurrently';
   $sql .= ', Events.EventId';
   $sql .= ', Runs.Day, Runs.StartHour, Runs.TitleSuffix';
@@ -115,7 +120,7 @@ function display_all_signups ()
   $sql .= '   AND Users.UserId=Signup.UserId';
   $sql .= '   AND Runs.RunId=Signup.RunId';
   $sql .= '   AND Events.EventId=Runs.EventId';
-  $sql .= ' ORDER BY LastName, FirstName, Day, StartHour';
+  $sql .= ' ORDER BY LastName, FirstName, Nickname, Day, StartHour';
 
   $result = mysql_query ($sql);
   if (! $result)
@@ -128,11 +133,13 @@ function display_all_signups ()
   while ($row = mysql_fetch_object ($result))
   {
     $name = "$row->LastName, $row->FirstName";
+    if (($row->Nickname != '') && ($row->Nickname != $row->FirstName))
+      $name .= " ($row->Nickname)";
 
     // If we're starting a new user, close the table
 
     if (('' != $cur_name) && ($name != $cur_name))
-      echo "</TABLE>\n\n<P>\n";
+      echo "</table>\n\n<P>\n";
 
     //    echo "<!-- name: '$name', next user: '" . key($users) . "' -->\n";
 
@@ -142,19 +149,21 @@ function display_all_signups ()
 
       while (strcasecmp ($name, key ($users)) > 0)
       {
-	$cur_name = key ($users);
+	$cur_name = sprintf ('<a href=mailto:%s>%s</A>',
+			     $row->EMail,
+			     key($users));
 
 	$ch = strtoupper (substr ($cur_name, 0, 1));
 	if ($cur_letter != $ch)
-	  echo ("<A NAME=$ch>");
+	  echo ("<a name=$ch>");
 
-	printf ("<B><FONT SIZE=\"+1\">%s</FONT></B><BR>\n" .
-		"<FONT color=red>Not signed up for any games</FONT>\n\n<P>\n",
+	printf ("<b><font size=\"+1\">%s</font></b><br>\n" .
+		"<font color=\"red\">Not signed up for any games</font>\n\n<P>\n",
 		$cur_name);
 
 	if ($cur_letter != $ch)
 	{
-	  echo ("</A>");
+	  echo ("</a>");
 	  $cur_letter = $ch;
 	}
 
@@ -172,24 +181,24 @@ function display_all_signups ()
       $ch = strtoupper (substr ($cur_name, 0, 1));
       if ($cur_letter != $ch)
       {
-	echo "<A NAME=$ch></A>\n";
+	echo "<a name=$ch></a>\n";
 	$cur_letter = $ch;
       }
 
-      $name = sprintf ('<A HREF=MAILTO:%s>%s</A>',
+      $name = sprintf ('<a href=mailto:%s>%s</A>',
 		       $row->EMail,
 		       $name);
       if ('Unpaid' == $row->CanSignup)
-	$name = sprintf ('<FONT COLOR=red>%s - Sanity check failure!  ' .
-			 'This user is Unpaid!!!!!</FONT>',
+	$name = sprintf ('<font color=\"red">%s - Sanity check failure!  ' .
+			 'This user is Unpaid!!!!!</font>',
 			 $name);
       elseif ('Alumni' == $row->CanSignup)
-	$name = sprintf ('<FONT COLOR=red>%s - Sanity check failure!  ' .
-			 'This user is an Alumni!!!!!</FONT>',
+	$name = sprintf ('<font color=\"red\">%s - Sanity check failure!  ' .
+			 'This user is an Alumni!!!!!</font>',
 			 $name);
       else
 	$signedup_users++;
-      printf ("<B><FONT SIZE=\"+1\">%s</FONT></B><BR>\n<TABLE>\n",
+      printf ("<b><font size=\"+1\">%s</font></b><br>\n<table>\n",
 	      $name);
 
       $last_day = '';
@@ -213,11 +222,11 @@ function display_all_signups ()
       if ($last_day == $row->Day)
       {
 	if ($last_end_hour > $start_hour)
-	  $game = "<FONT COLOR=red>Conflict: $game</FONT>";
+	  $game = "<font color=\"red\">Conflict: $game</font>";
       }
     }
 
-    $game = sprintf ('<A HREF=Schedule.php?action=%d&EventId=%d&RunId=%d TARGET=_blank>%s</A>',
+    $game = sprintf ('<a href=\"Schedule.php?action=%d&EventId=%d&RunId=%d target=_blank\">%s</a>',
 		     SCHEDULE_SHOW_SIGNUPS,
 		     $row->EventId,
 		     $row->RunId,
@@ -231,12 +240,12 @@ function display_all_signups ()
 	$state .= ' #' . $wait;
     }
 
-    echo "  <TR VALIGN=TOP>\n";
-    echo "    <TD>$row->Day&nbsp;&nbsp;&nbsp;</TD>\n";
-    echo "    <TD NOWRAP>$game_time&nbsp;&nbsp;&nbsp;</TD>\n";
-    echo "    <TD NOWRAP>$state&nbsp;&nbsp;&nbsp;</TD>\n";
-    echo "    <TD>$game</TD>\n";
-    echo "  </TR>\n";
+    echo "  <tr valign=\"top\">\n";
+    echo "    <td>$row->Day&nbsp;&nbsp;&nbsp;</td>\n";
+    echo "    <td nowrap>$game_time&nbsp;&nbsp;&nbsp;</td>\n";
+    echo "    <td nowrap>$state&nbsp;&nbsp;&nbsp;</td>\n";
+    echo "    <td>$game</td>\n";
+    echo "  </tr>\n";
 
     // Save the information for this game to check for conflicts
 
@@ -246,8 +255,8 @@ function display_all_signups ()
     $last_can_play_concurrently = $row->CanPlayConcurrently;
   }
 
-  echo "</TABLE>\n";
-  echo "<P>\n";
+  echo "</table>\n";
+  echo "<p>\n";
 
   // Get the last entries in the list or users who haven't signedup for
   // anything
@@ -260,12 +269,12 @@ function display_all_signups ()
     //    echo "<!-- ch: $ch, cur_letter: $cur_letter, name: $name -->\n";
     if ($cur_letter != $ch)
     {
-      $name = sprintf ('<A NAME=%s>%s</A>', $ch, $name);
+      $name = sprintf ('<a name=%s>%s</a>', $ch, $name);
       $cur_letter = $ch;
     }
 
-    printf ("<B><FONT SIZE=\"+1\">%s</FONT></B><BR>\n" .
-	    "<FONT color=red>Not signed up for any games</FONT>\n\n<P>\n",
+    printf ("<b><font size=\"+1\">%s</font></b><br>\n" .
+	    "<font color=\"red\">Not signed up for any games</font>\n\n<P>\n",
 	    $name);
     array_shift($users);
   }
