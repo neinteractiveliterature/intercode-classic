@@ -511,13 +511,8 @@ function display_event ($hour, $away_all_day, $away_hours,
   $males = $signup_counts["Male"];
   $females = $signup_counts["Female"];
 
-  if ($row->Max == null) {
-	$game_full = true;
-  } else {
-    $game_max = $row->Max;
-
-    $game_full = ($males + $females) >= $game_max;
-  }
+  $game_max = $row->MaxPlayersMale + $row->MaxPlayersFemale + $row->MaxPlayersNeutral;
+  $game_full = ($males + $females) >= $game_max;
 
   if (array_key_exists ($row->RunId, $signed_up_runs))
   {
@@ -615,7 +610,9 @@ function display_event_with_counts($hour, $row, $dimensions,
 				   $signup_counts)
 {
 
-  $confirmed_for_run = $signup_counts["Male"] + $signup_counts["Female"];
+  $male_confirmed = $signup_counts["Male"];
+  $female_confirmed = $signup_counts["Female"];
+  $total_confirmed = $male_confirmed + $female_confirmed;
   $not_counted_for_run = $signup_counts["Uncounted"];
   $waitlisted_for_run = $signup_counts["Waitlisted"];
 
@@ -624,14 +621,24 @@ function display_event_with_counts($hour, $row, $dimensions,
   // If we're above the minimum, but less than max, it's light green
   // If we're at max, it's dark green
 
-  if ($confirmed_for_run < $row->Min)
+  if ($male_confirmed < $row->MinPlayersMale ||
+	  $female_confirmed < $row->MinPlayersFemale ||
+	  $total_confirmed < ($row->MinPlayersMale + $row->MinPlayersFemale + $row->MinPlayersNeutral)) {
+	
     $bgcolor = get_bgcolor_hex ('Full');       // Light red
-  elseif ($confirmed_for_run < $row->Pref)
-    $bgcolor = get_bgcolor_hex ('Waitlisted'); // Light yellow
-  elseif ($confirmed_for_run < $row->Max)
+  } elseif ($male_confirmed < $row->PrefPlayersMale ||
+	  $female_confirmed < $row->PrefPlayersFemale ||
+	  $total_confirmed < ($row->PrefPlayersMale + $row->PrefPlayersFemale + $row->PrefPlayersNeutral)) {
+
+    $bgcolor = get_bgcolor_hex ('Waitlisted'); // Light yellow		
+  } elseif ($male_confirmed < $row->MaxPlayersMale ||
+	  $female_confirmed < $row->MaxPlayersFemale ||
+	  $total_confirmed < ($row->MaxPlayersMale + $row->MaxPlayersFemale + $row->MaxPlayersNeutral)) {
+	
     $bgcolor = get_bgcolor_hex ('Confirmed');  // Light green
-  else
+  } else {
     $bgcolor = get_bgcolor_hex ('CanPlayConcurrently'); // Light blue
+  }
 
   // Add the game title (and run suffix) with a link to the game page
 
@@ -655,10 +662,10 @@ function display_event_with_counts($hour, $row, $dimensions,
 		    '<NOBR><FONT COLOR=green>%d</FONT>/' .
 		    '<FONT COLOR=blue>%d</FONT>/' . 
 		    '<FONT COLOR=red>%d</FONT></NOBR>',
-		    $row->Min,
-		    $row->Pref,
-		    $row->Max,
-		    $confirmed_for_run,
+		    $row->MinPlayersMale + $row->MinPlayersFemale + $row->MinPlayersNeutral,
+		    $row->PrefPlayersMale + $row->PrefPlayersFemale + $row->PrefPlayersNeutral,
+		    $row->MaxPlayersMale + $row->MaxPlayersFemale + $row->MaxPlayersNeutral,
+		    $total_confirmed,
 		    $not_counted_for_run,
 		    $waitlisted_for_run);
 
@@ -782,9 +789,8 @@ function schedule_day ($day, $away_all_day, $away_hours,
   $sql .= ' Events.EventId, Events.SpecialEvent, Events.Hours, Events.Title,';
   $sql .= ' Events.CanPlayConcurrently, LENGTH(Events.Description) AS DescLen,';
   $sql .= ' MaxPlayersMale, MaxPlayersFemale, MaxPlayersNeutral, ';
-  $sql .= ' MinPlayersMale+MinPlayersFemale+MinPlayersNeutral AS Min,';
-  $sql .= ' MaxPlayersMale+MaxPlayersFemale+MaxPlayersNeutral AS Max,';
-  $sql .= ' PrefPlayersMale+PrefPlayersFemale+PrefPlayersNeutral AS Pref,';
+  $sql .= ' MinPlayersMale, MinPlayersFemale, MinPlayersNeutral, ';
+  $sql .= ' PrefPlayersMale, PrefPlayersFemale, PrefPlayersNeutral, ';
   $sql .= ' Events.IsOps, Events.IsConSuite ';
   $sql .= ' FROM Events, Runs';
   $sql .= " WHERE Events.EventId=Runs.EventId AND Day='$day'";
@@ -923,7 +929,7 @@ function schedule_day ($day, $away_all_day, $away_hours,
   $away_width .= "px";
   $totals_width .= "px";
   
-  $full_height = ($mainBlock->getHours() * 10) . "em";
+  $full_height = ($mainBlock->getHours() * 9) . "em";
 
   $events_width = ($mainBlock->maxColumns / $maxColumns) * 100 . "%";
   $volunteer_width = ($volunteerBlock->maxColumns / $maxColumns) * 100 . "%";
