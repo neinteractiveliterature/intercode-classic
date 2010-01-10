@@ -841,7 +841,7 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
     write_cell ('td', $text, $attrib);
 
 
-    for ($h = $min_consuite_start + 1; $h <= $hour; $h++)
+    for ($h = $min_consuite_start; $h < $hour; $h++)
     {
       // Read ConSuite entry
       $row = mysql_fetch_object ($result);
@@ -857,7 +857,7 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
 		       $game_max_male, $game_max_female, $game_max_neutral);
       }
       if ($logged_in)
-	write_away_checkbox ($away_hours[$h], $day, $hour, $away_all_day);
+	write_away_checkbox ($away_hours[$h], $day, $h, $away_all_day);
       echo "  </tr>\n";
       echo "  <tr align=\"center\">\n";
       write_24_hour ($h);
