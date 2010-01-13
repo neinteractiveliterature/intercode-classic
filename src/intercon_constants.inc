@@ -130,8 +130,8 @@ define (BIO_CLOSE, '2009-12-25');
 
 // Shirt stuff
 
-define (SHIRT_IMG_AVAILABLE, 0);
-define (SHIRT_TWO_SHIRTS, 0);
+define (SHIRT_IMG_AVAILABLE, 1);
+define (SHIRT_TWO_SHIRTS, 1);
 define (SHIRT_NAME, CON_NAME . " Men's Polo");
 define (SHIRT_2_NAME, CON_NAME . ' Babydoll');
 
