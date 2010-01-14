@@ -1,6 +1,8 @@
 <?
 
 include ("intercon_db.inc");
+include ("intercon_schedule.inc");
+include ("pcsg.inc");
 
 // Connect to the database
 
@@ -103,29 +105,134 @@ html_end();
 
 function list_accepted_events()
 {
-  $sql = 'SELECT PreConEventId, Title, ShortDescription FROM PreConEvents';
+  $sql = 'SELECT events.PreConEventId, PreConRunId, Title, Rooms, Day, StartHour, Hours FROM PreConRuns runs';
+  $sql .= ' INNER JOIN PreConEvents events ON events.PreConEventId = runs.PreConEventId';
   $sql .= ' WHERE "Accepted"=Status';
-  $sql .= ' ORDER BY Title';
+  $sql .= ' ORDER BY Day, StartHour, Hours';
 
   $result = mysql_query($sql);
   if (! $result)
     return display_mysql_error('Query for PreCon events failed', $sql);
-
-  if (0 == mysql_num_rows($result))
-    return true;
-
-  printf ("<b>The following events are scheduled for the %s Pre-Convention:</b>\n",
-	  CON_NAME);
-
+  
+  $thursday = new ScheduleBlock(21, 24);
+  $friday = new ScheduleBlock(12, 18);
+  $runs = array();
+  
   while ($row = mysql_fetch_object($result))
   {
+    $pcsgRun = new EventRun($row->StartHour, $row->Hours, $row->PreConRunId);
+    if ($row->Day == "Thu") {
+      $thursday->addEventRun($pcsgRun);
+    } else {
+      $friday->addEventRun($pcsgRun);
+    }
+    
+    $runs[$row->PreConRunId] = $row;
     echo "<p>\n";
-    printf("<a href=\"Thursday.php?action=%d&PreConEventId=%d\">%s</a>\n",
+  }
+  
+  mysql_free_result($result);
+  
+  $thursday->computeRunDimensions();
+  $friday->computeRunDimensions();
+  
+  echo "<h3>Schedule of Events</h3>";
+  
+  echo "<h4>Thursday, " . THR_DATE . "</h4>\n";
+  precon_schedule_day($thursday, $runs);
+
+  echo "<h4>Friday, " . FRI_DATE . "</h4>\n";
+  precon_schedule_day($friday, $runs);
+  
+//    printf("<a href=\"Thursday.php?action=%d&PreConEventId=%d\">%s</a>\n",
+//	   PRECON_SHOW_EVENT,
+//	   $row->PreConEventId,
+//	   $row->Title);
+//    echo "<br>$row->ShortDescription</p>\n";
+//
+//  printf ("<b>The following events are scheduled for the %s Pre-Convention:</b>\n",
+//	  CON_NAME);
+}
+
+function precon_schedule_day($block, $runs) {  
+  // calculate the minimum schedule width in pixels
+  $time_width = 70;
+  $events_width = $max_columns * 90;
+  $full_width = $events_width + $time_width;
+  
+  $events_width .= "px";
+  $full_width .= "px";
+  $time_width .= "px";
+  
+  $full_height = ($block->getHours() * 9) . "em";
+
+  // main wrapper for the whole schedule
+  echo "<div style=\"position: relative; border: 1px black solid; min-width: $full_width;\">";
+  
+  // left column: times
+  echo "<div style=\"position: relative; width: $time_width; float: left;\">";
+  echo "<div style=\"width: 100%; height: 30px;\">";
+  write_centering_table("<b>Time</b>");
+  echo "</div>";
+  
+  echo "<div style=\"position: relative; width: 100%; height: $full_height;\">";
+  for ($hour = $block->startHour; $hour < $block->endHour; $hour++) {
+	echo "<div style=\"position: absolute; ";
+	echo "width: 100%; left: 0%; ";
+	echo "top: " . ((($hour - $block->startHour) / $block->getHours()) * 100.0) . "%; ";
+	echo "height: " . (100.0 / $block->getHours()) . "%;";
+	echo "\">";
+	
+	write_24_hour($hour);
+	
+	echo "</div>";
+  }
+  echo "</div></div>";
+  
+  // main column: events and volunteer track
+  echo "<div style=\"position: relative; margin-left: $time_width; ";
+  // ie6 and 7 hacks to give this div hasLayout=true
+  echo "_height: 0; min-height: 0;";
+  echo "\">";  
+  echo "<div style=\"height: 30px;\">";
+  write_centering_table("<b>Events</b>");
+  echo "</div>";
+
+  display_precon_runs_in_div($block, $runs,
+							   "height: $full_height;",
+							   $hour);
+  
+  echo "</div></div>";
+}
+
+function display_precon_runs_in_div($block, $runs, $css) {
+  
+  $runDimensions = $block->getRunDimensions();
+  
+  echo "<div style=\"$css\">";
+  echo "<div style=\"position: relative; height: 100%; width: 100%;\">";
+
+  foreach ($runDimensions as $dimensions) {
+	$runId = $dimensions->run->id;
+	$row = $runs[$runId];
+	
+    display_precon_event ($row, $dimensions);		
+  }
+  
+  echo "</div></div>";
+}
+
+function display_precon_event($row, $dimensions) {
+  $text = sprintf ("<a href=\"Thursday.php?action=%d&PreConEventId=%d\">%s</a>\n"
+                   ."<p>%s</p>",
 	   PRECON_SHOW_EVENT,
 	   $row->PreConEventId,
-	   $row->Title);
-    echo "<br>$row->ShortDescription</p>\n";
-  }
+	   $row->Title,
+       implode(", ", explode(",", $row->Rooms)));
+
+  echo "<div style=\"".$dimensions->getCSS()."\">";
+  write_centering_table($text);
+  echo "</div>\n";
 }
 
 /*
@@ -141,18 +248,30 @@ function thursday_thing()
   $cost = '5.00';
   if (DEVELOPMENT_VERSION)
     $cost= '0.05';
-
-  printf ("<p>The %s Pre-Convention will be run at the Chelmsford Radisson\n",
-	  CON_NAME);
-  printf ("from Thursday evening until the start of %s Friday evening.</p>\n",
-	  CON_NAME);
-  echo "<p>The Pre-Convention\n";
+    
+  printf("<p>The %s Pre-Convention\n", CON_NAME);
   echo "is a conference about the writing, production, and play of live\n";
   echo "action roleplaying games.  There will be panels, discussions, and\n";
   echo "interactive workshops discussing LARP theory, costuming, writing\n";
   echo "techniques, play styles, and a variety of other topics.</p>\n";
 
+  printf ("<p>The Pre-Convention will be run at the Chelmsford Radisson\n");
+  printf ("from Thursday evening until the start of %s Friday evening.</p>\n",
+	  CON_NAME);
+  
+  echo "<style type=\"text/css\">\n";
+  echo "#precon_top { border-spacing: 5px; }\n";
+  echo "#precon_top td { border: 2px #4b067a solid; vertical-align: top; padding: 0; width: 50%; }\n";
+  echo "#precon_top td > * { padding: 2px; }\n";
+  echo "#precon_top td h3 { background-color: black; color: white; font-size: 100%; padding: 0; text-align: center; }\n";
+  echo "</style>\n";
+
+  echo "<table id=\"precon_top\"><tr>";
+  $paid = false;
   $url = '';
+
+  echo "<td id=\"precon_bid\">";
+  echo "<h3>Bid a Pre-Convention Event!</h3>\n";
   if (isset ($_SESSION[SESSION_LOGIN_USER_ID]))
   {
     if (0)
@@ -164,12 +283,17 @@ function thursday_thing()
     }
     else
     {
-      printf ('<a href="Thursday.php?action=%d">',
-	      PRECON_SHOW_EVENT_FORM);
       echo "Want to propose a panel, discussion or workshop?</a>\n";
       echo "We'd love to hear about it!\n";
+      
+      echo "<p>";
+      printf ('<a href="Thursday.php?action=%d">',
+	      PRECON_SHOW_EVENT_FORM);
+      echo "To bid an event, please fill out this quick form and we'll get back";
+      echo " to you by email.</a>  Thanks!</p>";
+      
     }
-
+    
     $sql = 'SELECT * FROM Thursday';
     $sql .= ' WHERE UserId=' . $_SESSION[SESSION_LOGIN_USER_ID];
 
@@ -182,11 +306,10 @@ function thursday_thing()
       $row = mysql_fetch_object($result);
       if ('Paid' == $row->Status)
       {
-	printf ("<p>You are signed up for the %s Pre-Convention.</p>\n",
-		CON_NAME);
-	return;
+        $paid = true;
       }
     }
+
 
     // Build the URL for the PayPal links.  If the user cancels, just return
     // to index.php which will default to his homepage
@@ -221,30 +344,52 @@ function thursday_thing()
     //  echo "Encoded URL: $url<p>\n";
     //  printf ("%d characters<p>\n", strlen ($url));
 
-    echo "<p><a href=\"$url\"><img\n";
-    echo "src=\"http://images.paypal.com/images/x-click-but3.gif\"\n";
-    echo "border=\"0\" align=\"right\"\n";
-    printf ('alt=\"Click to pay for the %s Pre-Convention.\"></a>', CON_NAME);
+  } else {
+    echo "<p>Want to run an event at the Pre-Convention?  We'd love to hear ";
+    echo "about it!  But you'll need to <a href=\"index.php\">log in</a> to ";
+    echo "tell us.</p>\n";
   }
+  echo "</td>\n";
 
-  printf ("Registration for the %s Pre-Convention costs \$$cost.\n",
-	  CON_NAME);
+  echo "<td id=\"precon_reg\">";
+  if ($paid) {
+    echo "<h3>You're Pre-Registered for the Pre-Convention!</h3>\n";
+    echo "<p>Thanks for registering ahead of time.  We've already got your";
+    echo " name in our database, so you'll have a badge waiting for you when";
+    echo " you arrive at the Pre-Convention.</p>";
+  } else {
+    echo "<h3>Registration</h3>";
+    
+    printf ("<p>Registration for the %s Pre-Convention costs <b>\$$cost</b>.</p>\n",
+        CON_NAME);
 
-  if ('' == $url)
-    echo "You must be logged in to pay for the Pre-Convention using PayPal.\n";
-  else
-  {
-    echo "You can pay in\n";
-    echo "advance using Paypal by clicking <a href=\"$url\">here</a>.\n";
-    echo "Please be sure to click the \"Return to Merchant\" button on the\n";
-    echo "PayPal site when your transaction is complete to return to the\n";
-    echo CON_NAME . " website so we can register your payment for the\n";
-    echo "Pre-Convention in the database.</p>\n";
+    echo "<h4 style=\"margin-bottom: 0;\">Pre-Register with PayPal</h4>\n";  
+    if ('' == $url)
+      echo "<p>You must be <a href=\"index.php\">logged in</a> to pay for the Pre-Convention using PayPal.</p>\n";
+    else
+    {
+      echo "<div style=\"float: right;\"><a href=\"$url\"><img\n";
+      echo "src=\"http://images.paypal.com/images/x-click-but3.gif\"\n";
+      echo "border=\"0\"\n";
+      printf ('alt=\"Click to pay for the %s Pre-Convention.\"></a>', CON_NAME);
+      echo "</div>";
+      
+      echo "<p style=\"margin-top: 0;\">You can pay in\n";
+      echo "advance using Paypal by clicking <a href=\"$url\">here</a>.\n";
+      echo "Please be sure to click the \"Return to Merchant\" button on the\n";
+      echo "PayPal site when your transaction is complete to return to the\n";
+      echo CON_NAME . " website so we can register your payment for the\n";
+      echo "Pre-Convention in the database.</p>\n";
+      
+
+    }
+    
+    echo "<h4 style=\"margin-bottom: 0;\">At The Door</h4>\n";
+    echo "<p style=\"margin-top: 0;\">You will also be able to register for the Pre-Convention on\n";
+    echo "Thursday night, at the door.  Payments will be accepted via cash or check.</p>\n";
   }
-  echo "<p>You will also be able to register for the Pre-Convention Events\n";
-  echo "Thursday night, at the door.</p>\n";
-  echo "<p>Check back here for the list of Events that will be part of the\n";
-  echo CON_NAME . " Pre-Convention!</p>\n";
+  
+  echo "</td></tr></table>\n\n";
 
   list_accepted_events();
 }
