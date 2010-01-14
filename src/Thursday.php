@@ -143,15 +143,6 @@ function list_accepted_events()
 
   echo "<h4>Friday, " . FRI_DATE . "</h4>\n";
   precon_schedule_day($friday, $runs);
-  
-//    printf("<a href=\"Thursday.php?action=%d&PreConEventId=%d\">%s</a>\n",
-//	   PRECON_SHOW_EVENT,
-//	   $row->PreConEventId,
-//	   $row->Title);
-//    echo "<br>$row->ShortDescription</p>\n";
-//
-//  printf ("<b>The following events are scheduled for the %s Pre-Convention:</b>\n",
-//	  CON_NAME);
 }
 
 function precon_schedule_day($block, $runs) {  
@@ -983,10 +974,6 @@ function display_precon_event_form()
   form_text(1, 'Length', 'Hours', 1, true, '(Hours)');
   form_text(64, 'Special Requirements', 'SpecialRequests', 128);
 
-  $text = 'Short paragraph (50 words or less) displayed in the Pre-';
-  $text .= "Convention event list.\n";
-  form_textarea ($text, 'ShortDescription', 4, TRUE, TRUE);
-
   $text = "Description for use on the " . CON_NAME . " website.  This\n";
   $text .= "information will also be used for advertising and some\n";
   $text .= "flyers.  The description should be a couple of paragraphs,\n";
@@ -1096,9 +1083,6 @@ function process_precon_event_form()
   if (0 == request_int('Hours'))
     return display_error ('You must specify the number of hours');
 
-  if ('' == request_string('ShortDescription'))
-    return display_error('You must provide a short description');
-
   if ('' == request_string('Description'))
     return display_error('You must provide a description');
 
@@ -1125,7 +1109,6 @@ function process_precon_event_form()
   $sql .= build_sql_string('Friday15');
   $sql .= build_sql_string('Friday16');
   $sql .= build_sql_string('Friday17');
-  $sql .= build_sql_string('ShortDescription', '', true, true);
   $sql .= build_sql_string('Description', '', true, true);
   $sql .= ', UpdatedById=' . $_SESSION[SESSION_LOGIN_USER_ID];
   if (0 == $PreConEventId)
