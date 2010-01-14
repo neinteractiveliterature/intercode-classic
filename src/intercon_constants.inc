@@ -14,10 +14,10 @@ define (DEVELOPMENT_VERSION, 0);
 // Per-con values - The values of all of these should be visible on
 // the status page
 
-//define (DB_SERVER, 'localhost');
-//define (DB_NAME,   'itest');
-define (DB_SERVER, 'mysql.interactiveliterature.org');
-define (DB_NAME,   'intercon_j');
+define (DB_SERVER, 'localhost');
+define (DB_NAME,   'itest');
+//define (DB_SERVER, 'mysql.interactiveliterature.org');
+//define (DB_NAME,   'intercon_j');
 
 // Database users - These could/should be used to control access to the
 // database.  In reality, it's handled by the software.  And the password
@@ -120,6 +120,9 @@ define (EMAIL_WEBMASTER, 'webmaster@' . CON_DOMAIN);
 define (FRI_TEXT, 'Friday, 12-Mar-2010');
 define (SAT_TEXT, 'Saturday, 13-Mar-2010');
 define (SUN_TEXT, 'Sunday, 14-Mar-2010');
+
+define (THR_DATE, '11-Mar-2010');
+define (FRI_DATE, '12-Mar-2010');
 
 // Deadlines - Format is YYYY-MM-DD
 
