@@ -228,7 +228,7 @@ function display_precon_event($row, $dimensions) {
 	   PRECON_SHOW_EVENT,
 	   $row->PreConEventId,
 	   $row->Title,
-       implode(", ", explode(",", $row->Rooms)));
+       pretty_rooms($row->Rooms));
 
   echo "<div style=\"".$dimensions->getCSS()."\">";
   write_centering_table($text);
