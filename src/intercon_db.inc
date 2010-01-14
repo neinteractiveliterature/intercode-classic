@@ -247,6 +247,9 @@ define (PRECON_PROCESS_EVENT_FORM, 211);
 define (PRECON_MANAGE_EVENTS, 212);
 define (PRECON_SHOW_STATUS_FORM, 213);
 define (PRECON_PROCESS_STATUS_FORM, 214);
+define (PRECON_SHOW_EVENT, 215);
+define (PRECON_SHOW_RUN_FORM, 216);
+define (PRECON_PROCESS_RUN_FORM, 217);
 
 // List types
 
@@ -288,6 +291,40 @@ define (SESSION_TIMEOUT, 'Timeout_' . CON_ID);
 
 if (1 == DEVELOPMENT_VERSION)
   error_reporting (E_ALL);
+
+function request_string($key, $default='')
+{
+  if (array_key_exists($key, $_REQUEST))
+    return trim($_REQUEST[$key]);
+  else
+    return $default;
+}
+
+function request_int($key, $default=0)
+{
+  $v = $default;
+  if (array_key_exists($key, $_REQUEST))
+    $v = intval(trim($_REQUEST[$key]));
+
+  return $v;
+}
+
+function post_string($key, $default='')
+{
+  if (array_key_exists($key, $_POST))
+    return trim($_POST[$key]);
+  else
+    return $default;
+}
+
+function post_int($key, $default=0)
+{
+  $v = $default;
+  if (array_key_exists($key, $_POST))
+    $v = intval(trim($_POST[$key]));
+
+  return $v;
+}
 
 /*
  * user_has_priv
@@ -781,14 +818,14 @@ function html_begin ($bShowLogo=true)
 
   // Add this menu if user has PRECON_SCHEDULING priv
 
-/*
+
   if (user_has_priv (PRIV_PRECON_SCHEDULING))
   {
     navbar_title (true, 'PreCon Event Scheduling');
     navbar_entry (true, 'Manage PreCon Event Schedule',
 		  'Thursday.php', PRECON_MANAGE_EVENTS);
   }
-*/
+
   // Add the static pages
 
   navbar_title (false, 'Information');
@@ -3148,6 +3185,32 @@ function form_radio ($name, $value, $checked)
     $chk = '';
 
   echo "<input type=\"radio\" name=\"$name\" value=\"$value\" $chk>";
+}
+
+function pretty_rooms($str)
+{
+  // Quick check for empty string - why waste time?
+  if ('' == $str)
+    return '';
+
+  // Convert combined rooms into something 'pretty'
+  $str = str_replace('Heritage A,Heritage B', 'Heritage A &amp; B', $str);
+  $str = str_replace('Salon A,Salon B,Salon C', 'Salon A, B &amp; C', $str);
+  $str = str_replace('Salon A,Salon B', 'Salon A &amp; B', $str);
+  $str = str_replace('Salon B,Salon C', 'Salon B &amp; C', $str);
+  $str = str_replace('Salon A,Salon C', 'Salon A &amp; C', $str);
+
+  // Check for single rooms
+  $ary = explode(',', $str);
+  if (1 == count($ary))
+    return $ary[0];
+
+  // Make a pretty list
+  $last = array_pop($ary);
+  $Rooms = implode(', ', $ary);
+  $Rooms .= ' and ' . $last;
+
+  return $Rooms;
 }
 
 ?>

@@ -952,7 +952,7 @@ function show_user_homepage_shirts ($UserId)
 {
   // Display the header for the user's TShirt order
 
-  display_header (CON_NAME . ' Shirts Ordered');
+  display_header ('<p>' . CON_NAME . ' Shirts Ordered');
 
   // Count up the number of shirts the user has ordered
 
@@ -1197,6 +1197,45 @@ function show_user_homepage_bids ($UserId)
   }
 
   echo "</TABLE>\n";
+
+  return true;
+}
+
+/*
+ * show_user_homepage_precon_bids
+ *
+ * Add links to any pre-con events the user has bid
+ */
+
+function show_user_homepage_precon_bids ($UserId)
+{
+  $sql = 'SELECT PreConEventId, Status, Title FROM PreConEvents';
+  $sql .= "  WHERE SubmitterUserId=$UserId";
+  $sql .= '  ORDER BY Title';
+
+  $result = mysql_query ($sql);
+  if (! $result)
+    return display_mysql_error ('Failed to get list of bid games');
+
+  if (0 == mysql_num_rows ($result))
+    return true;
+
+  display_header ("<P>Status of Pre-Convention Events You've Bid");
+
+  echo "<table cellpadding=\"2\">\n";
+  while ($row = mysql_fetch_object ($result))
+  {
+    echo "  <tr>\n";
+    echo "    <td>$row->Status:</td>\n";
+    printf ('    <td><a href="Thursday.php?action=%d&PreConEventId=%d">' .
+	    "%s</a></td>\n",
+	    PRECON_SHOW_EVENT_FORM,
+	    $row->PreConEventId,
+	    $row->Title);
+    echo "  </tr>\n";
+  }
+
+  echo "</table>\n";
 
   return true;
 }
@@ -1857,6 +1896,10 @@ function show_user_homepage ()
   if (user_is_gm())
     show_user_homepage_gm ($_SESSION[SESSION_LOGIN_USER_ID]);
 
+  // See if the user has bid any pre-convention events
+
+  show_user_homepage_precon_bids ($_SESSION[SESSION_LOGIN_USER_ID]);
+
   // See if the user has bid any games
 
   show_user_homepage_bids ($_SESSION[SESSION_LOGIN_USER_ID]);
@@ -2437,25 +2480,41 @@ function display_user_form_for_others ()
   priv_checkbox ($privs, PRIV_BID_CHAIR,  'Bid Comm. Chair');
   priv_checkbox ($privs, PRIV_CON_COM,    'Con Committee');
   priv_checkbox ($privs, PRIV_GM_LIAISON, 'GM Liaison');
-  echo "          </TD>\n";
-  echo "          <TD>\n";
+  echo "          </td>\n";
+  echo "          <td>\n";
   priv_checkbox ($privs, PRIV_OUTREACH,   'Outreach');
+  priv_checkbox ($privs, PRIV_PRECON_BID_CHAIR, 'Pre-Con Bid Chair');
+  priv_checkbox ($privs, PRIV_PRECON_SCHEDULING, 'Pre-Con Scheduling');
   priv_checkbox ($privs, PRIV_REGISTRAR,  'Registrar');
+  echo "          </td>\n";
+  echo "          <td>\n";
   priv_checkbox ($privs, PRIV_SCHEDULING, 'Scheduling');
   priv_checkbox ($privs, PRIV_STAFF,      'Website Staff');
-  echo "          </TD>\n";
-  echo "          <TD>\n";
+  echo "          </td>\n";
+  echo "        </tr>\n";
+  echo "      </table>\n";
+  echo "    </td>\n";
+  echo "  </tr>\n";
+  echo "  <tr><td colspan=\"2\">&nbsp;</td></tr>\n";
+  echo "  <tr>\n";
+  echo "    <td align=\"right\" valign=\"top\">Mail Privileges:</td>\n";
+  echo "    <td>\n";
+  echo "      <table>\n";
+  echo "        <tr valign=\"top\">\n";
+  echo "          <td>\n";
   priv_checkbox ($privs, PRIV_MAIL_ALL,       'Mail to All');
   //  priv_checkbox ($privs, PRIV_MAIL_ALUMNI,    'Mail to Alumni');
   priv_checkbox ($privs, PRIV_MAIL_ATTENDEES, 'Mail to Attendees');
   priv_checkbox ($privs, PRIV_MAIL_GMS,       'Mail to GMs');
+  echo "          </td>\n";
+  echo "          <td>\n";
   priv_checkbox ($privs, PRIV_MAIL_VENDORS,   'Mail to Vendors');
   priv_checkbox ($privs, PRIV_MAIL_UNPAID,    'Mail to Unpaid');
-  echo "          </TD>\n";
-  echo "        </TR>\n";
-  echo "      </TABLE>\n";
-  echo "    </TD>\n";
-  echo "  </TR>\n";
+  echo "          </td>\n";
+  echo "        </tr>\n";
+  echo "      </table>\n";
+  echo "    </td>\n";
+  echo "  </tr>\n";
 
   user_form_section(CON_NAME . ' Payment Info');
 

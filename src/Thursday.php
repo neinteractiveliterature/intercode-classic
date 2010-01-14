@@ -14,10 +14,7 @@ if (! intercon_db_connect ())
 
 html_begin ();
 
-if (array_key_exists ('action', $_REQUEST))
-  $action = $_REQUEST['action'];
-else
-  $action = THURSDAY_THING;
+$action = request_int('action', THURSDAY_THING);
 
 switch ($action)
 {
@@ -59,15 +56,37 @@ switch ($action)
    if (! process_precon_event_form())
      display_precon_event_form();
    else
-     thursday_thing();
+     display_bid_thank_you();
    break;
 
   case PRECON_MANAGE_EVENTS:
     display_event_summary();
     break;
 
+  case PRECON_PROCESS_STATUS_FORM:
+    if (process_status_form())
+      display_event_summary();
+    else
+      show_status_form();
+    break;
+
   case PRECON_SHOW_STATUS_FORM:
     show_status_form();
+    break;
+
+  case PRECON_SHOW_EVENT:
+    show_precon_event();
+    break;
+
+  case PRECON_SHOW_RUN_FORM:
+    show_run_form();
+    break;
+
+  case PRECON_PROCESS_RUN_FORM:
+    if (process_run_form())
+      display_event_summary();
+    else
+      show_run_form();
     break;
 
   default:
@@ -75,6 +94,39 @@ switch ($action)
 }
 
 html_end();
+
+/*
+ * list_accepted_events
+ *
+ * List the accepted Pre-Convention events
+ */
+
+function list_accepted_events()
+{
+  $sql = 'SELECT PreConEventId, Title, ShortDescription FROM PreConEvents';
+  $sql .= ' WHERE "Accepted"=Status';
+  $sql .= ' ORDER BY Title';
+
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Query for PreCon events failed', $sql);
+
+  if (0 == mysql_num_rows($result))
+    return true;
+
+  printf ("<b>The following events are scheduled for the %s Pre-Convention:</b>\n",
+	  CON_NAME);
+
+  while ($row = mysql_fetch_object($result))
+  {
+    echo "<p>\n";
+    printf("<a href=\"Thursday.php?action=%d&PreConEventId=%d\">%s</a>\n",
+	   PRECON_SHOW_EVENT,
+	   $row->PreConEventId,
+	   $row->Title);
+    echo "<br>$row->ShortDescription</p>\n";
+  }
+}
 
 /*
  * thursday_thing
@@ -103,7 +155,7 @@ function thursday_thing()
   $url = '';
   if (isset ($_SESSION[SESSION_LOGIN_USER_ID]))
   {
-    if (1)
+    if (0)
     {
       echo "<p>If you'd like to propose a panel, discussion or workshop\n";
       printf ("please contact %s at %s.</p>\n",
@@ -112,10 +164,10 @@ function thursday_thing()
     }
     else
     {
-      echo "<p>Want to propose a panel, discussion or workshop?  We'd love to\n";
-      printf ("<a href=\"Thursday.php?action=%d\">hear</a>\n",
+      printf ('<a href="Thursday.php?action=%d">',
 	      PRECON_SHOW_EVENT_FORM);
-      echo "about it!\n";
+      echo "Want to propose a panel, discussion or workshop?</a>\n";
+      echo "We'd love to hear about it!\n";
     }
 
     $sql = 'SELECT * FROM Thursday';
@@ -193,6 +245,8 @@ function thursday_thing()
   echo "Thursday night, at the door.</p>\n";
   echo "<p>Check back here for the list of Events that will be part of the\n";
   echo CON_NAME . " Pre-Convention!</p>\n";
+
+  list_accepted_events();
 }
 
 /*
@@ -695,7 +749,7 @@ function schedule_table_entry ($day, $date, $start_hour, $rowspan=0)
 
   switch ($value)
   {
-    case '':  $dont_care = 'selected'; break;
+    case '-': $dont_care = 'selected'; break;
     case '1': $one       = 'selected'; break;
     case '2': $two       = 'selected'; break;
     case '3': $three     = 'selected'; break;
@@ -729,10 +783,7 @@ function display_precon_event_form()
 
   // If we're updating a bid, grab the bid ID
 
-  if (empty ($_REQUEST['PreConEventId']))
-    $PreConEventId = 0;
-  else
-    $PreConEventId = intval (trim ($_REQUEST['PreConEventId']));
+  $PreConEventId = request_int('PreConEventId');
 
   // If this is a new bid, just display the header
 
@@ -779,12 +830,17 @@ function display_precon_event_form()
   echo "<form method=\"POST\" action=\"Thursday.php\">\n";
   form_add_sequence();
   form_hidden_value ('action', PRECON_PROCESS_EVENT_FORM);
+  form_hidden_value('PreConEventId', $PreConEventId);
 
   echo "<p><font color=red>*</font> indicates a required field\n";
   echo "<table border=\"0\">\n";
   form_text(64, 'Title', '', 128, true);
-  form_text(1, 'Length', 'Hours', 0, true, '(Hours)');
-  form_text(64, 'Special Requirements', 'SpecialRequests', true);
+  form_text(1, 'Length', 'Hours', 1, true, '(Hours)');
+  form_text(64, 'Special Requirements', 'SpecialRequests', 128);
+
+  $text = 'Short paragraph (50 words or less) displayed in the Pre-';
+  $text .= "Convention event list.\n";
+  form_textarea ($text, 'ShortDescription', 4, TRUE, TRUE);
 
   $text = "Description for use on the " . CON_NAME . " website.  This\n";
   $text .= "information will also be used for advertising and some\n";
@@ -796,12 +852,12 @@ function display_precon_event_form()
   $text .= "<A HREF=HtmlPrimer.html TARGET=_blank>here</A>.\n";
   form_textarea ($text, 'Description', 15, TRUE, TRUE);
   
-  form_section ('Scheduling Information');
+  form_section ('Scheduling Requests');
 
   echo "  <tr>\n";
   echo "    <td colspan=\"2\">\n";
   echo "      <p>The con can schedule your event into one (or more) of the\n";
-  echo "      time slots available during the Pre Convention.  The con has\n";
+  echo "      time slots available during the Pre-Convention.  The con has\n";
   echo "      to put together a balanced schedule so we can satisfy the\n";
   echo "      most attendees in the most time slots.  Your flexibility in\n";
   echo "      scheduling your event is vital.</p>\n";
@@ -835,13 +891,75 @@ function display_precon_event_form()
   echo "</form>\n";
 }
 
+function create_precon_event_mail($PreConEventId, &$subject, &$body)
+{
+  $subject = '';
+  $body = '';
+
+  $user = name_user($_SESSION[SESSION_LOGIN_USER_ID]);
+
+  if (0 == $PreConEventId)
+  {
+    $subject = sprintf('[%s - Pre-Con Event Bid] New: %s',
+		       CON_NAME,
+		       $_POST['Title']);
+    $body = "The bid has been submitted by $user";
+    return;
+  }
+
+
+  $sql = "SELECT * FROM PreConEvents WHERE PreConEventId=$PreConEventId";
+  $result = mysql_query($sql);
+  if (! $result)
+    return;
+
+  $changes = '';
+  $ary = mysql_fetch_assoc($result);
+  foreach ($ary as $k => $v)
+  {
+    if (post_string($k) != $v)
+    {
+      if ('' == $changes)
+	$changes = $k;
+      else
+	$changes .= ', ' . $k;
+    }
+  }
+
+  if ('' == $changes)
+    return;
+
+  $subject = sprintf('[%s - Pre-Con Event Bid] Updated: %s',
+		     CON_NAME,
+		     $_POST['Title']);
+  $body = "$user has changed the following fields: $changes.";
+}
+
 function process_precon_event_form()
 {
+  //  dump_array('$_REQUEST', $_REQUEST);
+
   // If we're updating a bid, grab the bid ID
 
-  $PreConEventId = 0;
-  if (array_key_exists ('PreConEventId', $_REQUEST))
-    $PreConEventId = intval (trim ($_REQUEST['PreConEventId']));
+  $PreConEventId = request_int('PreConEventId');
+
+  // We must have a title, Length and Descriptions!
+
+  if ('' == request_string('Title'))
+    return display_error ('You must specify a title.');
+
+  if (0 == request_int('Hours'))
+    return display_error ('You must specify the number of hours');
+
+  if ('' == request_string('ShortDescription'))
+    return display_error('You must provide a short description');
+
+  if ('' == request_string('Description'))
+    return display_error('You must provide a description');
+
+  // If this is an existing bid, build the list of changes
+
+  create_precon_event_mail($PreConEventId, $subject, $body);
 
   // If this is a new bid, just display the header
 
@@ -853,7 +971,6 @@ function process_precon_event_form()
   $sql .= build_sql_string('Title', $_REQUEST['Title'], false);
   $sql .= build_sql_string('Hours');
   $sql .= build_sql_string('SpecialRequests');
-  //  $sql .= build_sql_string('InviteOthers');
   $sql .= build_sql_string('Thursday21');
   $sql .= build_sql_string('Thursday22');
   $sql .= build_sql_string('Thursday23');
@@ -863,7 +980,8 @@ function process_precon_event_form()
   $sql .= build_sql_string('Friday15');
   $sql .= build_sql_string('Friday16');
   $sql .= build_sql_string('Friday17');
-  $sql .= build_sql_string('Description');
+  $sql .= build_sql_string('ShortDescription', '', true, true);
+  $sql .= build_sql_string('Description', '', true, true);
   $sql .= ', UpdatedById=' . $_SESSION[SESSION_LOGIN_USER_ID];
   if (0 == $PreConEventId)
     $sql .= ', SubmitterUserId=' . $_SESSION[SESSION_LOGIN_USER_ID];
@@ -873,14 +991,30 @@ function process_precon_event_form()
   $result = mysql_query($sql);
   if (! $result)
     return display_mysql_error ('Submission failed');
-  else
-    return true;
 
+  if (! intercon_mail (EMAIL_THURSDAY, $subject, $body))
+    display_error ('Attempt to send changes to Pre-Con event chair failed!');
+
+  return true;
+}
+
+function display_bid_thank_you()
+{
+  display_header('Thank you for bidding a Pre-Convention Event!');
+  echo "<p>The Pre-Convention Bid Chair has been notified and should\n";
+  echo "review your submission and be in touch with you shortly.  You\n";
+  printf ("can contact the Pre-Convention Bid Chair at %s .</p>\n",
+	  mailto_or_obfuscated_email_address(EMAIL_THURSDAY));
 }
 
 function display_event_summary()
 {
-  display_header ('PreCon Events');
+  // Make sure that only privileged users get here
+
+  if (! user_has_priv (PRIV_PRECON_BID_CHAIR))
+    return display_access_error ();
+
+  display_header ('Pre-Convention Events');
 
   $sql = 'SELECT PreConEventId, Title, Hours, Status FROM PreConEvents';
   $sql .= ' ORDER BY Status, Title';
@@ -902,14 +1036,14 @@ function display_event_summary()
   echo "    <th colspan=\"3\">Runs</th>\n";
   echo "  </tr>\n";
   echo "  <tr>\n";
-  echo "    <th>Track</th>\n";
-  echo "    <th>Day</th>\n";
-  echo "    <th>Start&nbsp;Time</th>\n";
+  echo "    <th>&nbsp;Day&nbsp;</th>\n";
+  echo "    <th>&nbsp;Start&nbsp;Time&nbsp;</th>\n";
+  echo "    <th>&nbsp;Room(s)&nbsp;</th>\n";
   echo "  </tr>\n";
 
   while ($row = mysql_fetch_object($result))
   {
-    $sql = 'SELECT Track, Day, StartHour FROM PreConRuns';
+    $sql = 'SELECT Day, StartHour, PreConRunId, Rooms FROM PreConRuns';
     $sql .= " WHERE PreConEventId=$row->PreConEventId";
     $sql .= ' ORDER BY Day, StartHour';
 
@@ -921,14 +1055,27 @@ function display_event_summary()
     if (0 == $rowspan)
       $rowspan = 1;
 
-    echo "  <tr>\n";
-    printf ('    <td rowspan="%d"><a href="Thursday.php?action=%d&Event=%d">' .
+    echo "  <tr align=\"center\">\n";
+    printf ('    <td rowspan="%d">' .
+	    '<a href="Thursday.php?action=%d&PreConEventId=%d">' .
 	    "%s</a></td>\n",
 	    $rowspan,
 	    PRECON_SHOW_STATUS_FORM,
 	    $row->PreConEventId,
 	    $row->Status);
-    echo "    <td rowspan=\"$rowspan\">$row->Title</td>\n";
+    if ('Accepted' == $row->Status)
+      printf ('    <td rowspan="%d" align="left" valign="top">&nbsp;' .
+	      '<a href="Thursday.php?action=%d&PreConEventId=%d">%s</a>' .
+	      "&nbsp;</td>\n",
+	      $rowspan,
+	      PRECON_SHOW_RUN_FORM,
+	      $row->PreConEventId,
+	      $row->Title);
+    else
+      printf ('    <td rowspan="%d" align="left" valign="top">&nbsp;' .
+	      "%s&nbsp;</td>\n",
+	      $rowspan,
+	      $row->Title);
 
     if (0 == mysql_num_rows($run_result))
       echo "    <td colspan=\"3\">&nbsp;</td>\n";
@@ -936,26 +1083,100 @@ function display_event_summary()
     {
       while ($run_row = mysql_fetch_object($run_result))
       {
-	echo "    <td>$row_run->Track</td>\n";
-	echo "    <td>$row_run->Day</td>\n";
-	echo "    <td>$row_run->StartTime</td>\n";
+	printf ('    <td>' .
+		'<a href="Thursday.php?action=%d&PreConEventId=%d' .
+		'&PreConRunId=%d">%s</a>' .
+		"</td>\n",
+		PRECON_SHOW_RUN_FORM,
+		$row->PreConEventId,
+		$run_row->PreConRunId,
+		$run_row->Day);
+	printf ('    <td>' .
+		'<a href="Thursday.php?action=%d&PreConEventId=%d' .
+		'&PreConRunId=%d">%d:00</a>' .
+		"</td>\n",
+		PRECON_SHOW_RUN_FORM,
+		$row->PreConEventId,
+		$run_row->PreConRunId,
+		$run_row->StartHour);
+
+	$Rooms = pretty_rooms($run_row->Rooms);
+	echo "    <td>&nbsp;$Rooms&nbsp;</td>\n";
       }
     }
     echo "  </tr>\n";
   }
 
   echo "</table>\n";
+  echo "<p>\n";
+  echo "Click on the <b>Status</b> to change (accept, reject, etc.)<br>\n";
+  echo "Click on the event <b>Title</b> to add a run<br>\n";
+  echo "Click on the <b>Day</b> or <b>Start Time</b> to edit or delete a run\n";
+  echo "</p>\n";
+}
+
+function scheduling_preference_row($day, $hour, $ary, $rowspan=0)
+{
+  $row_value = $ary["$day$hour"];
+  $text = "Don't Care";
+  $bg = '';
+
+  switch ($row_value)
+  {
+    case '1':
+      $text = 'First Choice';
+      $bg = 'bgcolor="#CCFFCC"';  // Light green
+      break;
+    case '2':
+      $text = 'Second Choice';
+      $bg = 'bgcolor="#FFFFCC"';  // Light yellow
+      break;
+    case '3':
+      $text = 'Third Choice';
+      $bg = 'bgcolor="#CCCCFF"';  // Light blue
+      break;
+    case 'X':
+      $text = 'Prefer Not';
+      $bg = 'bgcolor="#FFCCCC"';  // Light red
+      break;
+  }
+
+  echo "        <tr>\n";
+  if (0 != $rowspan)
+    echo "          <th rowspan=\"$rowspan\" valign=\"top\">&nbsp;$day&nbsp;</th>\n";
+
+  printf ("          <td>&nbsp;%d:00 -- %d:00&nbsp;</td>\n",
+	  $hour, $hour+1);
+  echo "          <td $bg>&nbsp;$text&nbsp;</td>\n";
+  echo "        </tr>\n";
+}
+
+function scheduling_start_option($day, $hour, $selection)
+{
+  $selected = '';
+  if ($selection == "$day$hour")
+    $selected = 'selected';
+
+  printf ("        <option value=\"%s%d\" %s>%s %d:00</option>\n",
+	  $day, $hour,
+	  $selected,
+	  $day, $hour);
 }
 
 function show_status_form()
 {
+  // Make sure that only privileged users get here
+
+  if (! user_has_priv (PRIV_PRECON_BID_CHAIR))
+    return display_access_error ();
+
   // Fetch the PreConEventId
 
-  $PreConEventId = intval (trim ($_REQUEST['Event']));
+  $PreConEventId = request_int('PreConEventId');
   if (0 == $PreConEventId)
     return display_error ('Invalid PreConEventId');
 
-  $sql = 'SELECT Title, Hours, Status FROM PreConEvents';
+  $sql = 'SELECT * FROM PreConEvents';
   $sql .= " WHERE PreConEventId=$PreConEventId";
 
   $result = mysql_query($sql);
@@ -969,10 +1190,10 @@ function show_status_form()
   if (1 != mysql_num_rows($result))
     return display_error ("Found multiple rows for PreConEventId $PreConEventId");
 
-  $row = mysql_fetch_object($result);
+  $ary = mysql_fetch_array($result);
 
   $count = 0;
-  if ('Accepted' == $row->Status)
+  if ('Accepted' == $ary['Status'])
   {
     $sql = 'SELECT PreConRunId FROM PreConRuns';
     $sql .= " WHERE PreConEventId=$PreConEventId";
@@ -989,7 +1210,7 @@ function show_status_form()
   $rejected = '';
   $dropped = '';
 
-  switch ($row->Status)
+  switch ($ary['Status'])
   {
     case 'Pending':  $pending =  'selected'; break;
     case 'Accepted': $accepted = 'selected'; break;
@@ -997,15 +1218,18 @@ function show_status_form()
     case 'Dropped':  $dropped =  'selected'; break;
   }
 
-  display_header ("Change status of <i>$row->Title</i>\n");
+  $Title = $ary['Title'];
+  display_header ("Change status of <i>$Title</i>\n");
 
   echo "<form method=\"POST\" action=\"Thursday.php\">\n";
   form_add_sequence();
-  form_hidden_value('action', PRECON_PROCESS_STATUS_CHANGE);
+  form_hidden_value('action', PRECON_PROCESS_STATUS_FORM);
+  form_hidden_value('PreConEventId', $PreConEventId);
+
   echo "<table>\n";
 
   echo "  <tr>\n";
-  echo "    <td>Status:</td>\n";
+  echo "    <th>Status:</th>\n";
   echo "    <td>\n";
   echo "      <select name=\"Status\">\n";
   echo "        <option value=\"Pending\" $pending>Pending</option>\n";
@@ -1023,11 +1247,454 @@ function show_status_form()
     echo "  <tr>\n";
   }
 
+  $none_selected = 'selected';
   form_section ('Schedule Run (Only if Accepting)');
+  echo "  <tr>\n";
+  echo "    <th>Start Time:</th>\n";
+  echo "    <td>\n";
+  echo "      <select name=\"StartTime\">\n";
+  echo "        <option value=\"None\" $none_selected>None</option>\n";
+  scheduling_start_option('Thursday', 21, '');
+  scheduling_start_option('Thursday', 22, '');
+  scheduling_start_option('Thursday', 23, '');
+  scheduling_start_option('Friday', 12, '');
+  scheduling_start_option('Friday', 13, '');
+  scheduling_start_option('Friday', 14, '');
+  scheduling_start_option('Friday', 15, '');
+  scheduling_start_option('Friday', 16, '');
+  scheduling_start_option('Friday', 17, '');
+  echo "      </select>\n";
+  echo "    </td>\n";
+  echo "  </tr>\n";
+
+  form_submit('Submit');
+
+  form_section ('Schedule Preferences');
+  echo "  <tr>\n";
+  echo "    <td colspan=\"2\">\n";
+  echo "      <table border=\"1\">\n";
+  
+  scheduling_preference_row('Thursday', 21, $ary, 3);
+  scheduling_preference_row('Thursday', 22, $ary);
+  scheduling_preference_row('Thursday', 23, $ary);
+  scheduling_preference_row('Friday', 12, $ary, 6);
+  scheduling_preference_row('Friday', 13, $ary);
+  scheduling_preference_row('Friday', 14, $ary);
+  scheduling_preference_row('Friday', 15, $ary);
+  scheduling_preference_row('Friday', 16, $ary);
+  scheduling_preference_row('Friday', 17, $ary);
+  echo "      </table>\n";
+  echo "    </td>\n";
+  echo "  </tr>\n";  
   
   echo "</table>\n";
   echo "</form>\n";
+}
+
+function show_precon_event()
+{
+  // Fetch the PreConEventId
+
+  $PreConEventId = request_int('PreConEventId');
+  if (0 == $PreConEventId)
+    return display_error ('Invalid PreConEventId');
+
+
+  $sql = 'SELECT PreConEvents.Title, PreConEvents.Hours,';
+  $sql .= ' PreConEvents.Description, Users.FirstName, Users.LastName,';
+  $sql .= ' PreConEvents.UpdatedById, PreConEvents.SubmitterUserId,';
+  $sql .= ' DATE_FORMAT(PreConEvents.LastUpdated, "%d-%b-%Y %H:%i") AS Timestamp';
+  $sql .= ' FROM PreConEvents, Users';
+  $sql .= " WHERE PreConEventId=$PreConEventId";
+  $sql .= '   AND Users.UserId=PreConEvents.SubmitterUserId';
+
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error("Query for PreConEventId $PreConEventId failed",
+			       $sql);
+
+  if (0 == mysql_num_rows($result))
+    return display_error ("Failed to find PreConEventId $PreConEventId");
+
+  if (1 != mysql_num_rows($result))
+    return display_error ("Found multiple rows for PreConEventId $PreConEventId");
+
+  $row = mysql_fetch_object($result);
+
+  $can_edit_event = user_has_priv(PRIV_PRECON_BID_CHAIR);
+  if (array_key_exists(SESSION_LOGIN_USER_ID, $_SESSION))
+    if ($row->SubmitterUserId == $_SESSION[SESSION_LOGIN_USER_ID])
+      $can_edit_event = true;
+
+  echo "<table width=\"100%\">\n";
+  echo "  <tr>\n";
+  echo "    <td><big><big><b><i>$row->Title</i></b></big></big></td>\n";
+  if ($can_edit_event)
+  {
+    printf ('    <td align="right" nowrap>[<a href="Thursday.php?action=%d' .
+	    '&PreConEventId=%d">Edit Event</a>]' .
+	    "</td>\n",
+	    PRECON_SHOW_EVENT_FORM,
+	    $PreConEventId);
+  }
+  echo "  </tr>\n";
+  echo "</table>\n";
+
+  $name = trim("$row->FirstName $row->LastName");
+  echo "<p><b>Submitted by:</b> $name</p>";
+  echo "<p>$row->Description</p>\n";
+
+  if ($can_edit_event)
+  {
+    $updater = name_user($row->UpdatedById);
+    echo "<p><b>Last updated</b>: $row->Timestamp by $updater</p>\n";
+  }
+}
+
+function process_status_form()
+{
+  // Make sure that only privileged users get here
+
+  if (! user_has_priv (PRIV_PRECON_BID_CHAIR))
+    return display_access_error ();
+
+  // Fetch the PreConEventId
+
+  $PreConEventId = request_int('PreConEventId');
+  if (0 == $PreConEventId)
+    return display_error ('Invalid PreConEventId');
+
+  // Fetch the Status
+
+  $Status = request_string('Status');
+  switch ($Status)
+  {
+    case 'Pending':
+    case 'Accepted':
+    case 'Rejected':
+    case 'Dropped':
+      break;
+    
+    default:
+      return display_error ('Invalid Status');
+  }
+
+  // The bid is being set to any status other than 'Accepted',
+  // delete any runs
+  if ('Accepted' != $Status)
+  {
+    $sql = "DELETE FROM PreConRuns WHERE PreConEventId=$PreConEventId";
+    $result = mysql_query($sql);
+    if (! $result)
+      return display_mysql_error('Failed to delete any Pre-Con Runs for' .
+				 "PreConEventId: $PreConEventId",
+				 $sql);
+  }
+
+  // Update the bid status
+  $sql = 'UPDATE PreConEvents';
+  $sql .= " SET Status='$Status', ";
+  $sql .= 'UpdatedById=' . $_SESSION[SESSION_LOGIN_USER_ID];
+  $sql .= " WHERE PreConEventId=$PreConEventId";
+
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Status update failed', $sql);
+
+  // We're done if this wasn't an attempt to accept the bid
+  if ('Accepted' != $Status)
+    return true;
+
+  // Fetch the Start time
+
+  $day = '';
+  $hour = 0;
+  $StartTime = request_string('StartTime');
+
+  switch ($StartTime)
+  {
+    case 'None':
+      return true;  // We're done!
+
+    case 'Thursday21':
+      $day = 'Thu';
+      $hour = 21;
+      break;
+
+    case 'Thursday22':
+      $day = 'Thu';
+      $hour = 22;
+      break;
+
+    case 'Thursday23':
+      $day = 'Thu';
+      $hour = 23;
+      break;
+
+    case 'Friday12':
+      $day = 'Fri';
+      $hour = 12;
+      break;
+
+    case 'Friday13':
+      $day = 'Fri';
+      $hour = 13;
+      break;
+
+    case 'Friday14':
+      $day = 'Fri';
+      $hour = 14;
+      break;
+
+    case 'Friday15':
+      $day = 'Fri';
+      $hour = 15;
+      break;
+
+    case 'Friday16':
+      $day = 'Fri';
+      $hour = 16;
+      break;
+
+    case 'Friday17':
+      $day = 'Fri';
+      $hour = 17;
+      break;
+
+    default:
+      return display_error ('Invalid StartTime');
+  }
   
+  $sql = 'INSERT PreConRuns SET ';
+  $sql .= build_sql_string('PreConEventId', $PreConEventId, false);
+  $sql .= build_sql_string('Day', $day);
+  $sql .= build_sql_string('StartHour', $hour);
+  $sql .= ', UpdatedById=' . $_SESSION[SESSION_LOGIN_USER_ID];
+
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Failed to create run', $sql);
+  else
+    return true;
+}
+
+function show_run_form()
+{
+  // Make sure that only privileged users get here
+
+  if (! user_has_priv (PRIV_PRECON_BID_CHAIR))
+    return display_access_error ();
+
+  dump_array('$_REQUEST', $_REQUEST);
+
+  if (is_array($_REQUEST['Rooms']))
+    dump_array('Rooms', $_REQUEST['Rooms']);
+
+  // Fetch the PreConEventId
+
+  $PreConEventId = request_int('PreConEventId');
+  if (0 == $PreConEventId)
+    return display_error ('Invalid PreConEventId');
+
+  // Fetch the PreConRunId
+    
+  $PreConRunId = request_int('PreConRunId');
+
+  if (0 == $PreConRunId)
+  {
+    if (! array_key_exists('Rooms', $_REQUEST))
+      $_REQUEST['Rooms'] = '';
+  }
+  else
+  {
+    $sql = "SELECT * FROM PreConRuns WHERE PreConRunId=$PreConRunId";
+    $result = mysql_query($sql);
+    if (!$result)
+      return display_mysql_error("Query for PreConRun $PreConRunId failed",
+				 $sql);
+
+    if ($row = mysql_fetch_assoc($result))
+    {
+      foreach($row as $k => $v)
+	$_REQUEST[$k] = $v;
+      if ('Thu' == $_REQUEST['Day'])
+	$day = 'Thursday';
+      else
+	$day = 'Friday';
+      $_REQUEST['StartTime'] = $day . $_REQUEST['StartHour'];
+    }
+  }
+
+  dump_array('$_REQUEST', $_REQUEST);
+
+  if (is_array($_REQUEST['Rooms']))
+    dump_array('Rooms', $_REQUEST['Rooms']);
+
+  $sql = "SELECT Title FROM PreConEvents WHERE PreConEventId=$PreConEventId";
+  $result = mysql_query($sql);
+  if (!$result)
+    return display_mysql_error("Query for PreConEvent $PreConEventId failed",
+			       $sql);
+
+  $row = mysql_fetch_object($result);
+  if (! $row)
+    return display_error("PreConEvent row not found for $PreConEventId");
+
+  if (0 == $PreConRunId)
+  {
+    $verb = 'Add';
+    $ok = 'Add Run';
+  }
+  else
+  {
+    $verb = 'Edit';
+    $ok = 'Update Run';
+  }
+
+  display_header ("$verb run for <i>$row->Title</i>");
+
+  echo "<form method=\"POST\" action=\"Thursday.php\">\n";
+  form_add_sequence();
+  form_hidden_value('action', PRECON_PROCESS_RUN_FORM);
+  form_hidden_value('PreConEventId', $PreConEventId);
+  form_hidden_value('PreConRunId', $PreConRunId);
+
+  echo "<table>\n";
+
+  $start_time_selection = post_string('StartTime', 'None');
+
+  if ('None' == $start_time_selection)
+    $none_selected = 'selected';
+  else
+    $none_selected = '';
+
+  echo "  <tr>\n";
+  echo "    <th>Start Time:</th>\n";
+  echo "    <td>\n";
+  echo "      <select name=\"StartTime\">\n";
+  echo "        <option value=\"None\" $none_selected>None</option>\n";
+  scheduling_start_option('Thursday', 21, $start_time_selection);
+  scheduling_start_option('Thursday', 22, $start_time_selection);
+  scheduling_start_option('Thursday', 23, $start_time_selection);
+  scheduling_start_option('Friday', 12, $start_time_selection);
+  scheduling_start_option('Friday', 13, $start_time_selection);
+  scheduling_start_option('Friday', 14, $start_time_selection);
+  scheduling_start_option('Friday', 15, $start_time_selection);
+  scheduling_start_option('Friday', 16, $start_time_selection);
+  scheduling_start_option('Friday', 17, $start_time_selection);
+  echo "      </select>\n";
+  echo "    </td>\n";
+  echo "  </tr>\n";
+
+  if (! is_array($_REQUEST['Rooms']))
+    $rooms = $_REQUEST['Rooms'];
+  else
+    $rooms = array_flip($_REQUEST['Rooms']);
+
+  if (is_array($rooms))
+    dump_array('Rooms', $rooms);
+  else
+    echo "<!-- Rooms is not an array -->\n";
+
+  echo "  <tr>\n";
+  echo "    <th>Room(s):</th>\n";
+  echo "    <td>\n";
+  echo "      <table>\n";
+  echo "        <tr valign=\"top\">\n";
+  echo "          <td>\n";
+  room_check($rooms, 'Boardroom');
+  room_check($rooms, 'Carlisle');
+  room_check($rooms, 'Chelmsford');
+  echo "          </td>\n";
+  echo "          <td>\n";
+  room_check($rooms, 'Concord');
+  room_check($rooms, 'Drawing');
+  echo "          </td>\n";
+  echo "        </tr>\n";
+  echo "      </table>\n";
+  echo "    </td>\n";
+  echo "  </tr>\n";
+  form_submit2($ok, 'Delete Run', 'Delete');
+  echo "</table>\n";
+}
+
+function room_check($ary, $room)
+{
+  $checked = '';
+  if (is_array($ary))
+    if (array_key_exists($room, $ary))
+      $checked = 'checked';
+
+  printf ('            <input type="checkbox" name="Rooms[]" ' .
+	  "value=\"%s\" %s>%s<br>\n",
+	  $room,
+	  $checked,
+	  $room);
+}
+
+function process_run_form()
+{
+  // Make sure that only privileged users get here
+
+  if (! user_has_priv (PRIV_PRECON_BID_CHAIR))
+    return display_access_error ();
+
+  // Fetch the PreConEventId
+
+  $PreConEventId = request_int('PreConEventId');
+  if (0 == $PreConEventId)
+    return display_error ('Invalid PreConEventId');
+
+  // Fetch the PreConRunId (may be zero)
+  $PreConRunId = request_int('PreConRunId');
+
+  if (array_key_exists('Delete', $_POST))
+  {
+    if (0 == $PreConRunId)
+      return display_error ('Cannot delete PreConRun 0');
+
+    $sql = "DELETE FROM PreConRuns WHERE $PreConRunId=$PreConRunId";
+    $result = mysql_query($sql);
+    if (! $result)
+      return display_mysql_error('Failed to delete PreConRun entry', $sql);
+    return true;
+  }
+
+  $StartTime = $_POST['StartTime'];
+  if ('None' == $StartTime)
+    return display_error ('You must specify a start time');
+
+  $hour = intval(substr($StartTime, -2));
+  if (0 == $hour)
+    return display_error ("Invalid start time: $StartTime");
+
+  $day = substr($StartTime, 0, 3);
+  if (('Thu' != $day) && ('Fri' != $day))
+    return display_error ("Invalid start time: $StartTime");
+
+  $Rooms = '';
+  if (array_key_exists('Rooms', $_REQUEST))
+    $Rooms = implode(',', $_REQUEST['Rooms']);
+
+  if (0 == $PreConRunId)
+    $sql = 'INSERT PreConRuns SET ';
+  else
+    $sql = 'UPDATE PreConRuns SET ';
+		     
+  $sql .= build_sql_string('PreConEventId', $PreConEventId, false);
+  $sql .= build_sql_string('Day', $day);
+  $sql .= build_sql_string('StartHour', $hour);
+  $sql .= build_sql_string('Rooms', $Rooms);
+  $sql .= ', UpdatedById=' . $_SESSION[SESSION_LOGIN_USER_ID];
+
+  if (0 != $PreConRunId)
+    $sql .= " WHERE PreConRunId=$PreConRunId";
+
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('PreConRun update failed', $sql);
+  else
+    return true;
 }
 
 ?>
