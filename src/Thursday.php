@@ -1144,7 +1144,11 @@ function display_event_summary()
 
   display_header ('Pre-Convention Events');
 
-  $sql = 'SELECT PreConEventId, Title, Hours, Status FROM PreConEvents';
+  $sql = 'SELECT PreConEvents.PreConEventId, PreConEvents.Title,';
+  $sql .= ' PreConEvents.Hours, PreConEvents.Status,';
+  $sql .= ' Users.FirstName, Users.LastName';
+  $sql .= ' FROM PreConEvents, Users';
+  $sql .= ' WHERE Users.UserId=PreConEvents.SubmitterUserId';
   $sql .= ' ORDER BY Status, Title';
 
   $result = mysql_query($sql);
@@ -1161,6 +1165,7 @@ function display_event_summary()
   echo "  <tr valign=\"bottom\">\n";
   echo "    <th rowspan=\"2\">Status</th>\n";
   echo "    <th rowspan=\"2\">Edit Event</th>\n";
+  echo "    <th rowspan=\"2\">Submitter</th>\n";
   echo "    <th rowspan=\"2\">Title</th>\n";
   echo "    <th colspan=\"3\">Runs</th>\n";
   echo "  </tr>\n";
@@ -1180,11 +1185,13 @@ function display_event_summary()
     if (! $run_result)
       return display_mysql_error ('Query for PreCon Event Runs failed', $sql);
 
+    $submitter = trim("$row->FirstName $row->LastName");
+
     $rowspan = mysql_num_rows($run_result);
     if (0 == $rowspan)
       $rowspan = 1;
 
-    echo "  <tr align=\"center\">\n";
+    echo "  <tr align=\"center\" valign=\"top\">\n";
     printf ('    <td rowspan="%d">' .
 	    '<a href="Thursday.php?action=%d&PreConEventId=%d">' .
 	    "%s</a></td>\n",
@@ -1198,6 +1205,7 @@ function display_event_summary()
 	    $rowspan,
 	    PRECON_SHOW_EVENT_FORM,
 	    $row->PreConEventId);
+    echo "    <td rowspan=\"$rowspan\">$submitter</td>\n";
     if ('Accepted' == $row->Status)
       printf ('    <td rowspan="%d" align="left" valign="top">&nbsp;' .
 	      '<a href="Thursday.php?action=%d&PreConEventId=%d">%s</a>' .
