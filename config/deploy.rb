@@ -1,7 +1,7 @@
 set :application, "intercon-j"
 set :user, "neiladmin"
 set :domain, "#{user}@apocalypse.dreamhost.com"
-set :repository, "file:///home/#{user}/svn/intercon/trunk/src"
+set :repository, "file:///home/#{user}/svn/intercon/branches/j/src"
 set :deploy_to, "/home/#{user}/#{application}"
 
 namespace :vlad do
