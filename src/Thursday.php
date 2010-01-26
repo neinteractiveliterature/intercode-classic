@@ -382,6 +382,11 @@ function thursday_thing()
   
   echo "</td></tr></table>\n\n";
 
+  echo "<p>If you have any questions about the Pre-Convention, we'd be happy to";
+  echo " help.  Email the Pre-Convention coordinator, ".NAME_THURSDAY.", at ";
+  echo mailto_or_obfuscated_email_address (EMAIL_THURSDAY);
+  echo ".</p>\n\n";
+
   list_accepted_events();
 }
 
