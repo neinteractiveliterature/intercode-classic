@@ -9,7 +9,7 @@
 
 // set this to 1 to debug schedule generation
 // requires Firebug or Firebug Lite
-define("PCSG_DEBUG", 1);
+define("PCSG_DEBUG", 0);
 
 class ScheduleBlock {
   public $startHour;
