@@ -166,8 +166,8 @@ function list_games_alphabetically ()
   echo "    <TH>Run Suffix</TH>\n";
   echo "    <TH>Schedule Note</TH>\n";
   echo "    <TH>Room(s)</TH>\n";
-  echo "    <TH>Track</TH>\n";
-  echo "    <TH>Tracks Spanned</TH>\n";
+//  echo "    <TH>Track</TH>\n";
+//  echo "    <TH>Tracks Spanned</TH>\n";
   echo "  </TR>\n";
 
   while ($game_row = mysql_fetch_object ($game_result))
@@ -232,8 +232,8 @@ function list_games_alphabetically ()
 	$venue = '&nbsp;';
       echo "    <TD>$venue</TD>\n";
 
-      echo "    <TD ALIGN=CENTER>$runs_row->Track</TD>\n";
-      echo "    <TD ALIGN=CENTER>$runs_row->Span</TD>\n";
+//      echo "    <TD ALIGN=CENTER>$runs_row->Track</TD>\n";
+ //     echo "    <TD ALIGN=CENTER>$runs_row->Span</TD>\n";
       echo "  </TR>\n";
 
       while ($runs_row = mysql_fetch_object ($runs_result))
@@ -263,8 +263,8 @@ function list_games_alphabetically ()
 	  $venue = '&nbsp;';
 	echo "    <TD>$venue</TD>\n";
 
-        echo "    <TD ALIGN=CENTER>$runs_row->Track</TD>\n";
-	echo "    <TD ALIGN=CENTER>$runs_row->Span</TD>\n";
+//        echo "    <TD ALIGN=CENTER>$runs_row->Track</TD>\n";
+//	echo "    <TD ALIGN=CENTER>$runs_row->Span</TD>\n";
         echo "  </TR>\n";
       }
     }
@@ -314,13 +314,13 @@ function list_games_by ($type)
   echo "  <TR>\n";
   echo "    <TH>Day</TH>\n";
   echo "    <TH>Start Time</TH>\n";
-  echo "    <TH>Track</TH>\n";
+//  echo "    <TH>Track</TH>\n";
   echo "    <TH>Game Title</TH>\n";
   echo "    <TH>Run Suffix</TH>\n";
   echo "    <TH>Schedule Note</TH>\n";
   echo "    <TH>Room(s)</TH>\n";
   echo "    <TH>Hours</TH>\n";
-  echo "    <TH>Tracks Spanned</TH>\n";
+//  echo "    <TH>Tracks Spanned</TH>\n";
   echo "  </TR>\n";
 
   while ($row = mysql_fetch_object ($result))
@@ -335,13 +335,13 @@ function list_games_by ($type)
 	echo "  <TR>\n";
 	echo "    <TH>Day</TH>\n";
 	echo "    <TH>Start Time</TH>\n";
-	echo "    <TH>Track</TH>\n";
+//	echo "    <TH>Track</TH>\n";
 	echo "    <TH>Game Title</TH>\n";
 	echo "    <TH>Run Suffix</TH>\n";
 	echo "    <TH>Schedule Note</TH>\n";
 	echo "    <TH>Room(s)</TH>\n";
 	echo "    <TH>Hours</TH>\n";
-	echo "    <TH>Tracks Spanned</TH>\n";
+//	echo "    <TH>Tracks Spanned</TH>\n";
 	echo "  </TR>\n";
       }
       $day = $row->Day;
@@ -355,7 +355,7 @@ function list_games_by ($type)
 	    EDIT_RUN,
 	    $row->RunId,
 	    $start_time);
-    echo "    <TD ALIGN=CENTER>$row->Track</TD>\n";
+//    echo "    <TD ALIGN=CENTER>$row->Track</TD>\n";
     printf ("    <TD VALIGN=TOP><A HREF=ListGames.php?action=%d&EventId=%d>%s</A></TD>\n",
 	    ADD_RUN,
 	    $row->EventId,
@@ -377,7 +377,7 @@ function list_games_by ($type)
     echo "    <TD>$venue</TD>\n";
 
     echo "    <TD VALIGN=TOP ALIGN=CENTER>$row->Hours</TD>\n";
-    echo "    <TD VALIGN=TOP ALIGN=CENTER>$row->Span</TD>\n";
+//    echo "    <TD VALIGN=TOP ALIGN=CENTER>$row->Span</TD>\n";
     echo "  </TR>\n";
   }
   echo "</TABLE>\n";
@@ -460,8 +460,8 @@ function add_run_form ($update)
   }
   echo "<TABLE BORDER=0>\n";
 
-  form_text (3, 'Track');
-  form_text (1, 'Tracks Spanned', 'Span');
+//  form_text (3, 'Track');
+//  form_text (1, 'Tracks Spanned', 'Span');
   form_day ('Day');
   form_start_hour ('Start Hour', 'StartHour');
   form_text (32, 'Title Suffix', 'TitleSuffix');
@@ -606,18 +606,18 @@ function process_add_run ()
     return true;
   }
 
-  if (! validate_int ('Track', 1, MAX_TRACKS))
-    return false;
+//  if (! validate_int ('Track', 1, MAX_TRACKS))
+//    return false;
 
-  if (! validate_int ('Span', 1, MAX_TRACKS))
-    return false;
+//  if (! validate_int ('Span', 1, MAX_TRACKS))
+//    return false;
 
   if (! validate_day_time ('StartHour', 'Day'))
     return false;
 
   $sql = "$verb Runs SET EventId=$EventId";
-  $sql .= build_sql_string ('Track');
-  $sql .= build_sql_string ('Span');
+//  $sql .= build_sql_string ('Track');
+//  $sql .= build_sql_string ('Span');
   $sql .= build_sql_string ('Day');
   $sql .= build_sql_string ('StartHour');
   $sql .= build_sql_string ('TitleSuffix');
@@ -645,7 +645,7 @@ function process_add_run ()
   return $RunId;
 }
 
-function add_parallel_run_form ()
+/*function add_parallel_run_form ()
 {
   // Fetch information about the run we're about to twin
 
@@ -730,7 +730,7 @@ function add_parallel_run_form ()
     echo "system will attempt to accept people from the waitlist into\n";
     echo "the newly added run\n";
   }
-}
+}*/
 
 /*
  * list_games_to_add_parallel_run
@@ -739,7 +739,7 @@ function add_parallel_run_form ()
  * to select one to add as a parallel run
  */
 
-function list_games_to_add_parallel_run ()
+/*function list_games_to_add_parallel_run ()
 {
   $sql = 'SELECT EventId, Title, Hours FROM Events';
   $sql .= ' WHERE SpecialEvent=0';
@@ -879,7 +879,7 @@ function list_games_to_add_parallel_run ()
     }
   }
   echo "</TABLE>\n";
-}
+}*/
 
 function accept_players_from_waitlist ($new_run_id)
 {

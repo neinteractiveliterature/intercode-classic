@@ -375,16 +375,25 @@ function user_has_any_mail_priv ()
 
 function get_bgcolor ($state)
 {
+  return ' BGCOLOR="'.get_bgcolor_hex($state).'"';
+}
+
+/*
+ * get_bgcolor_hex
+ *
+ * Returns just the hex color code as in get_bgcolor
+ */
+function get_bgcolor_hex ($state)
+{
   switch ($state)
   {
-    case 'Full':                return ' BGCOLOR="#FFCCCC"';  // Light red
-    case 'Confirmed':           return ' BGCOLOR="#CCFFCC"';  // Light green
-    case 'Waitlisted':          return ' BGCOLOR="#FFFFCC"';  // Light yellow
-    case 'CanPlayConcurrently': return ' BGCOLOR="#CCCCFF"';  // Light blue
-    case 'Away':                return ' BGCOLOR="#CCCCCC"';  // Light gray
+    case 'Full':                return '#FFCCCC';  // Light red
+    case 'Confirmed':           return '#CCFFCC';  // Light green
+    case 'Waitlisted':          return '#FFFFCC';  // Light yellow
+    case 'CanPlayConcurrently': return '#CCCCFF';  // Light blue
+    case 'Away':                return '#CCCCCC';  // Light gray
   }
-
-  return '';
+  return "#FFFFFF";
 }
 
 /*
@@ -909,6 +918,25 @@ function con_signups_allowed ()
   // Signups aren't allowed at this time
   
   return 0;
+}
+
+function attendees_at_max() {
+  $sql = 'SELECT CanSignup, COUNT(*) AS Count FROM Users';
+  $sql .= ' WHERE CanSignup<>"Alumni"';
+  $sql .= '   AND CanSignup<>"Unpaid"';
+  $sql .= ' GROUP BY CanSignup ORDER BY CanSignup';
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Failed to get user summary');
+
+  $attendees = 0;
+  while ($row = mysql_fetch_object($result))
+  {
+    if (('Alumni' <> $row->CanSignup) && ('Unpaid' <> $row->CanSignup))
+      $attendees += $row->Count;
+  }
+  
+  return $attendees >= CON_MAX;
 }
 
 /*

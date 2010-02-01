@@ -25,14 +25,14 @@ define (DB_NAME,   'itest');
 // from outside the domain, so we should be OK.  And it's not like we've got
 // credit card numbers or other sensative stuff in here anyway...
 
-define (DB_ADMIN_USR, 'interconneuser');
-define (DB_ADMIN_PWD, 'Thai4IeP');
+define (DB_ADMIN_USR, 'root');
+define (DB_ADMIN_PWD, '');
 
-define (DB_STAFF_USR, 'interconneuser');
-define (DB_STAFF_PWD, 'Thai4IeP');
+define (DB_STAFF_USR, 'root');
+define (DB_STAFF_PWD, '');
 
-define (DB_USER_USR, 'interconneuser');
-define (DB_USER_PWD, 'Thai4IeP');
+define (DB_USER_USR, 'root');
+define (DB_USER_PWD, '');
 
 
 // When DEVELOPMENT_VERSION is set to 1, all mail will be diverted to this
@@ -130,6 +130,9 @@ define (REGISTRATION_CLOSE, '2010-02-24');
 define (CON_OVER, '2010-03-14');
 define (SHIRT_CLOSE, '2010-02-01');
 define (BIO_CLOSE, '2009-12-25');
+
+// Information about the next convention for people who can't sign up for this one
+define (NEXT_CON_INFO, "Registration for Intercon K will open in March 2010.");
 
 // Shirt stuff
 
