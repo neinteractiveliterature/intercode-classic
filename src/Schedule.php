@@ -601,7 +601,6 @@ function display_event ($hour, $away_all_day, $away_hours,
 //		       $row->Track,
 //		       $row->Span);
       $text .= "<br>RunId: $row->RunId";
-    }
   }
   
   echo "<div style=\"".$dimensions->getCSS()."\">";
