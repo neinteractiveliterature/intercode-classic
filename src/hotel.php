@@ -79,7 +79,7 @@ echo "      </table>\n";
 echo "    </td>\n";
 echo "  </tr>\n";
 echo "  <tr>\n";
-echo "    <td align=\"center\" valign=\"center\"><img src=\"radisson.jpg\" border=\"0\"></td>\n";
+echo "    <td align=\"center\" valign=\"center\"><img src=\"westin.jpg\" border=\"0\" alt=\"The Westin Waltham Boston\"></td>\n";
 echo "  </tr>\n";
 echo "  <tr>\n";
 echo "    <td align=\"center\" valign=\"center\">\n";
