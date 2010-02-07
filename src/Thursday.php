@@ -246,7 +246,7 @@ function thursday_thing()
   echo "interactive workshops discussing LARP theory, costuming, writing\n";
   echo "techniques, play styles, and a variety of other topics.</p>\n";
 
-  printf ("<p>The Pre-Convention will be run at the Chelmsford Radisson\n");
+  printf ("<p>The Pre-Convention will be run\n");
   printf ("from Thursday evening until the start of %s Friday evening.</p>\n",
 	  CON_NAME);
   
