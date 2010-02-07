@@ -132,7 +132,7 @@ define (SHIRT_CLOSE, '2010-02-01');
 define (BIO_CLOSE, '2009-12-25');
 
 // Information about the next convention for people who can't sign up for this one
-define (NEXT_CON_INFO, "Registration for Intercon K will open in March 2010.");
+define (NEXT_CON_INFO, "Registration for Intercon L will open in March 2011.");
 
 // Shirt stuff
 
@@ -142,6 +142,18 @@ define (SHIRT_NAME, CON_NAME . " Men's Polo");
 define (SHIRT_2_NAME, CON_NAME . ' Babydoll');
 
 define (BIO_DUE_DATE, "December&nbsp;25,&nbsp;2009");
+
+// Theme colors
+
+//define (COLOR_MENU_PUBLIC_FG, "#24f");
+//define (COLOR_MENU_PUBLIC_BG, "#bdf");
+//define (COLOR_MENU_PRIV_FG, "#237723");
+//define (COLOR_MENU_PRIV_BG, "#bfb");
+
+define (COLOR_MENU_PUBLIC_FG, "#224099");
+define (COLOR_MENU_PUBLIC_BG, "#b9d1ec");
+define (COLOR_MENU_PRIV_FG, "#ca9a00");
+define (COLOR_MENU_PRIV_BG, "#fbc926");
 
 // 1 (true) if we're accepting bids, 0 if we're not
 

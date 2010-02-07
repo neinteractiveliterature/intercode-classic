@@ -518,14 +518,18 @@ function dump_array ($description, $array)
   }
 }
 
+function navbar_start($priv) {
+  if ($priv)
+    $cls = 'priv_menu';
+  else
+    $cls = 'public_menu';
+
+  echo "<ul class=\"$cls\">\n";
+}
+
 function navbar_title ($priv, $text)
 {
-  if ($priv)
-    $cls = 'priv_menu_title';
-  else
-    $cls = 'public_menu_title';
-
-  echo "<p class=$cls>$text</p>\n";
+    echo "<li class=\"title\">$text</li>\n";
 }
 
 function navbar_entry ($priv, $text, $page, $action=-1)
@@ -535,10 +539,10 @@ function navbar_entry ($priv, $text, $page, $action=-1)
   else
     $cls = 'public_menu_entry';
 
-  echo "<p class=$cls><a href=$page";
+  echo "<li class=\"$cls\"><a href=\"$page";
   if (-1 != $action)
     echo "?action=$action";
-  echo ">$text</a></p>\n";
+  echo "\">$text</a></li>\n";
 }
 
 function navbar_static ($priv, $text, $page)
@@ -548,21 +552,25 @@ function navbar_static ($priv, $text, $page)
   else
     $cls = 'public_menu_entry';
 
-  echo "<p class=$cls><a href=Static.php?page=$page>$text</a></p>\n";
+  echo "<li class=\"$cls\"><a href=\"Static.php?page=$page\">$text</a></li>\n";
 }
 
 function navbar_external_static ($text, $dest)
 {
-  echo "<p class=\"public_menu_entry\"><a href=\"$dest\" target=\"_blank\">$text</a></p>\n";
+  echo "<li class=\"public_menu_entry\"><a href=\"$dest\" target=\"_blank\">$text</a></li>\n";
 }
 
 function navbar_program_entry ($text, $prefix, $page)
 {
-  printf ("<p class=%s><a href=\"%s%s\">%s</a></p>\n",
+  printf ("<li class=\"%s\"><a href=\"%s%s\">%s</a></li>\n",
 	  'priv_menu_entry',
 	  $prefix,
 	  $page,
 	  $text);
+}
+
+function navbar_end() {
+    echo "</ul>\n";
 }
 
 /*
@@ -584,7 +592,7 @@ function html_begin ($bShowLogo=true)
   echo "<HEAD>\n";
   printf ("<TITLE>%s</TITLE>\n", CON_NAME);
   echo "<META HTTP-EQUIV=\"charset\" content=\"iso-8859-1\">\n";
-  echo "<link href='screen.css' rel='stylesheet' type='text/css' media='screen'>\n";
+  echo "<link href='screen.css.php' rel='stylesheet' type='text/css' media='screen'>\n";
   echo "<link href='print.css' rel='stylesheet' type='text/css' media='print'>\n";
   echo "<STYLE>\n";
   //  echo "  body {font-family: Arial, Helvetica, sans-serif}\n";
@@ -604,6 +612,7 @@ function html_begin ($bShowLogo=true)
 
   // Title the menu
 
+  navbar_start(false);
   navbar_title (false, 'What Can I Do...');
 
   // Show these options if the user is logged in
@@ -648,42 +657,50 @@ function html_begin ($bShowLogo=true)
     if (THURSDAY_ENABLED)
       navbar_entry (false, 'Pre-Convention Events', 'Thursday.php');
   }
+  navbar_end();
 
   // Add the GM menu, if this user is a GM
 
   if (user_is_gm())
   {
-    navbar_title (true, 'GM Information');
-    navbar_static (true, 'GM Benefits and Policies', 'GMPolicies');
-    navbar_entry (true, 'Edit My Bio', 'index.php', EDIT_BIO);
+      navbar_start(true);
+      navbar_title (true, 'GM Information');
+      navbar_static (true, 'GM Benefits and Policies', 'GMPolicies');
+      navbar_entry (true, 'Edit My Bio', 'index.php', EDIT_BIO);
+      navbar_end();
   }
   
   // Add the GM Liaison menu, if this user is the GM Liaison
   
   if (user_has_priv (PRIV_GM_LIAISON))
   {
+      navbar_start(true);
     navbar_title (true, 'GM Liaison');
     navbar_static (true, 'GM Benefits and Policies', 'GMPolicies');
     navbar_entry (true, 'Status of Bids', 'Bids.php', BID_REVIEW_BIDS);
     navbar_entry (true, 'BidCom Feedback Summary',
 		  'Bids.php', BID_FEEDBACK_SUMMARY);
+    navbar_end();
   }
 
   // Add these menu items if the user has BidCom privilege
 
   if (user_has_priv (PRIV_BID_COM))
   {
+      navbar_start(true);
     navbar_title (true, 'Bid Committee');
     navbar_entry (true, 'Status of Bids', 'Bids.php', BID_REVIEW_BIDS);
     navbar_entry (true, 'BidCom Feedback Summary',
 		  'Bids.php', BID_FEEDBACK_SUMMARY);
     navbar_static (true, 'Bid Committee Responsibilites', 'BidCommittee');
+    navbar_end();
   }
 
   // Add these menu items if the user has ConCom privilege
 
   if (user_has_priv (PRIV_CON_COM))
   {
+      navbar_start(true);
     navbar_title (true, 'ConCom');
     if (can_show_schedule ())
     {
@@ -722,17 +739,21 @@ function html_begin ($bShowLogo=true)
       navbar_entry (true, 'Edit My Bio', 'index.php', EDIT_BIO);
       navbar_static (true, 'GM Benefits and Policies', 'GMPolicies');
     }
+    navbar_end();
 
+    navbar_start(true);
     navbar_title (true, 'Analysis');
     navbar_entry (true, 'All Signups', 'SignupSpy.php', SHOW_ALL_SIGNUPS);
     navbar_entry (true, 'Signups with Choice #s', 'Choice1.php');
     navbar_entry (true, 'Games by Choice', 'Choice3.php');
+    navbar_end();
   }
 
   // Add these menu items if the user has any of the mail privileges
 
   if (user_has_any_mail_priv ())
   {
+      navbar_start(true);
     navbar_title (true, 'Mail');
     navbar_entry (true, 'Show Lists', 'MailTo.php', MAIL_LISTS);
     navbar_entry (true, 'GM Lists', 'MailTo.php', MAIL_GM_LISTS);
@@ -742,12 +763,14 @@ function html_begin ($bShowLogo=true)
     navbar_entry (true, 'Waitlisted Players', 'MailTo.php', MAIL_WAITLISTED);
     navbar_entry (true, 'Who\'s Not Playing When',
 		  'Reports.php', REPORT_WHOS_NOT_PLAYING_FORM);
+    navbar_end();
   }
 
   // If a user has ConCom priv, they can see the Ops reports
 
   if (user_has_priv (PRIV_CON_COM))
   {
+      navbar_start(true);
     navbar_title (true, 'Ops Reports');
     if (defined ('PROGRAM_PUB_PREFIX'))
     {
@@ -770,12 +793,14 @@ function html_begin ($bShowLogo=true)
     navbar_entry (true, 'Registration Report', 'Reports.php', REPORT_REGISTRATION);
     if (THURSDAY_ENABLED)
       navbar_entry (true, 'PreCon Events Report', 'Thursday.php', THURSDAY_REPORT);
+    navbar_end();
   }
 
   // Add this menu if the user has Registrar privilege
 
   if (user_has_priv (PRIV_REGISTRAR))
   {
+      navbar_start(true);
     navbar_title (true, 'Registrar');
     navbar_entry (true, 'Add or Edit a User',
 		  'index.php', SELECT_USER_TO_EDIT);
@@ -788,12 +813,14 @@ function html_begin ($bShowLogo=true)
     if (THURSDAY_ENABLED)
       navbar_entry (true, 'Edit User PreCon Event Info', 'Thursday.php',
 		    THURSDAY_SELECT_USER);
+    navbar_end();
   }
 
   // Add these menu items if the user has scheduling privilege
 
   if (user_has_priv (PRIV_SCHEDULING))
   {
+      navbar_start(true);
     navbar_title (true, 'Scheduling');
     navbar_entry (true, 'Manage Schedule', 'ListGames.php');
     navbar_entry (true, 'Schedule Ops', 'ListGames.php', LIST_ADD_OPS);
@@ -806,12 +833,14 @@ function html_begin ($bShowLogo=true)
 		  'SpecialEvents.php', SPECIAL_EVENT_LIST);
     navbar_entry (true, 'Manage Bid Page Info', 'biddingAGame.php',
 		  BAG_SHOW_FORM);
+    navbar_end();
   }
 
   // Add this menu if the user is staff
 
   if (user_has_priv (PRIV_STAFF))
   {
+      navbar_start(true);
     navbar_title (true, 'Website Staff');
     navbar_entry (true, 'Become User',
 		  'index.php', SELECT_USER_TO_BECOME);
@@ -823,6 +852,7 @@ function html_begin ($bShowLogo=true)
     navbar_entry (true, 'Convert Age To Year',
 		  'index.php', CONVERT_AGE_TO_YEAR);
 */
+    navbar_end();
   }
 
   // Add this menu if user has PRECON_SCHEDULING priv
@@ -830,13 +860,16 @@ function html_begin ($bShowLogo=true)
 
   if (user_has_priv (PRIV_PRECON_SCHEDULING))
   {
+      navbar_start(true);
     navbar_title (true, 'PreCon Event Scheduling');
     navbar_entry (true, 'Manage PreCon Event Schedule',
 		  'Thursday.php', PRECON_MANAGE_EVENTS);
+    navbar_end();
   }
 
   // Add the static pages
 
+  navbar_start(false);
   navbar_title (false, 'Information');
   //  navbar_static (false, 'What Does It Cost?', 'cost');
   navbar_entry (false, 'What Does It Cost?', 'cost.php');
@@ -854,6 +887,7 @@ function html_begin ($bShowLogo=true)
   navbar_entry (false, CON_NAME.' Flyer', 'InterconFlyer.pdf TARGET=_blank');
   navbar_entry (false, 'Shameless Plugs', 'Plugs.php');
 //  navbar_entry (false, CON_NAME . ' Vendors', 'Vendors.php');
+  navbar_end();
 
   echo "</div> <!-- navbar -->\n\n";
 
@@ -865,7 +899,7 @@ function html_begin ($bShowLogo=true)
   // Show the con logo.  Some pages may want to handle this themselves
 
   if ($bShowLogo)
-    echo "<div class=print_logo><img src=PageBanner.gif></div>\n";
+    echo "<div class=print_logo><img src=PageBanner.png></div>\n";
 }
 
 /*

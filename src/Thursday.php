@@ -1801,7 +1801,7 @@ function process_run_form()
     if (0 == $PreConRunId)
       return display_error ('Cannot delete PreConRun 0');
 
-    $sql = "DELETE FROM PreConRuns WHERE $PreConRunId=$PreConRunId";
+    $sql = "DELETE FROM PreConRuns WHERE PreConRunId=$PreConRunId";
     $result = mysql_query($sql);
     if (! $result)
       return display_mysql_error('Failed to delete PreConRun entry', $sql);
