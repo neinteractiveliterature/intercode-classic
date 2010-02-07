@@ -56,7 +56,7 @@ define (IRONGM_ENABLED, 0);
 // which allow users to download the program booklet sections.  The second
 // constant enables the entries on the Ops menu for the .PUB files
 
-//define (PROGRAM_PDF_PREFIX, '02-15-');
+define (PROGRAM_PDF_PREFIX, '02-06-');
 //define (PROGRAM_PUB_PREFIX, '02-15-');
 
 // Con identifiers

@@ -692,6 +692,9 @@ function html_begin ($bShowLogo=true)
       navbar_program_entry ('Program Interior',
 			    PROGRAM_PDF_PREFIX,
 			    'Interior.pdf');
+      navbar_program_entry ('Program Schedule',
+			    PROGRAM_PDF_PREFIX,
+			    'Centerfold.pdf');
     }
     navbar_entry (true, 'View User', 'index.php', SELECT_USER_TO_VIEW);
     navbar_entry (true, "Comp'd Users", 'index.php', SHOW_COMPED_USERS);
@@ -748,6 +751,9 @@ function html_begin ($bShowLogo=true)
       navbar_program_entry ('Program Interior.pub',
 			    PROGRAM_PUB_PREFIX,
 			    'Interior.pub');
+      navbar_program_entry ('Program Schedule.pub',
+			    PROGRAM_PUB_PREFIX,
+			    'Schedule.pub');
     }
     navbar_entry (true, 'Shirt Order Summary',
 		  'TShirts.php', SHOW_TSHIRT_SUMMARY);
