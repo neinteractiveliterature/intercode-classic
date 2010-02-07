@@ -4,7 +4,7 @@ header("Content-type: text/css");
 ?>
 body
 {
-	margin: 130px 0 0 0;
+	margin: 135px 0 0 0;
 	padding: 0 7% 0 180px;
 	background-image: url("PageBanner.png");
 	background-repeat: no-repeat;
