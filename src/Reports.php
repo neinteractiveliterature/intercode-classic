@@ -1097,28 +1097,33 @@ function report_users_csv_tshirts ($user_id)
   $order = '';
   $count = 0;
 
+  $shirtShortName = "(P)";
+  $shirt2ShortName = "(B)";
+
   $row = mysql_fetch_object ($result);
   if ($row)
   {
-    build_order_string ($row->Small,   'Small',   $order, $count, SHIRT_NAME);
-    build_order_string ($row->Medium,  'Medium',  $order, $count, SHIRT_NAME);
-    build_order_string ($row->Large,   'Large',   $order, $count, SHIRT_NAME);
-    build_order_string ($row->XLarge,  'XLarge',  $order, $count, SHIRT_NAME);
-    build_order_string ($row->XXLarge, 'XXLarge', $order, $count, SHIRT_NAME);
-    build_order_string ($row->XXLarge, 'XXLarge', $order, $count, SHIRT_NAME);
-    build_order_string ($row->X3Large, 'X3Large', $order, $count, SHIRT_NAME);
-    build_order_string ($row->X4Large, 'X4Large', $order, $count, SHIRT_NAME);
-    build_order_string ($row->X5Large, 'X5Large', $order, $count, SHIRT_NAME);
+    build_order_string ($row->Small,   'S',   $order, $count, $shirtShortName);
+    build_order_string ($row->Medium,  'M',   $order, $count, $shirtShortName);
+    build_order_string ($row->Large,   'L',   $order, $count, $shirtShortName);
+    build_order_string ($row->XLarge,  'XL',  $order, $count, $shirtShortName);
+    build_order_string ($row->XXLarge, 'XXL', $order, $count, $shirtShortName);
+    build_order_string ($row->X3Large, '3XL', $order, $count, $shirtShortName);
+    build_order_string ($row->X4Large, '4XL', $order, $count, $shirtShortName);
+    build_order_string ($row->X5Large, '5XL', $order, $count, $shirtShortName);
 
-    build_order_string ($row->Small_2,   'Small',   $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->Medium_2,  'Medium',  $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->Large_2,   'Large',   $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->XLarge_2,  'XLarge',  $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->XXLarge_2, 'XXLarge', $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->XXLarge_2, 'XXLarge', $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->X3Large_2, 'X3Large', $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->X4Large_2, 'X4Large', $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->X5Large_2, 'X5Large', $order, $count, SHIRT_2_NAME);
+    build_order_string ($row->Small_2,   'S',   $order, $count, $shirt2ShortName);
+    build_order_string ($row->Medium_2,  'M',   $order, $count, $shirt2ShortName);
+    build_order_string ($row->Large_2,   'L',   $order, $count, $shirt2ShortName);
+    build_order_string ($row->XLarge_2,  'XL',  $order, $count, $shirt2ShortName);
+    build_order_string ($row->XXLarge_2, 'XXL', $order, $count, $shirt2ShortName);
+    build_order_string ($row->X3Large_2, '3XL', $order, $count, $shirt2ShortName);
+    build_order_string ($row->X4Large_2, '4XL', $order, $count, $shirt2ShortName);
+    build_order_string ($row->X5Large_2, '5XL', $order, $count, $shirt2ShortName);
+
+    if ("Unpaid" == $row->Status) {
+      $order .= " - UNPAID";
+    }
   }
 
   mysql_free_result ($result);
