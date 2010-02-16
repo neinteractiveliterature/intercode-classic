@@ -62,23 +62,11 @@ switch ($action)
  case EDIT_RUN:
    add_run_form (true);
    break;
-/*
- case LIST_TO_ADD_PARALLEL_RUN:
-   list_games_to_add_parallel_run ();
-   break;
 
- case ADD_PARALLEL_RUN:
-   add_parallel_run_form ();
+ case LIST_CONVERT_ROOMS:
+   convert_rooms();
+   list_games (LIST_BY_GAME);
    break;
-
- case PROCESS_ADD_PARALLEL_RUN:
-   $run_id = process_add_run ();
-   if ($run_id)
-     accept_players_from_waitlist ($run_id);
-   else
-     add_parallel_run_form ();
-   break;
-*/
 
  case LIST_ADD_OPS:
    add_ops();
@@ -173,7 +161,7 @@ function list_games_alphabetically ()
   while ($game_row = mysql_fetch_object ($game_result))
   {
     $sql = 'SELECT RunId, Track, Day, Span, TitleSuffix, ScheduleNote,';
-    $sql .= ' StartHour, Venue';
+    $sql .= ' StartHour, Rooms, Venue';
     $sql .= ' FROM Runs';
     $sql .= ' WHERE EventId=' . $game_row->EventId;
     $sql .= ' ORDER BY Day, StartHour';
@@ -186,14 +174,14 @@ function list_games_alphabetically ()
     if (0 == $rowspan)
       $rowspan = 1;
 
-    echo "  <TR>\n";
-    printf ("    <TD VALIGN=TOP ROWSPAN=%d><A HREF=ListGames.php?action=%d&EventId=%d>%s</A></TD>\n",
+    echo "  <tr valign=\"top\">\n";
+    printf ("    <td rowspan=\"%d\"><a href=\"ListGames.php?action=%d&EventId=%d\">%s</a></td>\n",
 	    $rowspan,
 	    ADD_RUN,
 	    $game_row->EventId,
 	    $game_row->Title);
 
-    printf ("    <TD VALIGN=TOP ROWSPAN=%d ALIGN=CENTER>%d</TD>\n",
+    printf ("    <td rowspan=\"%d\" align=\"center\">%d</td>\n",
 	    $rowspan,
 	    $game_row->Hours);
 
@@ -206,65 +194,73 @@ function list_games_alphabetically ()
     }
     else
     {
-      $runs_row = mysql_fetch_object ($runs_result);
+      $run_row = mysql_fetch_object ($runs_result);
 
-      echo "    <TD ALIGN=CENTER>$runs_row->Day</TD>\n";
+      echo "    <TD ALIGN=CENTER>$run_row->Day</TD>\n";
 
-      $start_time = start_hour_to_24_hour ($runs_row->StartHour);
+      $start_time = start_hour_to_24_hour ($run_row->StartHour);
 
       printf ("    <TD ALIGN=CENTER><A HREF=ListGames.php?action=%d&RunId=%d>%s</A></TD>\n",
 	      EDIT_RUN,
-	      $runs_row->RunId,
+	      $run_row->RunId,
 	      $start_time);
 
-      $suffix = $runs_row->TitleSuffix;
+      $suffix = $run_row->TitleSuffix;
       if ('' == $suffix)
 	$suffix = '&nbsp;';
       echo "    <TD>$suffix</TD>\n";
 
-      $note = $runs_row->ScheduleNote;
+      $note = $run_row->ScheduleNote;
       if ('' == $note)
 	$note = '&nbsp;';
       echo "    <TD>$note</TD>\n";
 
-      $venue = $runs_row->Venue;
-      if ('' == $venue)
-	$venue = '&nbsp;';
-      echo "    <TD>$venue</TD>\n";
+      //      $venue = $run_row->Venue;
+      //      if ('' == $venue)
+      //	$venue = '&nbsp;';
+      //      echo "    <TD>$venue</TD>\n";
+      $rooms = pretty_rooms($run_row->Rooms);
+      $bgcolor = '';
+      if (('&nbsp;' == $rooms) && ('' != $run_row->Venue))
+	$bgcolor = ' bgcolor="#FFCCCC"';
+      echo "    <td $bgcolor>$rooms</td>\n";
 
-      echo "    <TD ALIGN=CENTER>$runs_row->Track</TD>\n";
-      echo "    <TD ALIGN=CENTER>$runs_row->Span</TD>\n";
+      echo "    <TD ALIGN=CENTER>$run_row->Track</TD>\n";
+      echo "    <TD ALIGN=CENTER>$run_row->Span</TD>\n";
       echo "  </TR>\n";
 
-      while ($runs_row = mysql_fetch_object ($runs_result))
+      while ($run_row = mysql_fetch_object ($runs_result))
       {
 	echo "  <TR>\n";
-        echo "    <TD ALIGN=CENTER>$runs_row->Day</TD>\n";
+        echo "    <TD ALIGN=CENTER>$run_row->Day</TD>\n";
 
-	$start_time = start_hour_to_24_hour ($runs_row->StartHour);
+	$start_time = start_hour_to_24_hour ($run_row->StartHour);
 
 	printf ("    <TD ALIGN=CENTER><A HREF=ListGames.php?action=%d&RunId=%d>%s</A></TD>\n",
 		EDIT_RUN,
-		$runs_row->RunId,
+		$run_row->RunId,
 		$start_time);
 
-        $suffix = $runs_row->TitleSuffix;
+        $suffix = $run_row->TitleSuffix;
         if ('' == $suffix)
 	  $suffix = '&nbsp;';
         echo "    <TD>$suffix</TD>\n";
 
-	$note = $runs_row->ScheduleNote;
+	$note = $run_row->ScheduleNote;
 	if ('' == $note)
 	  $note = '&nbsp;';
 	echo "    <TD>$note</TD>\n";
 
-	$venue = $runs_row->Venue;
-	if ('' == $venue)
-	  $venue = '&nbsp;';
-	echo "    <TD>$venue</TD>\n";
+	//	$venue = $run_row->Venue;
+	//	if ('' == $venue)
+	//	  $venue = '&nbsp;';
+	//	echo "    <TD>$venue</TD>\n";
 
-        echo "    <TD ALIGN=CENTER>$runs_row->Track</TD>\n";
-	echo "    <TD ALIGN=CENTER>$runs_row->Span</TD>\n";
+	$rooms = pretty_rooms($run_row->Rooms);
+	echo "    <td>$rooms</td>\n";
+
+        echo "    <TD ALIGN=CENTER>$run_row->Track</TD>\n";
+	echo "    <TD ALIGN=CENTER>$run_row->Span</TD>\n";
         echo "  </TR>\n";
       }
     }
@@ -282,7 +278,7 @@ function list_games_by ($type)
 {
   $sql = 'SELECT Runs.RunId, Runs.Track, Runs.TitleSuffix, Runs.Span,';
   $sql .= ' Runs.StartHour, Runs.Day, Runs.EventId, Runs.ScheduleNote,';
-  $sql .= ' Events.Hours, Events.Title, Runs.Venue';
+  $sql .= ' Events.Hours, Events.Title, Runs.Rooms';
   $sql .= ' FROM Events, Runs';
   $sql .= ' WHERE Events.EventId=Runs.EventId AND Events.SpecialEvent=0';
 
@@ -371,10 +367,13 @@ function list_games_by ($type)
       $note = '&nbsp;';
     echo "    <TD>$note</TD>\n";
 
-    $venue = $row->Venue;
-    if ('' == $venue)
-      $venue = '&nbsp;';
-    echo "    <TD>$venue</TD>\n";
+    //    $venue = $row->Venue;
+    //    if ('' == $venue)
+    //      $venue = '&nbsp;';
+    //    echo "    <TD>$venue</TD>\n";
+
+    $rooms = pretty_rooms($row->Rooms);
+    echo "    <td>$rooms</td>\n";
 
     echo "    <TD VALIGN=TOP ALIGN=CENTER>$row->Hours</TD>\n";
     echo "    <TD VALIGN=TOP ALIGN=CENTER>$row->Span</TD>\n";
@@ -382,6 +381,76 @@ function list_games_by ($type)
   }
   echo "</TABLE>\n";
 }
+
+function room_check($ary, $room)
+{
+  $checked = '';
+  if (is_array($ary))
+    if (array_key_exists($room, $ary))
+      $checked = 'checked';
+
+  printf ('            <input type="checkbox" name="Rooms[]" ' .
+	  "value=\"%s\" %s>%s<br>\n",
+	  $room,
+	  $checked,
+	  $room);
+}
+
+function form_con_rooms($display, $key)
+{
+  if (! array_key_exists($key, $_POST))
+    $rooms = '';
+  else
+  {
+    if (! is_array($_POST[$key]))
+      $rooms = $_POST[$key];
+    else
+      $rooms = array_flip($_POST[$key]);
+  }
+
+  echo "  <tr>\n";
+  echo "    <td valign=\"right\">$display:</td>\n";
+  echo "    <td>\n";
+  echo "      <table>\n";
+  echo "        <tr valign=\"top\">\n";
+  echo "          <td>\n";
+  room_check($rooms, 'Boardroom');
+  room_check($rooms, 'Carlisle');
+  room_check($rooms, 'Chelmsford');
+  room_check($rooms, 'Concord');
+  room_check($rooms, 'Drawing');
+  echo "          </td>\n";
+  echo "          <td>\n";
+  room_check($rooms, 'Hawthorne');
+  room_check($rooms, 'Heritage A');
+  room_check($rooms, 'Heritage B');
+  room_check($rooms, 'Merrimack');
+  room_check($rooms, 'Middlesex');
+  echo "          </td>\n";
+  echo "          <td>\n";
+  room_check($rooms, 'Parkhurst');
+  room_check($rooms, 'Pool');
+  room_check($rooms, 'Salon A');
+  room_check($rooms, 'Salon B');
+  room_check($rooms, 'Salon C');
+  echo "          </td>\n";
+  echo "          <td>\n";
+  room_check($rooms, 'Suite A');
+  room_check($rooms, 'Suite B');
+  room_check($rooms, 'Suite C');
+  room_check($rooms, 'Suite D');
+  echo "          </td>\n";
+  echo "        </tr>\n";
+  echo "      </table>\n";
+  echo "    </td>\n";
+  echo "  </tr>\n";
+}
+
+/*
+ * add_run_form
+ *
+ * Display the form to add or edit a run
+ */
 
 function add_run_form ($update)
 {
@@ -401,7 +470,7 @@ function add_run_form ($update)
     $RunId = $_REQUEST['RunId'];
 
     $sql = 'SELECT EventId, Track, Span, Day, TitleSuffix, ScheduleNote,';
-    $sql .= ' StartHour, TitleSuffix, Venue';
+    $sql .= ' StartHour, TitleSuffix, Rooms, Venue';
     $sql .= " FROM Runs WHERE RunId=$RunId";
 
     $result = mysql_query ($sql);
@@ -417,13 +486,19 @@ function add_run_form ($update)
 
     $row = mysql_fetch_array ($result, MYSQL_ASSOC);
 
-    dump_array ('row', $row);
+    //    dump_array ('row', $row);
 
     foreach ($row as $k => $v)
       $_POST[$k] = $v;
 
     $EventId = $row['EventId'];
+    $_POST['Rooms'] = explode(',', $row['Rooms']);
   }
+
+  dump_array('_POST', $_POST);
+  if (array_key_exists('Rooms', $_POST))
+    if (is_array($_POST['Rooms']))
+      dump_array('Rooms', $_POST['Rooms']);
 
   // Start by fetching the title
 
@@ -466,7 +541,15 @@ function add_run_form ($update)
   form_start_hour ('Start Hour', 'StartHour');
   form_text (32, 'Title Suffix', 'TitleSuffix');
   form_text (32, 'Schedule Note', 'ScheduleNote');
-  form_text (64, 'Room(s)', 'Venue');
+
+  echo "<tr>\n";
+  echo "<td align=\"right\">Venue:</td>\n";
+  printf("<td>%s</td>\n", $_POST['Venue']);
+  echo "</tr>\n";
+
+  //  form_text (64, 'Room(s)', 'Venue');
+
+  form_con_rooms('Room(s)', 'Rooms');
 
   if ($update)
     form_submit2 ('Update Run', 'Delete Run', 'DeleteRun');
@@ -615,6 +698,10 @@ function process_add_run ()
   if (! validate_day_time ('StartHour', 'Day'))
     return false;
 
+  $Rooms = '';
+  if (array_key_exists('Rooms', $_POST))
+    $Rooms = implode(',', $_POST['Rooms']);
+
   $sql = "$verb Runs SET EventId=$EventId";
   $sql .= build_sql_string ('Track');
   $sql .= build_sql_string ('Span');
@@ -622,11 +709,11 @@ function process_add_run ()
   $sql .= build_sql_string ('StartHour');
   $sql .= build_sql_string ('TitleSuffix');
   $sql .= build_sql_string ('ScheduleNote');
-  $sql .= build_sql_string ('Venue');
+  $sql .= build_sql_string ('Rooms', $Rooms);
   $sql .= build_sql_string ('UpdatedById', $_SESSION[SESSION_LOGIN_USER_ID]);
 
   if ($Update)
-    $sql .= "WHERE RunId=$RunId";
+    $sql .= " WHERE RunId=$RunId";
 
   //  echo "Command: $sql\n";
 
@@ -645,303 +732,6 @@ function process_add_run ()
   return $RunId;
 }
 
-function add_parallel_run_form ()
-{
-  // Fetch information about the run we're about to twin
-
-  $RunId = $_REQUEST['RunId'];
-
-  $sql = 'SELECT Events.Title, Runs.*';
-  $sql .= ' FROM Runs, Events';
-  $sql .= " WHERE Runs.RunId=$RunId AND Events.EventId=Runs.EventId";
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ("Cannot query run data for RunId $RunId",
-				$sql);
-
-  if (0 == mysql_num_rows ($result))
-    return display_error ("Cannot find RunId $RunId in the database!");
-
-  if (1 != mysql_num_rows ($result))
-    return display_error ("RunId $RunId matched more than 1 row!");
-
-  $row = mysql_fetch_object ($result);
-
-  //  dump_array ('row', $row);
-
-  $title = $row->Title;
-  $start_time = start_hour_to_24_hour ($row->StartHour);
-
-  // Display what we're proposing to do for the user
-
-  echo "<H2>Add a Parallel Run for <I>$title</I>, $row->Day $start_time</H2>";
-
-  echo "<FORM METHOD=POST ACTION=ListGames.php>\n";
-  form_add_sequence ();
-
-  printf ("<input type=hidden name=action value=%d>\n",
-	  PROCESS_ADD_PARALLEL_RUN);
-  echo "<input type=hidden name=EventId Value=$row->EventId>\n";
-  echo "<input type=hidden name=Span Value=$row->Span>\n";
-  echo "<input type=hidden name=StartHour Value=$row->StartHour>\n";
-  echo "<input type=hidden name=Day Value=$row->Day>\n";
-  echo "<input type=hidden name=RunId Value=$RunId>\n";
-  echo "<input type=hidden name=Update Value=0>\n";
-
-  echo "<TABLE BORDER=0>\n";
-
-  form_text (3, 'Track');
-  form_text (32, 'Title Suffix', 'TitleSuffix');
-  form_text (32, 'Schedule Note', 'ScheduleNote');
-  form_text (64, 'Room(s)', 'Venue');
-
-  echo "  <tr>\n";
-  echo "    <td>&nbsp;</td>\n";
-  echo "    <td align=left>\n";
-  echo "      <input type=checkbox name=DrainWaitlist checked>";
-  echo "&nbsp;Accept users on waitlist for this run\n";
-  echo "    </td>\n";
-  echo "  </tr>\n";
-
-  form_submit ('Add Parallel Run');
-
-  echo "</TABLE>\n";
-  echo "</FORM>\n";
-
-  $sql = 'SELECT COUNT(*) AS Count';
-  $sql .= ' FROM Signup';
-  $sql .= " WHERE State='Waitlisted' AND RunId=$RunId";
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Query for count of signed up players failed',
-				$sql);
-
-  $row = mysql_fetch_object ($result);
-  if (! $row)
-    return display_error ('Failed to fetch count of signed up players');
-
-  if (0 != $row->Count)
-  {
-    echo "<P>There are $row->Count players waitlisted up for\n";
-    echo "this run of <I>$title</I>.  If you check the &quot;\n";
-    echo "Accept users on waitlist for this run&quot; checkbox, the\n";
-    echo "system will attempt to accept people from the waitlist into\n";
-    echo "the newly added run\n";
-  }
-}
-
-/*
- * list_games_to_add_parallel_run
- *
- * List the games in the database alphabetically by game title
- * to select one to add as a parallel run
- */
-
-function list_games_to_add_parallel_run ()
-{
-  $sql = 'SELECT EventId, Title, Hours FROM Events';
-  $sql .= ' WHERE SpecialEvent=0';
-  $sql .= ' ORDER BY Title';
-
-  $game_result = mysql_query ($sql);
-  if (! $game_result)
-    return display_error ('Cannot query game list: ' . mysql_error());
-
-  if (0 == mysql_num_rows ($game_result))
-    return display_error ('No games in database');
-
-  echo "<h2>Add Parallel Run</h2>\n";
-
-  echo "<font color=\"red\"><b>Note:</b></font> Creating a parallel run can\n";
-  echo "problems because there are two, independent runs.  This means two\n";
-  echo "signup lists, so you can have a situation where one run has a\n";
-  echo "waitlist, and the other has open slots.\n<p>\n";
-  echo "A better solution may be to simply double the number of players and\n";
-  echo "add a schedule note that this game will run in two rooms in\n";
-  echo "parallel, leaving the question of which player is in which run to\n";
-  echo "the GMs.  Unfortunately, this won't work if there is another run\n";
-  echo "already scheduled for this game, since changing the number of\n";
-  echo "players in the game will effect all runs of the game.\n";
-  echo "<p>\n";
-
-  echo "<b>Click on a start time to add a run parallel run</b>\n";
-
-  echo "<TABLE BORDER=1>\n";
-  echo "  <TR>\n";
-  echo "    <TH>Game Title</TH>\n";
-  echo "    <TH>Hours</TH>\n";
-  echo "    <TH>Day</TH>\n";
-  echo "    <TH>Start Time</TH>\n";
-  echo "    <TH>Run Suffix</TH>\n";
-  echo "    <TH>Schedule Note</TH>\n";
-  echo "    <TH>Room(s)</TH>\n";
-  echo "    <TH>Track</TH>\n";
-  echo "    <TH>Tracks Spanned</TH>\n";
-  echo "  </TR>\n";
-
-  while ($game_row = mysql_fetch_object ($game_result))
-  {
-    $sql = 'SELECT RunId, Track, Day, Span, TitleSuffix, ScheduleNote,';
-    $sql .= ' StartHour, Venue';
-    $sql .= ' FROM Runs';
-    $sql .= ' WHERE EventId=' . $game_row->EventId;
-    $sql .= ' ORDER BY Day, StartHour';
-
-    $runs_result = mysql_query ($sql);
-    if (! $runs_result)
-      return display_error ("Cannot query runs for Event $game_row->EventId: " . mysql_error());
-
-    $rowspan = mysql_num_rows ($runs_result);
-    if (0 == $rowspan)
-      $rowspan = 1;
-
-    echo "  <TR>\n";
-    printf ("    <TD VALIGN=TOP ROWSPAN=%d>%s</TD>\n",
-	    $rowspan,
-	    $game_row->Title);
-
-    printf ("    <TD VALIGN=TOP ROWSPAN=%d ALIGN=CENTER>%d</TD>\n",
-	    $rowspan,
-	    $game_row->Hours);
-
-    //    echo "<!-- NumRows: " . mysql_num_rows ($runs_result) . "-->\n";
-
-    if (0 == mysql_num_rows ($runs_result))
-    {
-      echo "    <TD>&nbsp;</TD><TD>&nbsp;</TD><TD>&nbsp;</TD><TD>&nbsp;</TD><TD>&nbsp;</TD><TD>&nbsp;</TD><TD>&nbsp;</TD>\n";
-      echo "  </TR>\n";
-    }
-    else
-    {
-      $runs_row = mysql_fetch_object ($runs_result);
-
-      echo "    <TD ALIGN=CENTER>$runs_row->Day</TD>\n";
-
-      $start_time = start_hour_to_24_hour ($runs_row->StartHour);
-
-      printf ("    <TD ALIGN=CENTER><A HREF=ListGames.php?action=%d&RunId=%d>%s</A></TD>\n",
-	      ADD_PARALLEL_RUN,
-	      $runs_row->RunId,
-	      $start_time);
-
-      $suffix = $runs_row->TitleSuffix;
-      if ('' == $suffix)
-	$suffix = '&nbsp;';
-      echo "    <TD>$suffix</TD>\n";
-
-      $note = $runs_row->ScheduleNote;
-      if ('' == $note)
-	$note = '&nbsp;';
-      echo "    <TD>$note</TD>\n";
-
-      $venue = $runs_row->Venue;
-      if ('' == $venue)
-	$venue = '&nbsp;';
-      echo "    <TD>$venue</TD>\n";
-
-      echo "    <TD ALIGN=CENTER>$runs_row->Track</TD>\n";
-      echo "    <TD ALIGN=CENTER>$runs_row->Span</TD>\n";
-      echo "  </TR>\n";
-
-      while ($runs_row = mysql_fetch_object ($runs_result))
-      {
-	echo "  <TR>\n";
-        echo "    <TD ALIGN=CENTER>$runs_row->Day</TD>\n";
-
-	$start_time = start_hour_to_24_hour ($runs_row->StartHour);
-
-	printf ("    <TD ALIGN=CENTER><A HREF=ListGames.php?action=%d&RunId=%d>%s</A></TD>\n",
-		ADD_PARALLEL_RUN,
-		$runs_row->RunId,
-		$start_time);
-
-        $suffix = $runs_row->TitleSuffix;
-        if ('' == $suffix)
-	  $suffix = '&nbsp;';
-        echo "    <TD>$suffix</TD>\n";
-
-	$note = $runs_row->ScheduleNote;
-	if ('' == $note)
-	  $note = '&nbsp;';
-	echo "    <TD>$note</TD>\n";
-
-	$venue = $runs_row->Venue;
-	if ('' == $venue)
-	  $venue = '&nbsp;';
-	echo "    <TD>$venue</TD>\n";
-
-        echo "    <TD ALIGN=CENTER>$runs_row->Track</TD>\n";
-	echo "    <TD ALIGN=CENTER>$runs_row->Span</TD>\n";
-        echo "  </TR>\n";
-      }
-    }
-  }
-  echo "</TABLE>\n";
-}
-
-function accept_players_from_waitlist ($new_run_id)
-{
-  dump_array ('POST', $_POST);
-
-  $source_run_id = $_POST['RunId'];
-  $EventId = $_POST['EventId'];
-
-  // Fetch the counts for the game
-
-  $sql = 'SELECT MaxPlayersMale, MaxPlayersFemale, MaxPlayersNeutral,';
-  $sql .= ' Hours, CanPlayConcurrently, Title';
-  $sql .= '  FROM Events';
-  $sql .= "  WHERE EventId=$EventId";
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Query failed for current event counts');
-
-  $row = mysql_fetch_object ($result);
-  if (! $row)
-    return display_error ("Query for event counts failed for $EventId");
-
-  $max_male = $row->MaxPlayersMale;
-  $max_female = $row->MaxPlayersFemale;
-  $max_neutral = $row->MaxPlayersNeutral;
-
-  // We lock the Signup table to make sure that if there are two users trying
-  // to get the last slot in a game, then only one will succeed.  A READ lock
-  // allows clients that only read the table to continue, but will block
-  // clients that attempt to write to the table
-
-  $result = mysql_query ('LOCK TABLE Signup WRITE, Users READ, Runs READ, Events READ, GMs READ');
-  if (! $result)
-  {
-    display_mysql_error ('Failed to lock the Signup table');
-    return SIGNUP_FAIL;
-  }
-
-  accept_players_from_waitlist_for_run ($EventId,
-					$source_run_id,
-					$new_run_id,
-					$row->Title,
-					$_POST['Day'],
-					$_POST['StartHour'],
-					$row->Hours,
-					$row->CanPlayConcurrently,
-					$max_male,
-					$max_female,
-					$max_neutral);
-
-  // Unlock the Signup table so that other queries can access it
-
-  $result = mysql_query ('UNLOCK TABLES');
-  if (! $result)
-  {
-    display_mysql_error ('Failed to unlock the Signup table');
-    return SIGNUP_FAIL;
-  }
-
-  return true;
-}
 
 function add_ops_for_day ($OpsEventId, $Day)
 {
@@ -1014,7 +804,7 @@ function add_ops_for_day ($OpsEventId, $Day)
       $sql .= "StartHour='$hour',";
       $sql .= 'TitleSuffix="",';
       $sql .= 'ScheduleNote="",';
-      $sql .= 'Venue="",';
+      $sql .= 'Rooms="",';
       $sql .= 'UpdatedById="' . $_SESSION[SESSION_LOGIN_USER_ID] . '"';
 
       //      echo "Command: $sql<p>\n";
@@ -1109,7 +899,7 @@ function add_consuite_for_day ($ConSuiteEventId, $Day, $min_hour, $max_hour)
     $sql .= "StartHour='$hour',";
     $sql .= 'TitleSuffix="",';
     $sql .= 'ScheduleNote="",';
-    $sql .= 'Venue="",';
+    $sql .= 'Rooms="",';
     $sql .= 'UpdatedById="' . $_SESSION[SESSION_LOGIN_USER_ID] . '"';
 
     //      echo "Command: $sql<p>\n";
@@ -1216,6 +1006,67 @@ function add_consuite()
   add_consuite_for_day ($EventId, 'Fri', FRI_MIN, 24);  // noon - midnight
   add_consuite_for_day ($EventId, 'Sat', 9, 25);        // 9AM - 1AM
   add_consuite_for_day ($EventId, 'Sun', 9, 15);        // 9AM - 3PM
+}
+
+/*
+ * convert_rooms
+ *
+ * Convert the old "Venue" field to one or more entries in the Rooms set
+ */
+
+function convert_rooms()
+{
+  display_header('Convert Venue to Rooms');
+
+  $sql = 'SELECT Events.Title, Runs.RunId, Runs.Venue, Runs.Rooms';
+  $sql .= ' FROM Runs, Events';
+  $sql .= ' WHERE Events.EventId=Runs.EventId';
+  $sql .= '  AND Events.SpecialEvent=0';
+  $sql .= ' ORDER BY Events.Title';
+
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Query for runs failed', $sql);
+
+  while ($row = mysql_fetch_object($result))
+  {
+    if ('' != $row->Rooms)
+    {
+      echo "Skipping - Already converted <i>$row->Title</i><br>\n";
+      continue;
+    }
+
+    if ('' == $row->Venue)
+    {
+      echo "Skipping - empty venue <i>$row->Title</i><br>\n";
+      continue;
+    }
+
+    if ('' != stristr($row->Venue, ','))
+    {
+      echo "Skipping - Complex venue <i>row->Title</i><br>\n";
+      continue;
+    }
+
+    if ('' != stristr($row->Venue, ' and '))
+    {
+      echo "Skipping - Complex venue <i>row->Title</i><br>\n";
+      continue;
+    }
+
+    if ('' != strstr($row->Venue, '&'))
+    {
+      echo "Skipping - Complex venue <i>row->Title</i><br>\n";
+      continue;
+    }
+
+    $sql = "UPDATE Runs SET Rooms='$row->Venue' WHERE RunId=$row->RunId";
+    $update_result = mysql_query($sql);
+    if (! $update_result)
+      display_mysql_error("Update failed for <i>$row->Title</i>", $sql);
+    else
+      echo "Updated <i>$row->Title</i> - $sql<br>\n";
+  }
 }
 
 ?>

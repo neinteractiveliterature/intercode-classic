@@ -50,6 +50,13 @@ switch ($action)
       $bShowCopyright = false;
     break;
 
+
+  case REPORT_PER_ROOM:
+    html_begin (false);
+    if (report_per_room ())
+      $bShowCopyright = false;
+    break;
+
   case REPORT_WHOS_NOT_PLAYING_FORM:
     html_begin (true);
     whos_not_playing_when_form ();
@@ -173,7 +180,7 @@ function report_per_user ()
     if ('Admin' == $row->LastName)
       continue;
 
-    echo "<div class=print_logo><img src=InterconDLogo.jpg></div>\n";
+    echo "<div class=print_logo_break_before><img src=PageBanner.jpg></div>\n";
 
     write_user_report (trim ("$row->LastName, $row->FirstName"),
 		       $row->UserId);
@@ -184,6 +191,151 @@ function report_per_user ()
     echo "All Rights Reserved\n";
     echo "</div> <!-- copyright-->\n";
   }
+}
+
+
+function write_room_report($room, $day, $day_title, $start_hour, $end_hour)
+{
+  $sql = 'SELECT Runs.StartHour, Events.Title, Events.Hours';
+  $sql .= ' FROM Runs, Events';
+  $sql .= " WHERE Runs.Day='$day'";
+  $sql .= '   AND Runs.EventId = Events.EventId';
+  $sql .= "   AND FIND_IN_SET(Runs.Rooms, '$room') > 0";
+  $sql .= ' ORDER BY Runs.Day, Runs.StartHour';
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Query for room report failed', $sql);
+
+  echo "<table border=\"1\">\n";
+  echo "  <tr>\n";
+  echo "    <th colspan=\"2\">$day_title</th>\n";
+  echo "  </tr>\n";
+
+  $h = $start_hour;
+  while ($row = mysql_fetch_object($result))
+  {
+    // Add rows for the time before the start of the event
+    $span = $row->StartHour - $h;
+    if ($span > 0)
+    {
+      echo "  <tr>\n";
+      printf ("    <th>&nbsp;%02d:00&nbsp;</th>\n", $h++);
+      echo "    <td rowspan=\"$span\">Unscheduled</td>\n";
+      echo "  </tr>\n";
+
+      while ($h < $row->StartHour)
+      {
+	echo "  <tr>\n";
+	printf ("    <th>&nbsp;%02d:00&nbsp;</th>\n", $h++);
+	echo "  </tr>\n";
+      }
+    }
+
+    // Now fill in the time spanned by the event
+    echo "  <tr>\n";
+    printf ("    <th>&nbsp;%02d:00&nbsp;</th>\n", $h++);
+    echo "    <td rowspan=\"$row->Hours\">$row->Title</td>\n";
+    echo "  </tr>\n";
+
+    while ($h < $row->StartHour + $row->Hours)
+    {
+      echo "  <tr>\n";
+      printf ("    <th>&nbsp;%02d:00&nbsp;</th>\n", $h++);
+      echo "  </tr>\n";
+    }
+  }
+
+  // Fill in any time after the final event of the day
+  if ($h < $end_hour)
+  {
+    $span = $end_hour - $h;
+
+    echo "  <tr>\n";
+    printf ("    <th>&nbsp;%02d:00&nbsp;</th>\n", $h++);
+    echo "    <td rowspan=\"$span\">Unscheduled</td>\n";
+    echo "  </tr>\n";
+
+      while ($h < $end_hour)
+      {
+	echo "  <tr>\n";
+	printf ("    <th>&nbsp;%02d:00&nbsp;</th>\n", $h++);
+	echo "  </tr>\n";
+      }
+  }
+  echo "</table>\n";
+}
+
+/*
+ * report_per_room
+ *
+ * Dump a per-room report for all the venues at the Con
+ */
+
+function report_per_room ()
+{
+  // We'll need the year
+  $y = date ('Y');
+
+  // Fetch the set of rooms
+  $sql = 'SELECT COLUMN_TYPE FROM Information_Schema.Columns';
+  $sql .= ' WHERE Table_Name="Runs" AND Column_Name="Rooms"';
+
+  $result = mysql_query ($sql);
+  if (! $result)
+    return display_mysql_error ('Query for list of Con rooms failed', $sql);
+
+  $row = mysql_fetch_object ($result);
+  if (! $row)
+    return display_error ('No rooms fetched for Con runs');
+
+  // We're expecting a string of the form "set('room a', 'room b')"
+  // Start by trimming off the leading 'set(' and trailing ')'
+  $rooms = trim($row->COLUMN_TYPE, 'set()');
+
+  // Now break the rooms into an array
+  $rooms_array = explode(',', $rooms);
+
+  echo "<h1>Print Room Report in landscape mode</h1>\n";
+
+  foreach($rooms_array as $r)
+  {
+    $room_name = trim($r, "'");
+
+    $sql = 'SELECT RunId FROM Runs';
+    $sql .= " WHERE FIND_IN_SET(Rooms, '$room_name') > 0";
+
+    $room_result = mysql_query($sql);
+    if (! $room_result)
+      display_mysql_error ('Query for room rows failed', $sql);
+    else
+    {
+      if (0 == mysql_num_rows($room_result))
+	continue;
+    }
+
+    echo "<div class=print_logo_break_before><img src=PageBanner.jpg></div>\n";
+
+    echo "<font size=\"+3\"><b>$room_name</b></font><p>\n";
+
+    echo "<table>\n";
+    echo "  <tr valign=\"top\">\n";
+    echo "    <td>\n";
+    write_room_report ($room_name, 'Fri', FRI_TEXT, 18, 24);
+    echo "    </td>\n";
+    echo "    <td>&nbsp;</td>\n";
+    echo "    <td>\n";
+    write_room_report ($room_name, 'Sat', SAT_TEXT,  9, 24);
+    echo "    </td>\n";
+    echo "    <td>&nbsp;</td>\n";
+    echo "    <td>\n";
+    write_room_report ($room_name, 'Sun', SUN_TEXT,  9, 14);
+    echo "  </td>\n";
+    echo "  </tr>\n";
+    echo "</table>\n";
+  }
+
+  // Suppress the copyright display
+  return true;
 }
 
 /*
@@ -283,7 +435,7 @@ function write_user_report ($name, $user_id)
   // Now gather the list of games this user is signed up for
 
   $sql = 'SELECT Events.Title, Events.Hours, Events.EventId,';
-  $sql .= ' Runs.Day, Runs.StartHour, Runs.TitleSuffix, Runs.Venue,';
+  $sql .= ' Runs.Day, Runs.StartHour, Runs.TitleSuffix, Runs.Rooms,';
   $sql .= ' Signup.State';
   $sql .= ' FROM Signup, Runs, Users, Events';
   $sql .= ' WHERE Signup.State!="Withdrawn"';
@@ -314,11 +466,8 @@ function write_user_report ($name, $user_id)
     printf ("    <td align=right>%s&nbsp;&nbsp;</td>\n",
 	    start_hour_to_24_hour ($row->StartHour + $row->Hours));
 
-    if ('' == $row->Venue)
-      $venue = '&nbsp;';
-    else
-      $venue = $row->Venue;
-    echo "    <td>$venue</td>\n";
+    $rooms = pretty_rooms($row->Rooms);
+    echo "    <td>$rooms</td>\n";
 
     echo "    <td>&nbsp;</td>\n";
 
@@ -350,7 +499,7 @@ function report_per_game ()
 
   $sql = 'SELECT Events.Title, Events.MinPlayersMale, Events.MaxPlayersMale,';
   $sql .= ' Events.MinPlayersFemale, Events.MaxPlayersFemale,';
-  $sql .= ' Events.MinPlayersNeutral, Events.MaxPlayersNeutral, Runs.Venue,';
+  $sql .= ' Events.MinPlayersNeutral, Events.MaxPlayersNeutral, Runs.Rooms,';
   $sql .= ' Runs.TitleSuffix, Runs.RunId, Runs.Day, Runs.StartHour';
   $sql .= ' FROM Runs, Events';
   $sql .= ' WHERE Events.EventId=Runs.EventId';
@@ -369,12 +518,12 @@ function report_per_game ()
 
   while ($row = mysql_fetch_object ($result))
   {
-    echo "<div class=print_logo><img src=InterconDLogo.jpg></div>\n";
+    echo "<div class=print_logo_break_before><img src=PageBanner.jpg></div>\n";
 
     write_game_report ($row->RunId,
 		       $row->Title,
 		       $row->TitleSuffix,
-		       $row->Venue,
+		       pretty_rooms($row->Rooms),
 		       $row->Day,
 		       start_hour_to_24_hour ($row->StartHour),
 		       $row->MinPlayersMale,
@@ -999,7 +1148,7 @@ function whos_not_playing_when ()
 
 function report_games_by_time ($day)
 {
-  echo "<div class=print_logo><img src=InterconDLogo.jpg></div>\n";
+  echo "<div class=print_logo_break_before><img src=PageBanner.jpg></div>\n";
   printf ("<font size=\"+3\"><b>%s Schedule for %s</b></font><p>\n",
 	  CON_NAME,
 	  $day);
@@ -1007,7 +1156,7 @@ function report_games_by_time ($day)
   // Get the list of games for this day
 
   $sql = 'SELECT Events.Title, Events.Hours,';
-  $sql .= ' Runs.Day, Runs.StartHour, Runs.TitleSuffix, Runs.Venue';
+  $sql .= ' Runs.Day, Runs.StartHour, Runs.TitleSuffix, Runs.Rooms';
   $sql .= ' FROM Runs, Events';
   $sql .= " WHERE Day='$day'";
   $sql .= '   AND Events.Eventid=Runs.EventId';
@@ -1035,12 +1184,8 @@ function report_games_by_time ($day)
       $hour = $row->StartHour;
     }
 
-    if ('' != $row->Venue)
-      $venue = " @ $row->Venue";
-    else
-      $venue = '';
-
-    echo "    $row->Title $row->TitleSuffix$venue<br>\n";
+    $rooms = pretty_rooms($row->$Rooms);
+    echo "    $row->Title $row->TitleSuffix $rooms<br>\n";
   }
   echo "    </td>\n";
   echo "  </tr>\n";

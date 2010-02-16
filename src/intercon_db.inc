@@ -155,6 +155,7 @@ define (LIST_GAMES_BY_TIME, 65);
 //define (LIST_TO_ADD_PARALLEL_RUN, 68);
 define (LIST_ADD_OPS, 69);
 define (LIST_ADD_CONSUITE, 68);
+define (LIST_CONVERT_ROOMS, 67);
 
 // Action values in MailTo.php
 
@@ -185,6 +186,7 @@ define (REPORT_REGISTRATION, 107);
 define (REPORT_BY_AGE, 108);
 define (REPORT_HOW_HEARD, 109);
 define (REPORT_CONSUITE_TRACK, 190);
+define (REPORT_PER_ROOM, 191);
 
 
 // Action values in Referrers.php
@@ -759,6 +761,7 @@ function html_begin ($bShowLogo=true)
 		  'TShirts.php', SHOW_TSHIRT_SUMMARY);
     navbar_entry (true, 'Per User Report', 'Reports.php', REPORT_PER_USER);
     navbar_entry (true, 'Per Game Report', 'Reports.php', REPORT_PER_GAME);
+    navbar_entry (true, 'Per Room Report', 'Reports.php', REPORT_PER_ROOM);
     navbar_entry (true, 'Ops Report', 'Reports.php', REPORT_OPS_TRACK);
     navbar_entry (true, 'ConSuite Report', 'Reports.php',
 		  REPORT_CONSUITE_TRACK);
@@ -796,8 +799,6 @@ function html_begin ($bShowLogo=true)
     navbar_entry (true, 'Schedule Ops', 'ListGames.php', LIST_ADD_OPS);
     navbar_entry (true, 'Schedule ConSuite', 'ListGames.php',
 		  LIST_ADD_CONSUITE);
-//    navbar_entry (true, 'Add a Parallel Run', 'ListGames.php',
-//		  LIST_TO_ADD_PARALLEL_RUN);
     navbar_entry (true, 'Add Special Event', 'SpecialEvents.php');
     navbar_entry (true, 'Manage Special Events',
 		  'SpecialEvents.php', SPECIAL_EVENT_LIST);
@@ -815,6 +816,8 @@ function html_begin ($bShowLogo=true)
     navbar_entry (true, 'Change Con Settings', 'Status.php');
     navbar_entry (true, 'Manage Shameless Plugs',
 		  'Plugs.php', PLUGS_MANAGE_PLUGS);
+    navbar_entry (true, 'Convert Venue to Rooms', 'ListGames.php',
+		  LIST_CONVERT_ROOMS);
 /*
  * Should never be needed again!
     navbar_entry (true, 'Convert Age To Year',
@@ -3197,24 +3200,58 @@ function pretty_rooms($str)
 {
   // Quick check for empty string - why waste time?
   if ('' == $str)
-    return '';
+    return '&nbsp;';
 
   // Convert combined rooms into something 'pretty'
-  $str = str_replace('Heritage A,Heritage B', 'Heritage A &amp; B', $str);
-  $str = str_replace('Salon A,Salon B,Salon C', 'Salon A, B &amp; C', $str);
-  $str = str_replace('Salon A,Salon B', 'Salon A &amp; B', $str);
-  $str = str_replace('Salon B,Salon C', 'Salon B &amp; C', $str);
-  $str = str_replace('Salon A,Salon C', 'Salon A &amp; C', $str);
+  $str = str_replace('Heritage A,Heritage B',
+		     'Heritage A&nbsp;&amp;&nbsp;B',
+		     $str);
+
+  $str = str_replace('Salon A,Salon B,Salon C',
+		     'Salon A,&nbsp;B&nbsp;&amp;&nbsp;C',
+		     $str);
+  $str = str_replace('Salon A,Salon B', 'Salon A&nbsp;&amp;&nbsp;B', $str);
+  $str = str_replace('Salon B,Salon C', 'Salon B&nbsp;&amp;&nbsp;C', $str);
+  $str = str_replace('Salon A,Salon C', 'Salon A&nbsp;&amp;&nbsp;C', $str);
+
+  $str = str_replace('Suite A,Suite B,Suite C,Suite D',
+		     'Suite A,&nbsp;B,&nbsp;C,&nbsp;&amp;&nbsp;D',
+		     $str);
+  $str = str_replace('Suite A,Suite B,Suite C',
+		     'Suite A,&nbsp;B,&nbsp;&amp;&nbsp;C',
+		     $str);
+  $str = str_replace('Suite A,Suite C,Suite D',
+		     'Suite A,&nbsp;C,&nbsp;&amp;&nbsp;D',
+		     $str);
+  $str = str_replace('Suite B,Suite C,Suite D',
+		     'Suite B,&nbsp;C,&nbsp;&amp;&nbsp;D',
+		     $str);
+  $str = str_replace('Suite A,Suite B',
+		     'Suite A&nbsp;&amp;&nbsp;B',
+		     $str);
+  $str = str_replace('Suite A,Suite C',
+		     'Suite A&nbsp;&amp;&nbsp;C',
+		     $str);
+  $str = str_replace('Suite A,Suite D',
+		     'Suite A&nbsp;&amp;&nbsp;D',
+		     $str);
+  $str = str_replace('Suite B,Suite C',
+		     'Suite A&nbsp;&amp;&nbsp;C',
+		     $str);
+  $str = str_replace('Suite B,Suite D',
+		     'Suite A&nbsp;&amp;&nbsp;D',
+		     $str);
+  $str = str_replace('Suite C,Suite D',
+		     'Suite C&nbsp;&amp;&nbsp;D',
+		     $str);
 
   // Check for single rooms
   $ary = explode(',', $str);
   if (1 == count($ary))
-    return $ary[0];
+    return $str;
 
   // Make a pretty list
-  $last = array_pop($ary);
   $Rooms = implode(', ', $ary);
-  $Rooms .= ' and ' . $last;
 
   return $Rooms;
 }

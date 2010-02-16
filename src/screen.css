@@ -27,6 +27,12 @@ body
 	display: none;
 }
 
+
+.print_logo_break_before
+{
+	display: none;
+}
+
 .public_menu_title
 {
 	background-color: #000000;
