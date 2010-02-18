@@ -194,81 +194,58 @@ function report_per_user ()
 }
 
 
-function write_room_report($room, $day, $day_title, $start_hour, $end_hour)
+/*
+ * write_room_report
+ *
+ * Write per-room entry for the specified day
+ */
+
+function write_room_report($room, $day, $day_title)
 {
-  $sql = 'SELECT Runs.StartHour, Events.Title, Events.Hours';
+  $sql = 'SELECT Runs.StartHour, Runs.Rooms, Events.Title, Events.Hours';
   $sql .= ' FROM Runs, Events';
   $sql .= " WHERE Runs.Day='$day'";
   $sql .= '   AND Runs.EventId = Events.EventId';
-  $sql .= "   AND FIND_IN_SET(Runs.Rooms, '$room') > 0";
-  $sql .= ' ORDER BY Runs.Day, Runs.StartHour';
+  $sql .= "   AND FIND_IN_SET('$room', Runs.Rooms) > 0";
+  $sql .= ' ORDER BY Runs.StartHour';
   $result = mysql_query($sql);
   if (! $result)
     return display_mysql_error('Query for room report failed', $sql);
 
-  echo "<table border=\"1\">\n";
   echo "  <tr>\n";
-  echo "    <th colspan=\"2\">$day_title</th>\n";
+  echo "    <th colspan=\"2\" align=\"left\">$day_title</th>\n";
   echo "  </tr>\n";
 
-  $h = $start_hour;
   while ($row = mysql_fetch_object($result))
   {
-    // Add rows for the time before the start of the event
-    $span = $row->StartHour - $h;
-    if ($span > 0)
+    echo "  <tr valign=\"top\">\n";
+    printf ("    <td>&nbsp;%02d:00 - %02d:00&nbsp;</th>\n",
+	    $row->StartHour, $row->StartHour + $row->Hours);
+    echo "    <td>$row->Title";
+    $rooms_array = explode(',', $row->Rooms);
+    if (count($rooms_array) > 1)
     {
-      echo "  <tr>\n";
-      printf ("    <th>&nbsp;%02d:00&nbsp;</th>\n", $h++);
-      echo "    <td rowspan=\"$span\">Unscheduled</td>\n";
-      echo "  </tr>\n";
-
-      while ($h < $row->StartHour)
+      $a = array();
+      foreach($rooms_array as $r)
       {
-	echo "  <tr>\n";
-	printf ("    <th>&nbsp;%02d:00&nbsp;</th>\n", $h++);
-	echo "  </tr>\n";
+	if ($r != $room)
+	  array_push($a, $r);
       }
-    }
 
-    // Now fill in the time spanned by the event
-    echo "  <tr>\n";
-    printf ("    <th>&nbsp;%02d:00&nbsp;</th>\n", $h++);
-    echo "    <td rowspan=\"$row->Hours\">$row->Title</td>\n";
+      $other_rooms = pretty_rooms(implode(',', $a));
+      echo "<br>Also in: $other_rooms";
+    }
+    echo "</td>\n";
     echo "  </tr>\n";
-
-    while ($h < $row->StartHour + $row->Hours)
-    {
-      echo "  <tr>\n";
-      printf ("    <th>&nbsp;%02d:00&nbsp;</th>\n", $h++);
-      echo "  </tr>\n";
-    }
   }
 
-  // Fill in any time after the final event of the day
-  if ($h < $end_hour)
-  {
-    $span = $end_hour - $h;
-
-    echo "  <tr>\n";
-    printf ("    <th>&nbsp;%02d:00&nbsp;</th>\n", $h++);
-    echo "    <td rowspan=\"$span\">Unscheduled</td>\n";
-    echo "  </tr>\n";
-
-      while ($h < $end_hour)
-      {
-	echo "  <tr>\n";
-	printf ("    <th>&nbsp;%02d:00&nbsp;</th>\n", $h++);
-	echo "  </tr>\n";
-      }
-  }
-  echo "</table>\n";
+  echo "  <tr><td colspan=\"2\">&nbsp;</td></tr>\n";
 }
 
 /*
  * report_per_room
  *
- * Dump a per-room report for all the venues at the Con
+ * Dump a per-room report for all the rooms at the Con
  */
 
 function report_per_room ()
@@ -295,8 +272,6 @@ function report_per_room ()
   // Now break the rooms into an array
   $rooms_array = explode(',', $rooms);
 
-  echo "<h1>Print Room Report in landscape mode</h1>\n";
-
   foreach($rooms_array as $r)
   {
     $room_name = trim($r, "'");
@@ -318,19 +293,9 @@ function report_per_room ()
     echo "<font size=\"+3\"><b>$room_name</b></font><p>\n";
 
     echo "<table>\n";
-    echo "  <tr valign=\"top\">\n";
-    echo "    <td>\n";
-    write_room_report ($room_name, 'Fri', FRI_TEXT, 18, 24);
-    echo "    </td>\n";
-    echo "    <td>&nbsp;</td>\n";
-    echo "    <td>\n";
-    write_room_report ($room_name, 'Sat', SAT_TEXT,  9, 24);
-    echo "    </td>\n";
-    echo "    <td>&nbsp;</td>\n";
-    echo "    <td>\n";
-    write_room_report ($room_name, 'Sun', SUN_TEXT,  9, 14);
-    echo "  </td>\n";
-    echo "  </tr>\n";
+    write_room_report ($room_name, 'Fri', FRI_TEXT);
+    write_room_report ($room_name, 'Sat', SAT_TEXT);
+    write_room_report ($room_name, 'Sun', SUN_TEXT);
     echo "</table>\n";
   }
 
