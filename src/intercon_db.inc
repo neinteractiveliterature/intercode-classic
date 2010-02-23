@@ -755,7 +755,7 @@ function html_begin ($bShowLogo=true)
 			    'Interior.pub');
       navbar_program_entry ('Program Schedule.pub',
 			    PROGRAM_PUB_PREFIX,
-			    'Schedule.pub');
+			    'Centerfold.pub');
     }
     navbar_entry (true, 'Shirt Order Summary',
 		  'TShirts.php', SHOW_TSHIRT_SUMMARY);
