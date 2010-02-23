@@ -59,6 +59,7 @@ switch ($action)
 
 html_end ();
 
+
 /*
  * display_special_event_form
  *
@@ -89,6 +90,8 @@ function display_special_event_form ()
 
     foreach ($row as $k => $v)
       $_POST[$k] = $v;
+
+    $_POST['Rooms'] = explode(',', $row['Rooms']);
 
     $EventId = $row['EventId'];
 
@@ -122,6 +125,8 @@ function display_special_event_form ()
   echo "  </tr>\n";
   form_textarea ('Short Description', 'ShortBlurb', 4, TRUE, TRUE);
   form_textarea ('Description', 'Description', 20, TRUE, TRUE);
+
+  form_con_rooms('Room(s)', 'Rooms');
 
   if ($update)
     form_submit2 ('Update Event', 'Delete Event', 'DeleteRun');
@@ -215,6 +220,10 @@ function process_special_event_form ()
   if (! validate_day_time ('StartHour', 'Day'))
     return FALSE;
 
+  $Rooms = '';
+  if (array_key_exists('Rooms', $_POST))
+    $Rooms = implode(',', $_POST['Rooms']);
+
   $sql = "$verb Events SET Title='$Title', SpecialEvent=1";
   $sql .= build_sql_string ('Hours');
   $sql .= build_sql_string ('ShortBlurb');
@@ -227,7 +236,7 @@ function process_special_event_form ()
 
   $result = mysql_query ($sql);
   if (! $result)
-    return display_error ("$action_failed Events table failed: " . mysql_error ());
+    return display_mysql_error ("$action_failed Events table failed", $sql);
 
   if (! $update)
     $EventId = mysql_insert_id ();
@@ -237,6 +246,7 @@ function process_special_event_form ()
   $sql .= build_sql_string ('Span');
   $sql .= build_sql_string ('Day');
   $sql .= build_sql_string ('StartHour');
+  $sql .= build_sql_string ('Rooms', $Rooms);
   $sql .= build_sql_string ('UpdatedById', $_SESSION[SESSION_LOGIN_USER_ID]);
   if ($update)
     $sql .= " WHERE RunId=$RunId";
@@ -245,7 +255,7 @@ function process_special_event_form ()
 
   $result = mysql_query ($sql);
   if (! $result)
-    return display_error ("$action_failed Runs table failed: " . mysql_error ());
+    return display_mysql_error ("$action_failed Runs table failed", $sql);
 
   return TRUE;
 }
@@ -261,7 +271,7 @@ function list_special_events ()
   echo "<H2>Special Events</H2>";
 
   $sql = 'SELECT Runs.RunId, Runs.EventId, Runs.Track, Runs.StartHour,';
-  $sql .= ' Runs.Day, Runs.Span,';
+  $sql .= ' Runs.Day, Runs.Span, Runs.Rooms,';
   $sql .= ' Events.Hours, Events.Title';
   $sql .= ' FROM Events, Runs';
   $sql .= ' WHERE Events.EventId=Runs.EventId AND Events.SpecialEvent=1';
@@ -286,6 +296,7 @@ function list_special_events ()
   echo "    <TH>Track</TH>\n";
   echo "    <TH>Hours</TH>\n";
   echo "    <TH>Columns Spanned</TH>\n";
+  echo "    <TH>Room(s)</TH>\n";
   echo "  </TR>\n";
 
   while ($row = mysql_fetch_object ($result))
@@ -302,6 +313,7 @@ function list_special_events ()
     echo "    <TD ALIGN=CENTER>$row->Track</TD>\n";
     echo "    <TD VALIGN=TOP ALIGN=CENTER>$row->Hours</TD>\n";
     echo "    <TD ALIGN=CENTER>$row->Span</TD>\n";
+    printf ("    <td>%s</td>\n", pretty_rooms($row->Rooms));
     echo "  </TR>\n";
   }
   echo "</TABLE>\n";

@@ -382,70 +382,6 @@ function list_games_by ($type)
   echo "</TABLE>\n";
 }
 
-function room_check($ary, $room)
-{
-  $checked = '';
-  if (is_array($ary))
-    if (array_key_exists($room, $ary))
-      $checked = 'checked';
-
-  printf ('            <input type="checkbox" name="Rooms[]" ' .
-	  "value=\"%s\" %s>%s<br>\n",
-	  $room,
-	  $checked,
-	  $room);
-}
-
-function form_con_rooms($display, $key)
-{
-  if (! array_key_exists($key, $_POST))
-    $rooms = '';
-  else
-  {
-    if (! is_array($_POST[$key]))
-      $rooms = $_POST[$key];
-    else
-      $rooms = array_flip($_POST[$key]);
-  }
-
-  echo "  <tr>\n";
-  echo "    <td valign=\"right\">$display:</td>\n";
-  echo "    <td>\n";
-  echo "      <table>\n";
-  echo "        <tr valign=\"top\">\n";
-  echo "          <td>\n";
-  room_check($rooms, 'Boardroom');
-  room_check($rooms, 'Carlisle');
-  room_check($rooms, 'Chelmsford');
-  room_check($rooms, 'Concord');
-  room_check($rooms, 'Drawing');
-  echo "          </td>\n";
-  echo "          <td>\n";
-  room_check($rooms, 'Hawthorne');
-  room_check($rooms, 'Heritage A');
-  room_check($rooms, 'Heritage B');
-  room_check($rooms, 'Merrimack');
-  room_check($rooms, 'Middlesex');
-  echo "          </td>\n";
-  echo "          <td>\n";
-  room_check($rooms, 'Parkhurst');
-  room_check($rooms, 'Pool');
-  room_check($rooms, 'Salon A');
-  room_check($rooms, 'Salon B');
-  room_check($rooms, 'Salon C');
-  echo "          </td>\n";
-  echo "          <td>\n";
-  room_check($rooms, 'Suite A');
-  room_check($rooms, 'Suite B');
-  room_check($rooms, 'Suite C');
-  room_check($rooms, 'Suite D');
-  echo "          </td>\n";
-  echo "        </tr>\n";
-  echo "      </table>\n";
-  echo "    </td>\n";
-  echo "  </tr>\n";
-}
-
 /*
  * add_run_form
  *
@@ -719,7 +655,7 @@ function process_add_run ()
 
   $result = mysql_query ($sql);
   if (! $result)
-     return display_error ($action_failed . ' Runs table failed: ' . mysql_error ());
+     return display_mysql_error ("$action_failed Runs table failed", $sql);
 
   if ($Update)
     echo "Updated run $RunId for <I>$Title</I>\n<P>\n";

@@ -193,6 +193,29 @@ function report_per_user ()
   }
 }
 
+function ampm_time($h)
+{
+  $hour = $h % 12;
+  $suffix = 'PM';
+
+  if (1 == ($h / 12))
+  {
+    $suffix = 'PM';
+    if (0 == $hour)
+      $suffix = 'AM';
+  }
+  else
+  {
+    $suffix = 'AM';
+    if (0 == $hour)
+      $suffix = 'PM';
+  }
+
+  if (0 == $hour)
+    $hour = 12;
+
+  return "$hour $suffix";
+}
 
 /*
  * write_room_report
@@ -219,6 +242,11 @@ function write_room_report($room, $day, $day_title)
   while ($row = mysql_fetch_object($result))
   {
     echo "  <tr valign=\"top\">\n";
+    /*
+    printf ("    <td align=\"right\">&nbsp;%s - %s&nbsp;</th>\n",
+	    ampm_time($row->StartHour),
+	    ampm_time($row->StartHour + $row->Hours));
+    */
     printf ("    <td>&nbsp;%02d:00 - %02d:00&nbsp;</th>\n",
 	    $row->StartHour, $row->StartHour + $row->Hours);
     echo "    <td>$row->Title";
@@ -233,7 +261,7 @@ function write_room_report($room, $day, $day_title)
       }
 
       $other_rooms = pretty_rooms(implode(',', $a));
-      echo "<br>Also in: $other_rooms";
+      echo "<br><small>Also in: $other_rooms</small>";
     }
     echo "</td>\n";
     echo "  </tr>\n";

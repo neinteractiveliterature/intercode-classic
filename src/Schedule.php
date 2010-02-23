@@ -908,6 +908,10 @@ function schedule_day_away ($day, $away_all_day, $away_hours, $logged_in,
 			 $row->Title);
       else
 	$text = $row->Title;
+
+      if ('' != $row->Rooms)
+	$text .= '<p>' . pretty_rooms($row->Rooms);
+
       if (user_has_priv (PRIV_SCHEDULING))
 	$text .= sprintf ('<br><font color=red>Track: %d, Span: %d</font>',
 			  $row->Track,
@@ -1356,6 +1360,10 @@ function schedule_day_with_counts ($day,
 			 $row->Title);
       else
 	$text = $row->Title;
+
+      if ('' != $row->Rooms)
+	$text .= '<p>' . pretty_rooms($row->Rooms);
+
       if (user_has_priv (PRIV_SCHEDULING))
 	$text .= sprintf ('<br><font color=red>Track: %d, Span: %d</font>',
 			  $row->Track,
