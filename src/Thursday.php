@@ -1633,10 +1633,10 @@ function show_run_form()
   if (! user_has_priv (PRIV_PRECON_BID_CHAIR))
     return display_access_error ();
 
-  dump_array('$_REQUEST', $_REQUEST);
+  //  dump_array('$_REQUEST', $_REQUEST);
 
-  if (is_array($_REQUEST['Rooms']))
-    dump_array('Rooms', $_REQUEST['Rooms']);
+  //  if (is_array($_REQUEST['Rooms']))
+  //    dump_array('Rooms', $_REQUEST['Rooms']);
 
   // Fetch the PreConEventId
 
@@ -1673,10 +1673,10 @@ function show_run_form()
     }
   }
 
-  dump_array('$_REQUEST', $_REQUEST);
+  //  dump_array('$_REQUEST', $_REQUEST);
 
-  if (is_array($_REQUEST['Rooms']))
-    dump_array('Rooms', $_REQUEST['Rooms']);
+  //  if (is_array($_REQUEST['Rooms']))
+  //    dump_array('Rooms', $_REQUEST['Rooms']);
 
   $sql = "SELECT Title FROM PreConEvents WHERE PreConEventId=$PreConEventId";
   $result = mysql_query($sql);
@@ -1764,20 +1764,6 @@ function show_run_form()
   echo "  </tr>\n";
   form_submit2($ok, 'Delete Run', 'Delete');
   echo "</table>\n";
-}
-
-function room_check($ary, $room)
-{
-  $checked = '';
-  if (is_array($ary))
-    if (array_key_exists($room, $ary))
-      $checked = 'checked';
-
-  printf ('            <input type="checkbox" name="Rooms[]" ' .
-	  "value=\"%s\" %s>%s<br>\n",
-	  $room,
-	  $checked,
-	  $room);
 }
 
 function process_run_form()
