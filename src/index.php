@@ -2626,14 +2626,16 @@ function display_user_form_for_others ()
 
     // Give the user the option of removing this player from all games
 
-    echo "<table>\n  <tr>\n    <td bgcolor=\"ffcccc\">\n";
-    printf ("<a href=index.php?action=%d&UserId=%d&Seq=%d>%s</a>\n",
-	    WITHDRAW_USER_FROM_ALL_GAMES,
-	    $UserId,
-	    $seq,
-	    'Withdraw User From ALL Games');
-    echo "    </td>\n  </tr>\n</table>\n";
-
+    if (0 != con_signups_allowed())
+    {
+      echo "<table>\n  <tr>\n    <td bgcolor=\"ffcccc\">\n";
+      printf ("<a href=index.php?action=%d&UserId=%d&Seq=%d>%s</a>\n",
+	      WITHDRAW_USER_FROM_ALL_GAMES,
+	      $UserId,
+	      $seq,
+	      'Withdraw User From ALL Games');
+      echo "    </td>\n  </tr>\n</table>\n";
+    }
     show_gm_games ($UserId, $name);
   }
 }
