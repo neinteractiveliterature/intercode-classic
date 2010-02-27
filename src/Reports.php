@@ -501,9 +501,7 @@ function report_per_game ()
   $sql .= ' WHERE Events.EventId=Runs.EventId';
   $sql .= '   AND SpecialEvent=0';
   $sql .= '   AND IsOps="N"';
-  $sql .= '   AND Title<>"Friday Night Coffeehouse"';
-  $sql .= '   AND Title<>"The Eclectic Dance Mix Party"';
-  $sql .= '   AND Title<>"Intercon Sunday Breakfast"';
+  $sql .= '   AND IsConSuite="N"';
   $sql .= ' ORDER BY Events.Title, Runs.Day, Runs.StartHour';
 
   $result = mysql_query ($sql);
