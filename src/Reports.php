@@ -180,6 +180,23 @@ function report_per_user ()
     if ('Admin' == $row->LastName)
       continue;
 
+    // Do a quick check for how many games the user is signed up for.
+    // If he isn't signed up for any games, skip him (or her)
+    $sql = 'SELECT SignupId FROM Signup';
+    $sql .= " WHERE Signup.UserId=$row->UserId";
+    $sql .= '   AND Signup.State!="Withdrawn"';
+
+    $quick_result = mysql_query($sql);
+    if (! $quick_result)
+    {
+      display_mysql_error('Query for users signups failed', $sql);
+      continue;
+    }
+    $count = mysql_num_rows($quick_result);
+    mysql_free_result($quick_result);
+    if (0 == $count)
+      continue;
+
     echo "<div class=print_logo_break_before><img src=PageBanner.jpg></div>\n";
 
     write_user_report (trim ("$row->LastName, $row->FirstName"),
@@ -357,20 +374,6 @@ function build_order_string ($n, $size, &$s, &$count, $type)
 function write_user_report ($name, $user_id)
 {
   echo "<font size=\"+3\"><b>$name</b></font><p>\n";
-/*
-  if (('Comp' == $can_signup) && (0 != $comp_event_id))
-  {
-    $sql = "SELECT Title FROM Events WHERE EventId=$comp_event_id";
-    $result = mysql_query ($sql);
-    if (! $result)
-      return display_mysql_error ('Query for comp event failed', $sql);
-
-    $row = mysql_fetch_object ($result);
-    echo "Comp'd for $row->Title<p>\n";
-  }
-  else
-    echo "Payment: $payment_note<p>\n";
-*/
   $gms = array();
 
   // See if this user has ordered any shirts
