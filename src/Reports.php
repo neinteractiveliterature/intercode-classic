@@ -322,7 +322,7 @@ function report_per_room ()
     $room_name = trim($r, "'");
 
     $sql = 'SELECT RunId FROM Runs';
-    $sql .= " WHERE FIND_IN_SET(Rooms, '$room_name') > 0";
+    $sql .= " WHERE FIND_IN_SET('$room_name', Rooms) > 0";
 
     $room_result = mysql_query($sql);
     if (! $room_result)
