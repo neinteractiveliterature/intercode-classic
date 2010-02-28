@@ -90,28 +90,28 @@ function display_special_event_form ()
     foreach ($row as $k => $v)
       $_POST[$k] = $v;
 
+    $_POST['Rooms'] = explode(',', $row['Rooms']);
+
     $EventId = $row['EventId'];
 
-    echo "<H2>Update a special event for ".CON_NAME."</H2>\n";
+    echo "<h2>Update a special event for ".CON_NAME."</h2>\n";
   }
   else
-    echo "<H2>Add a special event for ".CON_NAME."</H2>\n";
+    echo "<h2>Add a special event for ".CON_NAME."</h2>\n";
 
-  echo "<FORM METHOD=POST ACTION=SpecialEvents.php>\n";
+  echo "<form method=POST action=\"SpecialEvents.php\">\n";
   form_add_sequence ();
-  echo "<INPUT TYPE=HIDDEN NAME=action VALUE=" . SPECIAL_EVENT_ADD . ">\n";
+  form_hidden_value('action', SPECIAL_EVENT_ADD);
   if ($update)
   {
-    echo "<INPUT TYPE=HIDDEN NAME=RunId VALUE=$RunId>\n";
-    echo "<INPUT TYPE=HIDDEN NAME=EventId VALUE=$EventId>\n";
+    form_hidden_value('RunId', $RunId);
+    form_hidden_value('EventId', $EventId);
   }
 
-  echo "<TABLE BORDER=0>\n";
+  echo "<table border=\"0\">\n";
 
   form_text (64, 'Event Text', 'Title');
   form_day ('Day');
-//  form_track_day ('Track', 'Day');
-//  form_text (2, 'Tracks Spanned', 'Span');
   form_start_hour ('Start Hour', 'StartHour');
   form_text (2, 'Hours');
 
@@ -124,13 +124,15 @@ function display_special_event_form ()
   form_textarea ('Short Description', 'ShortBlurb', 4, TRUE, TRUE);
   form_textarea ('Description', 'Description', 20, TRUE, TRUE);
 
+  form_con_rooms('Room(s)', 'Rooms');
+
   if ($update)
     form_submit2 ('Update Event', 'Delete Event', 'DeleteRun');
   else
     form_submit ('Add Event');
 
-  echo "</TABLE>\n";
-  echo "</FORM>\n";
+  echo "</table>\n";
+  echo "</form>\n";
 
   display_valid_start_times ();
 }
@@ -210,11 +212,12 @@ function process_special_event_form ()
 
   // Validate the track
 
-//  if (! validate_int ('Track', 1, MAX_TRACKS))
-//    return FALSE;
-
   if (! validate_day_time ('StartHour', 'Day'))
     return FALSE;
+
+  $Rooms = '';
+  if (array_key_exists('Rooms', $_POST))
+    $Rooms = implode(',', $_POST['Rooms']);
 
   $sql = "$verb Events SET Title='$Title', SpecialEvent=1";
   $sql .= build_sql_string ('Hours');
@@ -234,10 +237,9 @@ function process_special_event_form ()
     $EventId = mysql_insert_id ();
 
   $sql = "$verb Runs SET EventId=$EventId";
-//  $sql .= build_sql_string ('Track');
-//  $sql .= build_sql_string ('Span');
   $sql .= build_sql_string ('Day');
   $sql .= build_sql_string ('StartHour');
+  $sql .= build_sql_string ('Rooms', $Rooms);
   $sql .= build_sql_string ('UpdatedById', $_SESSION[SESSION_LOGIN_USER_ID]);
   if ($update)
     $sql .= " WHERE RunId=$RunId";
@@ -259,10 +261,10 @@ function process_special_event_form ()
 
 function list_special_events ()
 {
-  echo "<H2>Special Events</H2>";
+  echo "<h2>Special Events</h2>";
 
-  $sql = 'SELECT Runs.RunId, Runs.EventId, Runs.Track, Runs.StartHour,';
-  $sql .= ' Runs.Day, Runs.Span,';
+  $sql = 'SELECT Runs.RunId, Runs.EventId, Runs.StartHour,';
+  $sql .= ' Runs.Day, Runs.Rooms,';
   $sql .= ' Events.Hours, Events.Title';
   $sql .= ' FROM Events, Runs';
   $sql .= ' WHERE Events.EventId=Runs.EventId AND Events.SpecialEvent=1';
@@ -275,37 +277,35 @@ function list_special_events ()
   if (0 == mysql_num_rows ($result))
     return display_error ('No special events in database');
 
-  echo "<B>\n";
-  echo "Click on a special event title to edit or delete it.<BR>\n";
-  echo "</B>\n";
+  echo "<b>\n";
+  echo "Click on a special event title to edit or delete it.<br>\n";
+  echo "</b>\n";
 
-  echo "<TABLE BORDER=1>\n";
-  echo "  <TR>\n";
-  echo "    <TH>Special Event</TH>\n";
-  echo "    <TH>Day</TH>\n";
-  echo "    <TH>Start Time</TH>\n";
-//  echo "    <TH>Track</TH>\n";
-  echo "    <TH>Hours</TH>\n";
-//  echo "    <TH>Columns Spanned</TH>\n";
-  echo "  </TR>\n";
+  echo "<table border=\"1\">\n";
+  echo "  <tr>\n";
+  echo "    <th>Special Event</th>\n";
+  echo "    <th>Day</th>\n";
+  echo "    <th>Start Time</th>\n";
+  echo "    <th>Hours</th>\n";
+  echo "    <th>Room(s)</th>\n";
+  echo "  </tr>\n";
 
   while ($row = mysql_fetch_object ($result))
   {
     $start_time = start_hour_to_24_hour ($row->StartHour);
 
-    echo "  <TR VALIGN=TOP>\n";
-    printf ("    <TD><A HREF=SpecialEvents.php?action=%d&RunId=%d>%s</A>\n",
+    echo "  <tr valign=\"top\">\n";
+    printf ("    <td><a href=\"SpecialEvents.php?action=%d&RunId=%d\">%s</a>\n",
 	    SPECIAL_EVENT_FORM,
 	    $row->RunId,
 	    $row->Title);
-    echo "    <TD ALIGN=CENTER>$row->Day</TD>\n";
-    echo "    <TD ALIGN=CENTER>$start_time</TD>\n";
-//    echo "    <TD ALIGN=CENTER>$row->Track</TD>\n";
-    echo "    <TD VALIGN=TOP ALIGN=CENTER>$row->Hours</TD>\n";
-//    echo "    <TD ALIGN=CENTER>$row->Span</TD>\n";
-    echo "  </TR>\n";
+    echo "    <td align=\"center\">$row->Day</td>\n";
+    echo "    <td align=\"center\">$start_time</td>\n";
+    echo "    <td align=\"center\">$row->Hours</td>\n";
+    printf ("    <td>%s</td>\n", pretty_rooms($row->Rooms));
+    echo "  </tr>\n";
   }
-  echo "</TABLE>\n";
+  echo "</table>\n";
 }
 
 ?>

@@ -686,14 +686,11 @@ function display_special_event($row, $dimensions, $bgcolor) {
 			 $row->RunId,
 			 $row->Title);
   } else {
-	$text = $row->Title;
+    $text = $row->Title;
   }
+  if ('' != $row->Rooms)
+    $text .= '<p>' . pretty_rooms($row->Rooms) . "\n";
   
-//      if (user_has_priv (PRIV_SCHEDULING))
-//	$text .= sprintf ('<br><font color=red>Track: %d, Span: %d</font>',
-//			  $row->Track,
-//			  $row->Span);
-//      write_cell ("td", $text, $attrib);
 
   echo "<div style=\"".$dimensions->getCSS()."\">";
   write_centering_table($text, $bgcolor);

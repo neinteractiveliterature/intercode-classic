@@ -3279,9 +3279,7 @@ function pretty_rooms($str)
     return $ary[0];
 
   // Make a pretty list
-  $last = array_pop($ary);
   $Rooms = implode(', ', $ary);
-  $Rooms .= ' and ' . $last;
 
   return $Rooms;
 }

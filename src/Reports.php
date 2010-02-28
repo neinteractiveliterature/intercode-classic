@@ -331,7 +331,7 @@ function report_per_room ()
       continue;
     }
 
-    printf ("<p>Room: %s - %d rows</p>\n", $room_name, mysql_num_rows($room_result));
+    //    printf ("<p>Room: %s - %d rows</p>\n", $room_name, mysql_num_rows($room_result));
 
     if (0 == mysql_num_rows($room_result))
       continue;
