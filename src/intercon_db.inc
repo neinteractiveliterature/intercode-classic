@@ -185,6 +185,7 @@ define (REPORT_REGISTRATION, 107);
 define (REPORT_BY_AGE, 108);
 define (REPORT_HOW_HEARD, 109);
 define (REPORT_CONSUITE_TRACK, 190);
+define (REPORT_PER_ROOM, 191);
 
 
 // Action values in Referrers.php
@@ -785,6 +786,7 @@ function html_begin ($bShowLogo=true)
 		  'TShirts.php', SHOW_TSHIRT_SUMMARY);
     navbar_entry (true, 'Per User Report', 'Reports.php', REPORT_PER_USER);
     navbar_entry (true, 'Per Game Report', 'Reports.php', REPORT_PER_GAME);
+    navbar_entry (true, 'Per Room Report', 'Reports.php', REPORT_PER_ROOM);
     navbar_entry (true, 'Ops Report', 'Reports.php', REPORT_OPS_TRACK);
     navbar_entry (true, 'ConSuite Report', 'Reports.php',
 		  REPORT_CONSUITE_TRACK);
@@ -3253,14 +3255,23 @@ function pretty_rooms($str)
 {
   // Quick check for empty string - why waste time?
   if ('' == $str)
-    return '';
+    return '&nbsp;';
 
   // Convert combined rooms into something 'pretty'
-  $str = str_replace('Heritage A,Heritage B', 'Heritage A &amp; B', $str);
-  $str = str_replace('Salon A,Salon B,Salon C', 'Salon A, B &amp; C', $str);
-  $str = str_replace('Salon A,Salon B', 'Salon A &amp; B', $str);
-  $str = str_replace('Salon B,Salon C', 'Salon B &amp; C', $str);
-  $str = str_replace('Salon A,Salon C', 'Salon A &amp; C', $str);
+  $str = str_replace('Cambridge East,Cambridge West', 'Cambridge', $str);
+  $str = str_replace('Lincoln East,Lincoln West', 'Lincoln', $str);
+  $str = str_replace('Eden Vale A1,Eden Vale A2,Eden Vale A3', 'Eden Vale A', $str);
+  $str = str_replace('Eden Vale A1,Eden Vale A2', 'Eden Vale A1 &amp; A2', $str);
+  $str = str_replace('Eden Vale A2,Eden Vale A3', 'Eden Vale A2 &amp; A3', $str);
+  $str = str_replace('Eden Vale A1,Eden Vale A3', 'Eden Vale A1 &amp; A3', $str);
+  $str = str_replace('Eden Vale C1,Eden Vale C2,Eden Vale C3', 'Eden Vale C', $str);
+  $str = str_replace('Eden Vale C1,Eden Vale C2', 'Eden Vale C1 &amp; C2', $str);
+  $str = str_replace('Eden Vale C2,Eden Vale C3', 'Eden Vale C2 &amp; C3', $str);
+  $str = str_replace('Eden Vale C1,Eden Vale C3', 'Eden Vale C1 &amp; C3', $str);
+  $str = str_replace('Eden Vale A,Eden Vale B,Eden Vale C', 'Eden Vale A, B &amp; C', $str);
+  $str = str_replace('Eden Vale A,Eden Vale B', 'Eden Vale A &amp; B', $str);
+  $str = str_replace('Eden Vale B,Eden Vale C', 'Eden Vale B &amp; C', $str);
+  $str = str_replace('Eden Vale A,Eden Vale C', 'Eden Vale A &amp; C', $str);
 
   // Check for single rooms
   $ary = explode(',', $str);
@@ -3275,4 +3286,71 @@ function pretty_rooms($str)
   return $Rooms;
 }
 
+function room_check($ary, $room)
+{
+  $checked = '';
+  if (is_array($ary))
+    if (array_key_exists($room, $ary))
+      $checked = 'checked';
+
+  printf ('            <input type="checkbox" name="Rooms[]" ' .
+	  "value=\"%s\" %s>%s<br>\n",
+	  $room,
+	  $checked,
+	  $room);
+}
+
+function form_con_rooms($display, $key)
+{
+  if (! array_key_exists($key, $_POST))
+    $rooms = '';
+  else
+  {
+    if (! is_array($_POST[$key]))
+      $rooms = $_POST[$key];
+    else
+      $rooms = array_flip($_POST[$key]);
+  }
+
+  echo "  <tr>\n";
+  echo "    <td valign=\"right\">$display:</td>\n";
+  echo "    <td>\n";
+  echo "      <table>\n";
+  echo "        <tr valign=\"top\">\n";
+  echo "          <td>\n";
+  room_check($rooms, 'Alcott');
+  room_check($rooms, 'Belmont');
+  room_check($rooms, 'Cambridge East');
+  room_check($rooms, 'Cambridge West');
+  room_check($rooms, 'Concord');
+  echo "          </td>\n";
+  echo "          <td>\n";
+  room_check($rooms, 'Eden Vale A1');
+  room_check($rooms, 'Eden Vale A2');
+  room_check($rooms, 'Eden Vale A3');
+  room_check($rooms, 'Eden Vale B');
+  room_check($rooms, 'Eden Vale C1');
+  room_check($rooms, 'Eden Vale C2');
+  room_check($rooms, 'Eden Vale C3');
+  echo "          </td>\n";
+  echo "          <td>\n";
+  room_check($rooms, 'Emerson');
+  room_check($rooms, 'Hawthorne');
+  room_check($rooms, 'Lincoln East');
+  room_check($rooms, 'Lincoln West');
+  room_check($rooms, 'Livermore');
+  echo "          </td>\n";
+  echo "          <td>\n";
+  room_check($rooms, 'Pool');
+  room_check($rooms, 'Thoreau');
+  room_check($rooms, 'Waltham');
+  room_check($rooms, 'Wellesley');
+  room_check($rooms, 'Wellington');
+  room_check($rooms, 'Weston');
+  echo "          </td>\n";
+  echo "        </tr>\n";
+  echo "      </table>\n";
+  echo "    </td>\n";
+  echo "  </tr>\n";
+}
 ?>

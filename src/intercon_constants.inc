@@ -9,7 +9,7 @@ session_start ();
 // Setting DEVELOPMENT_VERSION turns on additional error checking, as well
 // as diverting all mail to the DEVELOPMENT_MAIL_ADDR
 
-define (DEVELOPMENT_VERSION, 0);
+define (DEVELOPMENT_VERSION, 1);
 
 // Per-con values - The values of all of these should be visible on
 // the status page
@@ -26,19 +26,19 @@ define (DB_NAME,   'itest');
 // credit card numbers or other sensative stuff in here anyway...
 
 define (DB_ADMIN_USR, 'root');
-define (DB_ADMIN_PWD, '');
+define (DB_ADMIN_PWD, 'Thebrows');
 
 define (DB_STAFF_USR, 'root');
-define (DB_STAFF_PWD, '');
+define (DB_STAFF_PWD, 'Thebrows');
 
 define (DB_USER_USR, 'root');
-define (DB_USER_PWD, '');
+define (DB_USER_PWD, 'Thebrows');
 
 
 // When DEVELOPMENT_VERSION is set to 1, all mail will be diverted to this
 // address
 
-define (DEVELOPMENT_MAIL_ADDR, 'barry@tannenbaum.mv.com');
+define (DEVELOPMENT_MAIL_ADDR, 'barry.tannenbaum@gmail.com');
 
 // Set to 0 to disable the poll
 

@@ -50,6 +50,13 @@ switch ($action)
       $bShowCopyright = false;
     break;
 
+
+  case REPORT_PER_ROOM:
+    html_begin (false);
+    if (report_per_room ())
+      $bShowCopyright = false;
+    break;
+
   case REPORT_WHOS_NOT_PLAYING_FORM:
     html_begin (true);
     whos_not_playing_when_form ();
@@ -173,7 +180,24 @@ function report_per_user ()
     if ('Admin' == $row->LastName)
       continue;
 
-    echo "<div class=print_logo><img src=InterconDLogo.jpg></div>\n";
+    // Do a quick check for how many games the user is signed up for.
+    // If he isn't signed up for any games, skip him (or her)
+    $sql = 'SELECT SignupId FROM Signup';
+    $sql .= " WHERE Signup.UserId=$row->UserId";
+    $sql .= '   AND Signup.State!="Withdrawn"';
+
+    $quick_result = mysql_query($sql);
+    if (! $quick_result)
+    {
+      display_mysql_error('Query for users signups failed', $sql);
+      continue;
+    }
+    $count = mysql_num_rows($quick_result);
+    mysql_free_result($quick_result);
+    if (0 == $count)
+      continue;
+
+    echo "<div class=print_logo_break_before><img src=PageBanner.png></div>\n";
 
     write_user_report (trim ("$row->LastName, $row->FirstName"),
 		       $row->UserId);
@@ -184,6 +208,147 @@ function report_per_user ()
     echo "All Rights Reserved\n";
     echo "</div> <!-- copyright-->\n";
   }
+}
+
+function ampm_time($h)
+{
+  $hour = $h % 12;
+  $suffix = 'PM';
+
+  if (1 == ($h / 12))
+  {
+    $suffix = 'PM';
+    if (0 == $hour)
+      $suffix = 'AM';
+  }
+  else
+  {
+    $suffix = 'AM';
+    if (0 == $hour)
+      $suffix = 'PM';
+  }
+
+  if (0 == $hour)
+    $hour = 12;
+
+  return "$hour $suffix";
+}
+
+/*
+ * write_room_report
+ *
+ * Write per-room entry for the specified day
+ */
+
+function write_room_report($room, $day, $day_title)
+{
+  $sql = 'SELECT Runs.StartHour, Runs.Rooms, Events.Title, Events.Hours';
+  $sql .= ' FROM Runs, Events';
+  $sql .= " WHERE Runs.Day='$day'";
+  $sql .= '   AND Runs.EventId = Events.EventId';
+  $sql .= "   AND FIND_IN_SET('$room', Runs.Rooms) > 0";
+  $sql .= ' ORDER BY Runs.StartHour';
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Query for room report failed', $sql);
+
+  echo "  <tr>\n";
+  echo "    <th colspan=\"2\" align=\"left\">$day_title</th>\n";
+  echo "  </tr>\n";
+
+  while ($row = mysql_fetch_object($result))
+  {
+    echo "  <tr valign=\"top\">\n";
+    /*
+    printf ("    <td align=\"right\">&nbsp;%s - %s&nbsp;</th>\n",
+	    ampm_time($row->StartHour),
+	    ampm_time($row->StartHour + $row->Hours));
+    */
+    printf ("    <td>&nbsp;%02d:00 - %02d:00&nbsp;</th>\n",
+	    $row->StartHour, $row->StartHour + $row->Hours);
+    echo "    <td>$row->Title";
+    $rooms_array = explode(',', $row->Rooms);
+    if (count($rooms_array) > 1)
+    {
+      $a = array();
+      foreach($rooms_array as $r)
+      {
+	if ($r != $room)
+	  array_push($a, $r);
+      }
+
+      $other_rooms = pretty_rooms(implode(',', $a));
+      echo "<br><small>Also in: $other_rooms</small>";
+    }
+    echo "</td>\n";
+    echo "  </tr>\n";
+  }
+
+  echo "  <tr><td colspan=\"2\">&nbsp;</td></tr>\n";
+}
+
+/*
+ * report_per_room
+ *
+ * Dump a per-room report for all the rooms at the Con
+ */
+
+function report_per_room ()
+{
+  // We'll need the year
+  $y = date ('Y');
+
+  // Fetch the set of rooms
+  $sql = 'SELECT COLUMN_TYPE FROM Information_Schema.Columns';
+  $sql .= ' WHERE Table_Name="Runs" AND Column_Name="Rooms"';
+
+  $result = mysql_query ($sql);
+  if (! $result)
+    return display_mysql_error ('Query for list of Con rooms failed', $sql);
+
+  $row = mysql_fetch_object ($result);
+  if (! $row)
+    return display_error ('No rooms fetched for Con runs');
+
+  // We're expecting a string of the form "set('room a', 'room b')"
+  // Start by trimming off the leading 'set(' and trailing ')'
+  $rooms = trim($row->COLUMN_TYPE, 'set()');
+
+  // Now break the rooms into an array
+  $rooms_array = explode(',', $rooms);
+
+  foreach($rooms_array as $r)
+  {
+    $room_name = trim($r, "'");
+
+    $sql = 'SELECT RunId FROM Runs';
+    $sql .= " WHERE FIND_IN_SET('$room_name', Rooms) > 0";
+
+    $room_result = mysql_query($sql);
+    if (! $room_result)
+    {
+      display_mysql_error ('Query for room rows failed', $sql);
+      continue;
+    }
+
+    printf ("<p>Room: %s - %d rows</p>\n", $room_name, mysql_num_rows($room_result));
+
+    if (0 == mysql_num_rows($room_result))
+      continue;
+
+    echo "<div class=print_logo_break_before><img src=PageBanner.png></div>\n";
+
+    echo "<font size=\"+3\"><b>$room_name</b></font><p>\n";
+
+    echo "<table>\n";
+    write_room_report ($room_name, 'Fri', FRI_TEXT);
+    write_room_report ($room_name, 'Sat', SAT_TEXT);
+    write_room_report ($room_name, 'Sun', SUN_TEXT);
+    echo "</table>\n";
+  }
+
+  // Suppress the copyright display
+  return true;
 }
 
 /*
@@ -212,20 +377,6 @@ function build_order_string ($n, $size, &$s, &$count, $type)
 function write_user_report ($name, $user_id)
 {
   echo "<font size=\"+3\"><b>$name</b></font><p>\n";
-/*
-  if (('Comp' == $can_signup) && (0 != $comp_event_id))
-  {
-    $sql = "SELECT Title FROM Events WHERE EventId=$comp_event_id";
-    $result = mysql_query ($sql);
-    if (! $result)
-      return display_mysql_error ('Query for comp event failed', $sql);
-
-    $row = mysql_fetch_object ($result);
-    echo "Comp'd for $row->Title<p>\n";
-  }
-  else
-    echo "Payment: $payment_note<p>\n";
-*/
   $gms = array();
 
   // See if this user has ordered any shirts
@@ -283,7 +434,7 @@ function write_user_report ($name, $user_id)
   // Now gather the list of games this user is signed up for
 
   $sql = 'SELECT Events.Title, Events.Hours, Events.EventId,';
-  $sql .= ' Runs.Day, Runs.StartHour, Runs.TitleSuffix, Runs.Venue,';
+  $sql .= ' Runs.Day, Runs.StartHour, Runs.TitleSuffix, Runs.Rooms,';
   $sql .= ' Signup.State';
   $sql .= ' FROM Signup, Runs, Users, Events';
   $sql .= ' WHERE Signup.State!="Withdrawn"';
@@ -314,11 +465,8 @@ function write_user_report ($name, $user_id)
     printf ("    <td align=right>%s&nbsp;&nbsp;</td>\n",
 	    start_hour_to_24_hour ($row->StartHour + $row->Hours));
 
-    if ('' == $row->Venue)
-      $venue = '&nbsp;';
-    else
-      $venue = $row->Venue;
-    echo "    <td>$venue</td>\n";
+    $rooms = pretty_rooms($row->Rooms);
+    echo "    <td>$rooms</td>\n";
 
     echo "    <td>&nbsp;</td>\n";
 
@@ -350,15 +498,13 @@ function report_per_game ()
 
   $sql = 'SELECT Events.Title, Events.MinPlayersMale, Events.MaxPlayersMale,';
   $sql .= ' Events.MinPlayersFemale, Events.MaxPlayersFemale,';
-  $sql .= ' Events.MinPlayersNeutral, Events.MaxPlayersNeutral, Runs.Venue,';
+  $sql .= ' Events.MinPlayersNeutral, Events.MaxPlayersNeutral, Runs.Rooms,';
   $sql .= ' Runs.TitleSuffix, Runs.RunId, Runs.Day, Runs.StartHour';
   $sql .= ' FROM Runs, Events';
   $sql .= ' WHERE Events.EventId=Runs.EventId';
   $sql .= '   AND SpecialEvent=0';
   $sql .= '   AND IsOps="N"';
-  $sql .= '   AND Title<>"Friday Night Coffeehouse"';
-  $sql .= '   AND Title<>"The Eclectic Dance Mix Party"';
-  $sql .= '   AND Title<>"Intercon Sunday Breakfast"';
+  $sql .= '   AND IsConSuite="N"';
   $sql .= ' ORDER BY Events.Title, Runs.Day, Runs.StartHour';
 
   $result = mysql_query ($sql);
@@ -369,12 +515,12 @@ function report_per_game ()
 
   while ($row = mysql_fetch_object ($result))
   {
-    echo "<div class=print_logo><img src=InterconDLogo.jpg></div>\n";
+    echo "<div class=print_logo_break_before><img src=PageBanner.png></div>\n";
 
     write_game_report ($row->RunId,
 		       $row->Title,
 		       $row->TitleSuffix,
-		       $row->Venue,
+		       pretty_rooms($row->Rooms),
 		       $row->Day,
 		       start_hour_to_24_hour ($row->StartHour),
 		       $row->MinPlayersMale,
@@ -999,7 +1145,7 @@ function whos_not_playing_when ()
 
 function report_games_by_time ($day)
 {
-  echo "<div class=print_logo><img src=InterconDLogo.jpg></div>\n";
+  echo "<div class=print_logo_break_before><img src=PageBanner.png></div>\n";
   printf ("<font size=\"+3\"><b>%s Schedule for %s</b></font><p>\n",
 	  CON_NAME,
 	  $day);
@@ -1007,7 +1153,7 @@ function report_games_by_time ($day)
   // Get the list of games for this day
 
   $sql = 'SELECT Events.Title, Events.Hours,';
-  $sql .= ' Runs.Day, Runs.StartHour, Runs.TitleSuffix, Runs.Venue';
+  $sql .= ' Runs.Day, Runs.StartHour, Runs.TitleSuffix, Runs.Rooms';
   $sql .= ' FROM Runs, Events';
   $sql .= " WHERE Day='$day'";
   $sql .= '   AND Events.Eventid=Runs.EventId';
@@ -1035,12 +1181,8 @@ function report_games_by_time ($day)
       $hour = $row->StartHour;
     }
 
-    if ('' != $row->Venue)
-      $venue = " @ $row->Venue";
-    else
-      $venue = '';
-
-    echo "    $row->Title $row->TitleSuffix$venue<br>\n";
+    $rooms = pretty_rooms($row->$Rooms);
+    echo "    $row->Title $row->TitleSuffix $rooms<br>\n";
   }
   echo "    </td>\n";
   echo "  </tr>\n";
@@ -1097,28 +1239,33 @@ function report_users_csv_tshirts ($user_id)
   $order = '';
   $count = 0;
 
+  $shirtShortName = "(P)";
+  $shirt2ShortName = "(B)";
+
   $row = mysql_fetch_object ($result);
   if ($row)
   {
-    build_order_string ($row->Small,   'Small',   $order, $count, SHIRT_NAME);
-    build_order_string ($row->Medium,  'Medium',  $order, $count, SHIRT_NAME);
-    build_order_string ($row->Large,   'Large',   $order, $count, SHIRT_NAME);
-    build_order_string ($row->XLarge,  'XLarge',  $order, $count, SHIRT_NAME);
-    build_order_string ($row->XXLarge, 'XXLarge', $order, $count, SHIRT_NAME);
-    build_order_string ($row->XXLarge, 'XXLarge', $order, $count, SHIRT_NAME);
-    build_order_string ($row->X3Large, 'X3Large', $order, $count, SHIRT_NAME);
-    build_order_string ($row->X4Large, 'X4Large', $order, $count, SHIRT_NAME);
-    build_order_string ($row->X5Large, 'X5Large', $order, $count, SHIRT_NAME);
+    build_order_string ($row->Small,   'S',   $order, $count, $shirtShortName);
+    build_order_string ($row->Medium,  'M',   $order, $count, $shirtShortName);
+    build_order_string ($row->Large,   'L',   $order, $count, $shirtShortName);
+    build_order_string ($row->XLarge,  'XL',  $order, $count, $shirtShortName);
+    build_order_string ($row->XXLarge, 'XXL', $order, $count, $shirtShortName);
+    build_order_string ($row->X3Large, '3XL', $order, $count, $shirtShortName);
+    build_order_string ($row->X4Large, '4XL', $order, $count, $shirtShortName);
+    build_order_string ($row->X5Large, '5XL', $order, $count, $shirtShortName);
 
-    build_order_string ($row->Small_2,   'Small',   $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->Medium_2,  'Medium',  $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->Large_2,   'Large',   $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->XLarge_2,  'XLarge',  $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->XXLarge_2, 'XXLarge', $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->XXLarge_2, 'XXLarge', $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->X3Large_2, 'X3Large', $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->X4Large_2, 'X4Large', $order, $count, SHIRT_2_NAME);
-    build_order_string ($row->X5Large_2, 'X5Large', $order, $count, SHIRT_2_NAME);
+    build_order_string ($row->Small_2,   'S',   $order, $count, $shirt2ShortName);
+    build_order_string ($row->Medium_2,  'M',   $order, $count, $shirt2ShortName);
+    build_order_string ($row->Large_2,   'L',   $order, $count, $shirt2ShortName);
+    build_order_string ($row->XLarge_2,  'XL',  $order, $count, $shirt2ShortName);
+    build_order_string ($row->XXLarge_2, 'XXL', $order, $count, $shirt2ShortName);
+    build_order_string ($row->X3Large_2, '3XL', $order, $count, $shirt2ShortName);
+    build_order_string ($row->X4Large_2, '4XL', $order, $count, $shirt2ShortName);
+    build_order_string ($row->X5Large_2, '5XL', $order, $count, $shirt2ShortName);
+
+    if ("Unpaid" == $row->Status) {
+      $order .= " - UNPAID";
+    }
   }
 
   mysql_free_result ($result);

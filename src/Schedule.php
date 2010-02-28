@@ -557,8 +557,8 @@ function display_event ($hour, $away_all_day, $away_hours,
   $text .= '</a>';
   if ('' != $row->ScheduleNote)
     $text .= "<P>$row->ScheduleNote";
-  if ('' != $row->Venue)
-    $text .= "<P>$row->Venue\n";
+  if ('' != $row->Rooms)
+    $text .= '<p>' . pretty_rooms($row->Rooms) . "\n";
 
   if ($game_full)
     $text .= '<P><I>Full</I>';
@@ -655,8 +655,8 @@ function display_event_with_counts($hour, $row, $dimensions,
 
   if ('' != $row->ScheduleNote)
     $text .= "<p>$row->ScheduleNote";
-  if ('' != $row->Venue)
-    $text .= "<p>$row->Venue\n";
+  if ('' != $row->Rooms)
+    $text .= '<p>' . pretty_rooms($row->Rooms) . "\n";
 
   // Add the available slots for this game
 
@@ -779,7 +779,7 @@ function schedule_day ($day, $away_all_day, $away_hours,
   // Get the day's events
 
   $sql = 'SELECT Runs.RunId, Runs.Track, Runs.TitleSuffix, Runs.StartHour,';
-  $sql .= ' Runs.Span, Runs.ScheduleNote, Runs.Venue, Runs.Track,';
+  $sql .= ' Runs.Span, Runs.ScheduleNote, Runs.Rooms, Runs.Track,';
   $sql .= ' Events.EventId, Events.SpecialEvent, Events.Hours, Events.Title,';
   $sql .= ' Events.CanPlayConcurrently, LENGTH(Events.Description) AS DescLen,';
   $sql .= ' MaxPlayersMale, MaxPlayersFemale, MaxPlayersNeutral, ';
@@ -1797,7 +1797,7 @@ function show_game ()
 
     // Extract information for the runs of this game
 
-    $sql = "SELECT RunId, Day, StartHour, Venue FROM Runs";
+    $sql = "SELECT RunId, Day, StartHour, Rooms FROM Runs";
     $sql .= ' WHERE EventId=' . $game_row->EventId;
     $sql .= ' ORDER BY Day, StartHour';
     $runs_result = mysql_query ($sql);
@@ -1903,8 +1903,8 @@ function show_game ()
 	    $game_end = start_hour_to_24_hour ($run_row->StartHour +
 					       $game_row->Hours);
 	    $run_text = "$run_row->Day. $game_start - $game_end\n";
-	    if ('' != $run_row->Venue)
-	      $run_text .= '<br>' . $run_row->Venue . "\n";
+	    if ('' != $run_row->Rooms)
+	      $run_text .= '<br>' . pretty_rooms($run_row->Rooms) . "\n";
 
 	    $user_away = check_if_away ($run_row->Day,
 					$run_row->StartHour,

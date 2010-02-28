@@ -1635,9 +1635,6 @@ function show_run_form()
 
   dump_array('$_REQUEST', $_REQUEST);
 
-  if (is_array($_REQUEST['Rooms']))
-    dump_array('Rooms', $_REQUEST['Rooms']);
-
   // Fetch the PreConEventId
 
   $PreConEventId = request_int('PreConEventId');
@@ -1650,8 +1647,8 @@ function show_run_form()
 
   if (0 == $PreConRunId)
   {
-    if (! array_key_exists('Rooms', $_REQUEST))
-      $_REQUEST['Rooms'] = '';
+    if (! array_key_exists('Rooms', $_POST))
+      $_POST['Rooms'] = '';
   }
   else
   {
@@ -1664,19 +1661,15 @@ function show_run_form()
     if ($row = mysql_fetch_assoc($result))
     {
       foreach($row as $k => $v)
-	$_REQUEST[$k] = $v;
-      if ('Thu' == $_REQUEST['Day'])
+	$_POST[$k] = $v;
+      if ('Thu' == $_POST['Day'])
 	$day = 'Thursday';
       else
 	$day = 'Friday';
-      $_REQUEST['StartTime'] = $day . $_REQUEST['StartHour'];
+      $_POST['StartTime'] = $day . $_POST['StartHour'];
     }
+    $_POST['Rooms'] = explode(',', $row['Rooms']);
   }
-
-  dump_array('$_REQUEST', $_REQUEST);
-
-  if (is_array($_REQUEST['Rooms']))
-    dump_array('Rooms', $_REQUEST['Rooms']);
 
   $sql = "SELECT Title FROM PreConEvents WHERE PreConEventId=$PreConEventId";
   $result = mysql_query($sql);
@@ -1734,50 +1727,11 @@ function show_run_form()
   echo "    </td>\n";
   echo "  </tr>\n";
 
-  if (! is_array($_REQUEST['Rooms']))
-    $rooms = $_REQUEST['Rooms'];
-  else
-    $rooms = array_flip($_REQUEST['Rooms']);
+  form_con_rooms('Rooms(s)', 'Rooms');
 
-  if (is_array($rooms))
-    dump_array('Rooms', $rooms);
-  else
-    echo "<!-- Rooms is not an array -->\n";
-
-  echo "  <tr>\n";
-  echo "    <th>Room(s):</th>\n";
-  echo "    <td>\n";
-  echo "      <table>\n";
-  echo "        <tr valign=\"top\">\n";
-  echo "          <td>\n";
-  room_check($rooms, 'Boardroom');
-  room_check($rooms, 'Carlisle');
-  room_check($rooms, 'Chelmsford');
-  echo "          </td>\n";
-  echo "          <td>\n";
-  room_check($rooms, 'Concord');
-  room_check($rooms, 'Drawing');
-  echo "          </td>\n";
-  echo "        </tr>\n";
-  echo "      </table>\n";
-  echo "    </td>\n";
-  echo "  </tr>\n";
   form_submit2($ok, 'Delete Run', 'Delete');
   echo "</table>\n";
-}
-
-function room_check($ary, $room)
-{
-  $checked = '';
-  if (is_array($ary))
-    if (array_key_exists($room, $ary))
-      $checked = 'checked';
-
-  printf ('            <input type="checkbox" name="Rooms[]" ' .
-	  "value=\"%s\" %s>%s<br>\n",
-	  $room,
-	  $checked,
-	  $room);
+  echo "</form>\n";
 }
 
 function process_run_form()
@@ -1821,8 +1775,9 @@ function process_run_form()
     return display_error ("Invalid start time: $StartTime");
 
   $Rooms = '';
-  if (array_key_exists('Rooms', $_REQUEST))
-    $Rooms = implode(',', $_REQUEST['Rooms']);
+  if (array_key_exists('Rooms', $_POST))
+    $Rooms = implode(',', $_POST['Rooms']);
+
 
   if (0 == $PreConRunId)
     $sql = 'INSERT PreConRuns SET ';
@@ -1837,6 +1792,8 @@ function process_run_form()
 
   if (0 != $PreConRunId)
     $sql .= " WHERE PreConRunId=$PreConRunId";
+
+  //  echo "SQL: $sql\n";
 
   $result = mysql_query($sql);
   if (! $result)
