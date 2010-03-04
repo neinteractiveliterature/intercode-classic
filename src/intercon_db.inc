@@ -2568,6 +2568,10 @@ function withdraw_from_game ($SignupId = 0)
     }
   }
 
+  if (!con_signups_allowed()) {
+      return display_error("Game signups and withdrawals are not allowed at this time.");
+  }
+
   $sql = 'SELECT Signup.State, Signup.Counted, Signup.Gender,';
   $sql .= ' Users.FirstName, Users.LastName, Users.EMail';
   $sql .= ' FROM Signup, Users';
