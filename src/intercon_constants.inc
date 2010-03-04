@@ -14,10 +14,10 @@ define (DEVELOPMENT_VERSION, 0);
 // Per-con values - The values of all of these should be visible on
 // the status page
 
-define (DB_SERVER, 'localhost');
-define (DB_NAME,   'itest');
-//define (DB_SERVER, 'mysql.interactiveliterature.org');
-//define (DB_NAME,   'intercon_j');
+//define (DB_SERVER, 'localhost');
+//define (DB_NAME,   'itest');
+define (DB_SERVER, 'mysql.interactiveliterature.org');
+define (DB_NAME,   'intercon_j');
 
 // Database users - These could/should be used to control access to the
 // database.  In reality, it's handled by the software.  And the password
