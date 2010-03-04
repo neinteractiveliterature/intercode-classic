@@ -167,6 +167,7 @@ function report_per_user ()
   $sql = 'SELECT UserId, FirstName, LastName';
   $sql .= ' FROM Users';
   $sql .= ' WHERE CanSignup!="Alumni"';
+  $sql .= '   AND CanSignup!="Unpaid"';
   $sql .= ' ORDER BY LastName, FirstName';
 
   $result = mysql_query ($sql);
@@ -178,23 +179,6 @@ function report_per_user ()
   while ($row = mysql_fetch_object ($result))
   {
     if ('Admin' == $row->LastName)
-      continue;
-
-    // Do a quick check for how many games the user is signed up for.
-    // If he isn't signed up for any games, skip him (or her)
-    $sql = 'SELECT SignupId FROM Signup';
-    $sql .= " WHERE Signup.UserId=$row->UserId";
-    $sql .= '   AND Signup.State!="Withdrawn"';
-
-    $quick_result = mysql_query($sql);
-    if (! $quick_result)
-    {
-      display_mysql_error('Query for users signups failed', $sql);
-      continue;
-    }
-    $count = mysql_num_rows($quick_result);
-    mysql_free_result($quick_result);
-    if (0 == $count)
       continue;
 
     echo "<div class=print_logo_break_before><img src=PageBanner.jpg></div>\n";
