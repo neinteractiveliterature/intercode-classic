@@ -12,9 +12,12 @@ remote_task :update_symlinks, :roles => :app do
 for f in $(ls #{shared_path}/local/*)
 do 
   FILENAME=$(basename $f)
-  echo "Linking in local copy of $f"
-  rm -f #{release_path}/$FILENAME
-  ln -s #{shared_path}/local/$FILENAME #{release_path}/$FILENAME
+  if [[ $FILENAME != *~ ]]
+  then
+    echo "Linking in local copy of $f"
+    rm -f #{release_path}/$FILENAME
+    ln -s #{shared_path}/local/$FILENAME #{release_path}/$FILENAME
+  fi
 done
 EOF
   end
