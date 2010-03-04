@@ -254,7 +254,6 @@ function update_status ()
   // Unregister the session copies so we'll fetch new values from the database
 
   session_unregister (SESSION_CON_NEWS);
-  session_unregister (SESSION_CON_CAN_SIGNUP);
   session_unregister (SESSION_CON_SHOW_SCHEDULE);
 
   return TRUE;

@@ -275,14 +275,12 @@ define (SESSION_LOGIN_USER_GM, 'LoginUserGM_' . CON_ID);
 define (SESSION_LOGIN_USER_ID, 'LoginUserId_' . CON_ID);
 define (SESSION_LOGIN_USER_PRIVS, 'LoginUserPrivs_' . CON_ID);
 define (SESSION_LOGIN_USER_CAN_SIGNUP, 'LoginUserCanSignup_' . CON_ID);
-define (SESSION_CON_SIGNUPS_ALLOWED, 'ConSignupsAllowed_' . CON_ID);
 define (SESSION_REFERRER_ID, 'ReferrerId_' . CON_ID);
 define (SESSION_LOGIN_USER_GENDER, 'LoginUserGender_' . CON_ID);
 define (SESSION_LOGIN_USER_NAME, 'LoginUserName_' . CON_ID);
 define (SESSION_LOGIN_USER_EMAIL, 'LoginUserEMail_' . CON_ID); 
 define (SESSION_CON_SHOW_SCHEDULE, 'ConShowSchedule_' . CON_ID);
 define (SESSION_CON_NEWS, 'ConNews_' . CON_ID);
-define (SESSION_CON_CAN_SIGNUP, 'ConCanSignup_' . CON_ID);
 define (SESSION_ATTENDENCE_SHOWN, 'AttendenceShown_' . CON_ID);
 define (SESSION_CON_LAST_UPDATED, 'ConLastUpdated_' . CON_ID);
 define (SESSION_SEQUENCE_NUMBER, 'SequenceNumber_' . CON_ID);
@@ -938,12 +936,28 @@ function con_signups_allowed ()
   // If we haven't set the session variables, then the user hasn't logged
   // in, and he can't signup for anything
 
-  if (! array_key_exists (SESSION_CON_SIGNUPS_ALLOWED, $_SESSION))
+  if (! is_logged_in())
     return 0;
+
+  // Otherwise fetch from con settings.  Yes, really.  Using a session
+  // variable is a security risk because site freeze won't affect logged
+  // in users.
+
+  $result = mysql_query ("SELECT SignupsAllowed FROM Con");
+  if (! $result)
+  {
+    return 0;
+  }
+
+  $row = mysql_fetch_object ($result);
+  if (! $row)
+  {
+    return 0;
+  }
 
   // Return how many games a user can signup for, if any
 
-  switch ($_SESSION[SESSION_CON_SIGNUPS_ALLOWED])
+  switch ($row->SignupsAllowed)
   {
     case '1':   return 1;
     case '2':   return 2;
@@ -1810,9 +1824,6 @@ function can_show_schedule ()
   session_register (SESSION_CON_NEWS);
   $_SESSION[SESSION_CON_NEWS] = $row->News;
 
-  session_register (SESSION_CON_SIGNUPS_ALLOWED);
-  $_SESSION[SESSION_CON_SIGNUPS_ALLOWED] = $row->SignupsAllowed;
-
   session_register (SESSION_CON_SHOW_SCHEDULE);
   switch ($row->ShowSchedule)
   {
@@ -2610,6 +2621,10 @@ function withdraw_from_game ($SignupId = 0)
 	if ($row->UserId != $_SESSION[SESSION_LOGIN_USER_ID])
 	  return display_error ('You are not allowed to withdraw from a game for another user.');
     }
+  }
+
+  if (!con_signups_allowed()) {
+      return display_error("Game signups and withdrawals are not allowed at this time.");
   }
 
   $sql = 'SELECT Signup.State, Signup.Counted, Signup.Gender,';
