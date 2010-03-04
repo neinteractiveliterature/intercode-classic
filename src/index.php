@@ -1457,16 +1457,11 @@ function mark_user_paid ()
 
 function display_signup_status ()
 {
-  switch ($_SESSION[SESSION_CON_SIGNUPS_ALLOWED])
+
+  $signups_allowed = con_signups_allowed();
+
+  switch ($signups_allowed)
   {
-    case 'NotYet':
-      echo "Game signup is not allowed at this time.\n";
-      return;
-
-    case 'NotNow':
-      echo "Game signup and withdrawal is not allowed at this time.\n";
-      return;
-
     case '1':
       echo "You may signup to play only 1 game at this time.  &quot;Ops!&quot;,\n";
       echo "or games that you are a GM for do not count towards your total.<p>\n";
@@ -1474,9 +1469,13 @@ function display_signup_status ()
 
     case '2':
     case '3':
-      echo 'You may signup to play only ' . $_SESSION[SESSION_CON_SIGNUPS_ALLOWED];
+      echo 'You may signup to play only ' . $signups_allowed;
       echo " games at this time.  &quot;Ops!&quot;, or games that you are\n";
       echo "a GM for do not count towards your total.<p>\n";
+      break;
+
+    default:
+      echo "Game signup is not allowed at this time.\n";
       break;
   }
 
@@ -1672,31 +1671,27 @@ function show_user_homepage_status ()
   // If game signup is not allowed at the time, don't allow them to
   // withdraw
 
-  if ('NotYet' != $_SESSION[SESSION_CON_SIGNUPS_ALLOWED])
-  {
     // Use a single sequence number for all of the entries.  Note that
     // -1 is used as a flag that the "Withdraw" link is not supposed
     // to be displayed.  This should only be true when we've frozen
     // signups.
 
-    if (('NotYet' == $_SESSION[SESSION_CON_SIGNUPS_ALLOWED]) ||
-	('NotNow' == $_SESSION[SESSION_CON_SIGNUPS_ALLOWED]))
+    if (!con_signups_allowed())
       $sequence_number = -1;
     else
       $sequence_number = increment_sequence_number ();
 
     show_games ($_SESSION[SESSION_LOGIN_USER_ID],
-		'You are',
-		'signed up',
-		'Confirmed',
-		$sequence_number);
+                'You are',
+                'signed up',
+                'Confirmed',
+                $sequence_number);
 
     show_games ($_SESSION[SESSION_LOGIN_USER_ID],
-		'You are',
-		'wait listed',
-		'Waitlisted',
-		$sequence_number);
-  }
+                'You are',
+                'wait listed',
+                'Waitlisted',
+                $sequence_number);
 
   return true;
 }
