@@ -1724,7 +1724,19 @@ function status_unpaid ()
     printf ("We're sorry, but %s has reached it's attendance limit.\n",
 	    CON_NAME);
     echo "We cannot accept any more registrations at this time.\n";
-    echo "Registrations for next Intercon J will open in February, 2009\n";
+    return false;
+  }
+
+  // If the website is frozen, don't display the PayPal info
+  if ('NotNow' == $_SESSION[SESSION_CON_SIGNUPS_ALLOWED])
+  {
+    printf ("<p>We're sorry, but signups for %s are not allowed at this\n",
+	    CON_NAME);
+    echo "time. We can not accept payment for the convention\n";
+    echo "on the website.</p>\n";
+    printf ("<p>Please contact the <a href=%s>Con&nbsp;Chair</a> if you\n",
+	    mailto_url(EMAIL_CON_CHAIR, 'Registration question'));
+    echo "still want to pay.</p>\n";
     return false;
   }
 
