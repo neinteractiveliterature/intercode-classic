@@ -1697,6 +1697,26 @@ function show_user_homepage_status ()
 }
 
 /*
+ * is_site_frozen
+ *
+ * Returns true if the signups are no longer allowed
+ */
+
+function is_site_frozen()
+{
+  $sql = 'SELECT SignupsAllowed FROM Con';
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Failed to get con signup status', $sql);
+
+  $row = mysql_fetch_object($result);
+  if (! $row)
+    return display_error('Failed to get con signup status');
+
+  return 'NotNow' == $row->SignupsAllowed;
+}
+
+/*
  * status_unpaid
  *
  * Tell user that he has to pay to attend the con and direct him to PayPal
@@ -1724,11 +1744,17 @@ function status_unpaid ()
     printf ("We're sorry, but %s has reached it's attendance limit.\n",
 	    CON_NAME);
     echo "We cannot accept any more registrations at this time.\n";
+
+    if ('' != $_SESSION[SESSION_CON_NEWS])
+    {
+      display_header ('Intercon News');
+      echo $_SESSION[SESSION_CON_NEWS] . "<P>\n";
+    }
     return false;
   }
 
   // If the website is frozen, don't display the PayPal info
-  if ('NotNow' == $_SESSION[SESSION_CON_SIGNUPS_ALLOWED])
+  if (is_site_frozen())
   {
     printf ("<p>We're sorry, but signups for %s are not allowed at this\n",
 	    CON_NAME);
@@ -1737,6 +1763,12 @@ function status_unpaid ()
     printf ("<p>Please contact the <a href=%s>Con&nbsp;Chair</a> if you\n",
 	    mailto_url(EMAIL_CON_CHAIR, 'Registration question'));
     echo "still want to pay.</p>\n";
+
+    if ('' != $_SESSION[SESSION_CON_NEWS])
+    {
+      display_header ('Intercon News');
+      echo $_SESSION[SESSION_CON_NEWS] . "<P>\n";
+    }
     return false;
   }
 
