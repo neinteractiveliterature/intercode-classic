@@ -932,13 +932,13 @@ function show_user_homepage_thursday ($UserId)
 
   if (0 == mysql_num_rows($result))
   {
-    printf ("You're not signed up for the %s Pre-Convention.\n", CON_NAME);
+    printf ("<p>You're not signed up for the %s Pre-Convention.\n", CON_NAME);
     echo "What is the Pre-Convention?  Click <a href=\"Thursday.php\">here</a>";
-    echo " to find out.<br><br>\n";
+    echo " to find out.</p>\n";
     return;
   }
 
-  printf ("You are signed up and paid for the %s Pre-Convention.<br><br>\n",
+  printf ("<p>You are signed up and paid for the %s Pre-Convention.</p>\n",
 	  CON_NAME);
 }
 
@@ -1044,7 +1044,7 @@ function show_user_homepage_shirts ($UserId)
 
   if ((0 == $paid_count) && (0 == $unpaid_count) && (0 == $pending_count))
   {
-    echo 'You have not requested any ' . CON_NAME . " Shirts.\n";
+    echo '<p>You have not requested any ' . CON_NAME . " Shirts.\n";
     if (! past_shirt_deadline())
       echo "Click <a href='TShirts.php'>here</a> to order shirts.<p>\n";
     else
@@ -1053,6 +1053,7 @@ function show_user_homepage_shirts ($UserId)
       echo "If you want a shirt, check at the registration desk to see\n";
       echo "if any are available in your size.\n";
     }
+    echo "</p>\n";
     return true;
   }
 
@@ -1697,6 +1698,74 @@ function show_user_homepage_status ()
 }
 
 /*
+ * is_site_frozen
+ *
+ * Returns true if the signups are no longer allowed
+ */
+
+function is_site_frozen()
+{
+  $sql = 'SELECT SignupsAllowed FROM Con';
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Failed to get con signup status', $sql);
+
+  $row = mysql_fetch_object($result);
+  if (! $row)
+    return display_error('Failed to get con signup status');
+
+  return 'NotNow' == $row->SignupsAllowed;
+}
+
+/*
+ * show_unpaid_messages
+ *
+ * If the user is unpaid, there are a number of possible messages:
+ * - The con may be full
+ * - The site may be frozen
+ * - They may be able to pay
+ *
+ * Display the appropriate message.  Return true if homepage processing
+ * should continue
+ */
+
+function show_unpaid_messages()
+{
+  printf ("<p><b>You are currently unpaid for %s!</b></p>", CON_NAME);
+
+  // Check for a full con
+  if (attendees_at_max())
+  {
+    printf ("<p>Unfortunately, %s has reached its attendance limit.\n",
+	    CON_NAME);
+    echo "We cannot accept any more registrations at this time.</p>\n";
+    echo "<p>".NEXT_CON_INFO."</p>";
+
+    return false;
+  }
+
+  // If the website is frozen, don't display the PayPal info
+  if (is_site_frozen())
+  {
+    printf ("<p>We're sorry, but signups for %s are not allowed at this\n",
+	    CON_NAME);
+    echo "time. We can not accept payment for the convention\n";
+    echo "on the website.</p>\n";
+    printf ("<p>Please contact the <a href=%s>Con&nbsp;Chair</a> if you\n",
+	    mailto_url(EMAIL_CON_CHAIR, 'Registration question'));
+    printf ("still want to pay and attend %s.</p>\n", CON_NAME);
+    return false;
+  }
+
+  // If we get here, the user can still pay for the con and signup for games,
+  // assuming that signups have opened and games are still available
+  echo "Until you pay, you won't be able to sign up for any games. ";
+  echo "<a href=\"PaymentStatus.php\">Click here to pay!</a>\n";
+
+  return true;
+}
+
+/*
  * status_unpaid
  *
  * Tell user that he has to pay to attend the con and direct him to PayPal
@@ -1704,34 +1773,21 @@ function show_user_homepage_status ()
 
 function status_unpaid ()
 {
-  
-  echo "<div style=\"border: 3px red solid; padding: 1ex; margin: 2ex;\">";
-  
-  echo "<b>You are currently unpaid for ".CON_NAME.".</b><br/>";
+  // Put a red box around the unpaid message in the hopes that this will
+  // get the user's attention
 
-  if (attendees_at_max())
-  {
-    printf ("<p>Unfortunately, %s has reached its attendance limit.\n",
-	    CON_NAME);
-    echo "We cannot accept any more registrations at this time.</p>\n";
-	echo "<p>".NEXT_CON_INFO."</p>";
-	echo "</div>";
-    return false;
-  } else {
-	echo "Until you pay, you won't be able to sign up for any games. ";
-	echo "<a href=\"PaymentStatus.php\">Click here to pay!</a>\n";
-  }
+  echo "<div style=\"border: 3px red solid; padding: 1ex; margin: 2ex;\">";
+  $result = show_unpaid_messages();
   echo "</div>";
 
   // Give the user the news, if any
-
   if ('' != $_SESSION[SESSION_CON_NEWS])
   {
     display_header ('Intercon News');
-    echo $_SESSION[SESSION_CON_NEWS] . "<P>\n";
+    echo '<p>' . $_SESSION[SESSION_CON_NEWS] . "</p>\n";
   }
 
-  return true;
+  return $result;
 }
 
 /*
@@ -1781,10 +1837,10 @@ function show_user_homepage_bio_info ()
 
   if ('' == $bio_text)
   {
-    echo "<FONT COLOR=RED>No bio text found.</FONT>  ";
+    echo "<p><font color=\"red\">No bio text found.</font>  ";
     printf ("Click <A HREF=index.php?action=%d>Edit My Bio</A> to enter" .
 	    " biographical information.  Bios are due by" .
-	    " <b><font color=red>%s</font></b>.\n",
+	    " <b><font color=red>%s</font></b></p>.\n",
 	    EDIT_BIO,
 	    BIO_DUE_DATE);
   }
