@@ -632,7 +632,7 @@ function form_text_one_col ($size, $display, $key='', $maxsize=0, $required=FALS
 
 function display_bid_form ($first_try)
 {
-  $EditGameInfo = TRUE;
+  $EditGameInfo = 1;
 
   // Make sure that the user is logged in
 
@@ -700,7 +700,11 @@ function display_bid_form ($first_try)
 
       $EventId = $row['EventId'];
 
-      $EditGameInfo = (0 == $EventId);
+      if (0 == $EventId)
+	$EditGameInfo = 1;
+      else
+	$EditGameInfo = 0;
+      //      $EditGameInfo = (0 == $EventId);
     }
 
     // Only the Bid Chair, GM Liaison or the bidder can update this bid
@@ -722,20 +726,22 @@ function display_bid_form ($first_try)
   form_hidden_value ('BidId', $BidId);
   form_hidden_value ('EditGameInfo', $EditGameInfo);
 
+
   echo "<p><font color=red>*</font> indicates a required field\n";
   echo "<TABLE BORDER=0>\n";
 
   form_section ('Game Information');
   if (! $EditGameInfo)
   {
-    echo "  <TR>\n";
-    echo "    <TD COLSPAN=2>\n";
+    form_hidden_value ('Title', $_POST['Title']);
+    echo "  <tr>\n";
+    echo "    <td colspan=\"2\">\n";
     echo "The game has been accepted and is already in the Events table.\n";
-    printf ("Click <A HREF=Schedule.php?action=%d&EventId=%d TARGET=_blank>here</A>",
+    printf ("Click <a href=\"Schedule.php?action=%d&EventId=%d\" target=_blank>here</a>",
 	    EDIT_GAME,
 	    $EventId);
     echo " if you want to modify the game information.\n";
-    echo "    </TD>\n";
+    echo "    </td>\n";
     echo "  </tr>\n";
   }
   else
@@ -1019,7 +1025,7 @@ function process_bid_form ()
   if (out_of_sequence ())
     return display_sequence_error (false);
 
-  //  dump_array ('$_POST', $_POST);
+  //dump_array ('$_POST', $_POST);
 
   // Make sure that the user is logged in
 
@@ -1082,10 +1088,13 @@ function process_bid_form ()
 
   // Make sure that we don't already have a game with this title
 
-  $Title = trim ($_POST['Title']);
+  if ($EditGameInfo)
+  {
+    $Title = trim ($_POST['Title']);
 
-  if (! title_not_in_events_table ($Title))
-    return false;
+    if (! title_not_in_events_table ($Title))
+      return false;
+  }
 
   // Sanity checks
 
@@ -1254,11 +1263,20 @@ function process_bid_form ()
     $msg = "The bid has been updated by $name";
   }
 
-  $msg .= ' and is waiting for your review at http://' . CON_DOMAIN;
+  $msg .= ' and is waiting for your review at ';
+  $msg .= sprintf ('http://%s/Bids.php?action=%d&BidId=%d',
+		   CON_DOMAIN,
+		   BID_SHOW_BID,
+		   $BidId);
+  $msg .= ' . You must be logged in to see this bid.';
+
+  //echo "subject: $subject<br>\n";
+  //echo "message: $msg<br>\n";
 
   if (! intercon_mail ($send_to,
 		       $subject,
-		       $msg))
+		       $msg,
+		       $email))
     display_error ('Attempt to send mail failed');
 
   return TRUE;

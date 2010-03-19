@@ -2863,7 +2863,7 @@ function get_waitlist_number ($RunId, $SignupId)
  * than the default PHP mail function if I want to...
  */
 
-function intercon_mail ($to, $subject, $msg)
+function intercon_mail ($to, $subject, $msg, $reply_to='')
 {
   // If this is the development version, all mail goes to me
 
@@ -2874,7 +2874,9 @@ function intercon_mail ($to, $subject, $msg)
   }
 
   $headers = sprintf ("From: Intercon Webmaster<%s>\r\n", EMAIL_WEBMASTER);
-  $headers .= sprintf ("Reply-To: Intercon Webmaster<%s>\r\n", EMAIL_WEBMASTER);
+  if ('' == $reply_to)
+    $reply_to = sprintf ('Intercon Webmaster<%s>', EMAIL_WEBMASTER);
+  $headers .= "Reply-To: $reply_to\r\n";
   $headers .= "X-Priority: 1\r\n";
   $headers .= "X-MSMail-Priority: High\r\n";
   $headers .= "X-Mailer: php\r\n";
@@ -2888,6 +2890,11 @@ function intercon_mail ($to, $subject, $msg)
 //  $ret =  mail ($to, $subject, $msg, $headers, '-f' . EMAIL_WEBMASTER);
 //  ini_restore ('sendmail_from');
 //  return $ret;
+
+//echo "mail to: $to<br>\n";
+//echo "subject: $subject<br>\n";
+//echo "headers: $headers<br>\n";
+//echo "message: $msg<br>\n";
 
   return mail($to, $subject, $msg, $headers);
 }
