@@ -1254,7 +1254,7 @@ function process_bid_form ()
     $msg = "The bid has been updated by $name";
   }
 
-  $msg .= ' and is waiting for your review at http://www.interactiveliterature.org';
+  $msg .= ' and is waiting for your review at http://' . CON_DOMAIN;
 
   if (! intercon_mail ($send_to,
 		       $subject,
