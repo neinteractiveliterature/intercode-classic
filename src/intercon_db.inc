@@ -1,4 +1,5 @@
 <?
+session_set_cookie_params(0, '/', '.interactiveliterature.org');
 require ('intercon_constants.inc');
 
 define (SHOW_TSHIRTS, 1);
