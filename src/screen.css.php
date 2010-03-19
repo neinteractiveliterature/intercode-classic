@@ -1,5 +1,5 @@
 <? 
-require ('intercon_constants.inc');
+require ('intercon_db.inc');
 header("Content-type: text/css");
 ?>
 body
