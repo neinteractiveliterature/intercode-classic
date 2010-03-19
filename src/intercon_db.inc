@@ -2,10 +2,6 @@
 session_set_cookie_params(0, '/', '.interactiveliterature.org');
 require ('intercon_constants.inc');
 
-// unset old non-SSO cookies
-setcookie(session_name(), ' ', time() - 3600, '/', 'interactiveliterature.org');
-setcookie(session_name(), ' ', time() - 3600, '/', 'www.interactiveliterature.org');
-
 define (SHOW_TSHIRTS, 1);
 define (TSHIRT_DOLLARS, 20);
 define (UNLIMITED_SIGNUPS, 100);
