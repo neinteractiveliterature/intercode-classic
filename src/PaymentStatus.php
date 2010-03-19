@@ -65,8 +65,8 @@ if (!is_logged_in()) {
     
       // Build the URL for the PayPal links
     
-      $return_url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
-      $cancel_url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
+      $return_url = 'http://' . $_SERVER['SERVER_NAME'] . dirname($_SERVER['PHP_SELF']) . "/index.php";
+      $cancel_url = 'http://' . $_SERVER['SERVER_NAME'] . dirname($_SERVER['PHP_SELF']) . "/index.php";
     
       $url = 'https://www.paypal.com/cgi-bin/webscr?';
       $url .= build_url_string ('cmd', '_xclick');
