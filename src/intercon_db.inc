@@ -1,5 +1,7 @@
 <?
-session_set_cookie_params(0, '/', '.interactiveliterature.org');
+if (strstr($_SERVER["SERVER_NAME"], "interactiveliterature.org")) {
+    session_set_cookie_params(0, '/', '.interactiveliterature.org');
+}
 require ('intercon_constants.inc');
 
 define (SHOW_TSHIRTS, 1);
