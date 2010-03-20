@@ -887,7 +887,7 @@ function html_begin ($bShowLogo=true)
 		          'http://www.larpaweb.org');
   navbar_static (false, 'Volunteering', 'volunteering');
   navbar_entry (false, 'ConCom Schedule', 'ConComSchedule.php');
-  navbar_entry (false, CON_NAME.' Flyer', 'InterconFlyer.pdf TARGET=_blank');
+  navbar_entry (false, CON_NAME.' Flyer', 'InterconFlyer.pdf');
   navbar_entry (false, 'Shameless Plugs', 'Plugs.php');
 //  navbar_entry (false, CON_NAME . ' Vendors', 'Vendors.php');
   navbar_end();
