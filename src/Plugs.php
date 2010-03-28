@@ -41,6 +41,15 @@ switch ($action)
       show_plugs();
     break;
 
+  case PLUGS_CONFIRM_DELETE:
+    confirm_plug_deletion();
+    break;
+
+  case PLUGS_DELETE:
+    delete_plug();
+    manage_plugs();
+    break;
+
   default:
     display_error ("Unknown action code: $action");
 }
@@ -199,7 +208,11 @@ function manage_plugs()
 	$visible = 'Expired';
       else
 	$visible = $row->Visible;
-      echo "    <td align=\"center\">$visible</td>\n";
+      printf ('    <td align="center">' .
+	      '<a href="Plugs.php?action=%d&PlugId=%d">%s</td>' . "\n",
+	      PLUGS_CONFIRM_DELETE,
+	      $row->PlugId,
+	      $visible);
       echo "    <td align=\"center\">$row->LastUpdated</td>\n";
       echo "    <td>$updater</td>\n";
       echo "  </tr>\n";
@@ -339,6 +352,68 @@ function form_owner($display, $key)
   echo "  <tr>\n";
 }
 
+/*
+ * name_month
+ *
+ * Names a month
+ */
+
+function name_month($m)
+{
+  switch($m)
+  {
+    case 1: return 'Jan';
+    case 2: return 'Feb';
+    case 3: return 'Mar';
+    case 4: return 'Apr';
+    case 5: return 'May';
+    case 6: return 'Jun';
+    case 7: return 'Jul';
+    case 8: return 'Aug';
+    case 9: return 'Sep';
+    case 10: return 'Oct';
+    case 11: return 'Nov';
+    case 12: return 'Dec';
+  }
+
+  return 'Unknown';
+}
+
+/*
+ * date_is_past
+ *
+ * Returns 1 if the date is in the past, 0 if it's not.
+ */
+
+function date_is_past($year, $month, $day)
+{
+  $a = explode (' ', date ('Y n d'));
+  $today_year = $a[0];
+  $today_month = $a[1];
+  $today_day = $a[2];
+
+  if ($today_year > $year)
+    return 1;
+  if ($today_year < $year)
+    return 0;
+
+  if ($today_month > $month)
+    return 1;
+  if ($today_month < $month)
+    return 0;
+
+  if ($today_day > $day)
+    return 1;
+  else
+    return 0;
+}
+
+/*
+ * show_form
+ *
+ * Show the form that allows users to edit a shameless plug
+ */
+
 function show_form()
 {
   display_header ('Shameless Plug Form');
@@ -413,6 +488,31 @@ function show_form()
     form_checkboxYN('Visible');
     echo " Plug is visible</td>\n  </tr>\n";
   }
+  else
+  {
+    if (array_key_exists('EndDateYear', $_POST))
+    {
+      echo "  <tr>\n";
+      echo "    <td colspan=\"2\">\n";
+      if ('N' == $_POST['Visible'])
+	echo "    This plug has been hidden.\n";
+      else
+      {
+	$verb = 'will expire';
+	if (date_is_past($_POST['EndDateYear'],
+			 $_POST['EndDateMonth'],
+			 $_POST['EndDateDay']))
+	  $verb = 'expired';
+	printf ("    This plug $verb %s-%s-%s.\n",
+		$_POST['EndDateDay'],
+		name_month($_POST['EndDateMonth']),
+		$_POST['EndDateYear']);
+      }
+      echo "    </td>\n";
+      echo "  </tr>\n";
+    }
+  }
+
 
   if (0 == $PlugId)
     form_submit ('Add New Plug');
@@ -476,6 +576,62 @@ function process_form()
   $result = mysql_query($sql);
   if (! $result)
     return display_mysql_error('Failed to update Plugs', $sql);
+  else
+    return true;
+}
+
+function confirm_plug_deletion()
+{
+  // Make sure the user is allowed here
+
+  if (! user_has_priv (PRIV_STAFF))
+    return display_access_error();
+
+  // Make sure we've got a PlugId and it's valid
+
+  if (! array_key_exists('PlugId', $_REQUEST))
+    return display_error('PlugId not specified');
+
+  $PlugId = intval(trim($_REQUEST['PlugId']));
+  if (0 == $PlugId)
+    return display_error('Invalid PlugId');
+
+  $sql = "SELECT Name FROM Plugs WHERE PlugId=$PlugId";
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Query for plug name failed', $sql);
+
+  $row = mysql_fetch_object($result);
+  if (! $row)
+    return display_error('Invalid PlugId');
+
+  display_header ("Confirm Plug Deletion");
+  printf ("Click <a href=\"Plugs.php?action=%d&PlugId=%d\">here</a>\n",
+	  PLUGS_DELETE,
+	  $PlugId);
+  echo " to confirm that the plug for <i>$row->Name</i> should be deleted.\n";
+}
+
+function delete_plug()
+{
+  // Make sure the user is allowed here
+
+  if (! user_has_priv (PRIV_STAFF))
+    return display_access_error();
+
+  // Make sure we've got a PlugId and it's valid
+
+  if (! array_key_exists('PlugId', $_REQUEST))
+    return display_error('PlugId not specified');
+
+  $PlugId = intval(trim($_REQUEST['PlugId']));
+  if (0 == $PlugId)
+    return display_error('Invalid PlugId');
+
+  $sql = "DELETE FROM Plugs WHERE PlugId=$PlugId";
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Plug deletion failed', $sql);
   else
     return true;
 }

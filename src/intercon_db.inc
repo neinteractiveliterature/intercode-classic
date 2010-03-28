@@ -243,6 +243,8 @@ define (PLUGS_SHOW_FORM, 190);
 define (PLUGS_PROCESS_FORM, 191);
 define (PLUGS_SHOW_PAGE, 192);
 define (PLUGS_MANAGE_PLUGS, 193);
+define (PLUGS_CONFIRM_DELETE, 194);
+define (PLUGS_DELETE, 195);
 
 // Action values for PreConEvents
 
