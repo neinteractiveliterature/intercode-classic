@@ -501,7 +501,7 @@ function display_login_form ($error='')
   printf ("Welcome to the home of %s, the premiere multi-genre\n", CON_NAME);
   echo "<A HREF=Static.php?page=faq>Live Action Role Playing</A> (LARP)\n";
   printf ("convention in the world.  %s is the\n", CON_NAME);
-  printf ("<a href=\"http://www.interactiveliterature.org/NEIL/history.html\" target=\"_blank\">%s</a> Intercon in the Boston\n",
+  printf ("<a href=\"http://www.interactiveliterature.org/NEIL/conventions.html\" target=\"_blank\">%s</a> Intercon in the Boston\n",
 	  CON_NUMBER);
   echo "area, and we're planning on making it the best ever. If you love to\n";
   printf ("LARP, then %s is the place you want to be. If you've always\n",
