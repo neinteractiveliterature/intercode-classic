@@ -1325,7 +1325,7 @@ function display_bids_for_review ()
         break;
 
       case 'Created':
-	$order = 'Created DESC';
+	$order = 'Bids.Created DESC';
         $desc = 'Created';
         break;
 
