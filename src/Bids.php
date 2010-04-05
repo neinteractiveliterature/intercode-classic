@@ -1324,6 +1324,11 @@ function display_bids_for_review ()
         $desc = 'Last Updated';
         break;
 
+      case 'Created':
+	$order = 'Created DESC';
+        $desc = 'Created';
+        break;
+
       case 'Submitter':
 	$order = 'LastName, FirstName, Title';
         $desc = 'Submitter';
@@ -1337,6 +1342,7 @@ function display_bids_for_review ()
   $sql .= ' Bids.SatAM, Bids.SatPM, Bids.SatEve, Bids.SatLate, Bids.SunAM,';
   $sql .= ' Bids.Organization, Bids.EventId, Bids.UserId,';
   $sql .= ' DATE_FORMAT(Bids.LastUpdated, "%H:%i <NOBR>%d-%b-%y</NOBR>") AS LastUpdatedFMT,';
+  $sql .= ' DATE_FORMAT(Bids.Created, "%H:%i <NOBR>%d-%b-%y</NOBR>") AS CreatedFMT,';
   $sql .= ' Bids.MinPlayersMale+Bids.MinPlayersFemale+Bids.MinPlayersNeutral AS Min,';
   $sql .= ' Bids.MaxPlayersMale+Bids.MaxPlayersFemale+Bids.MaxPlayersNeutral AS Max,';
   $sql .= ' Bids.PrefPlayersMale+Bids.PrefPlayersFemale+Bids.PrefPlayersNeutral AS Pref';
@@ -1377,6 +1383,9 @@ function display_bids_for_review ()
 	  BID_REVIEW_BIDS);
   printf ("    <th rowspan=\"3\" align=\"left\">" .
 	  "<a href=\"Bids.php?action=%d&order=LastUpdated\">LastUpdated</th>\n",
+	  BID_REVIEW_BIDS);
+  printf ("    <th rowspan=\"3\" align=\"left\">" .
+	  "<a href=\"Bids.php?action=%d&order=Created\">Created</th>\n",
 	  BID_REVIEW_BIDS);
   echo "  </tr>\n";
 
@@ -1518,6 +1527,7 @@ function display_bids_for_review ()
       echo "    <TD>$row->Status</TD>\n";
 
     echo "    <TD>$row->LastUpdatedFMT</TD>\n";
+    echo "    <TD>$row->CreatedFMT</TD>\n";
     echo "  </tr>\n";
   }
 
