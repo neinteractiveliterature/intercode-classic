@@ -1494,6 +1494,58 @@ function show_iron_gms()
   echo "<ul>\n";
 }
 
+function display_comp_info($EventId)
+{
+  $sql = 'SELECT FirstName, LastName FROM Users';
+  $sql .= "  WHERE CompEventId=$EventId";
+  $sql .= "  ORDER BY LastName, FirstName";
+
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error("Query for list of comp'd users failed", $sql);
+
+  $comp_count = mysql_num_rows($result);
+  switch ($comp_count)
+  {
+    case 0:
+      echo "<p>No users are comped for this game. You can comp\n";
+      echo "2 users using the ";
+      printf ('<a href="Schedule.php?action=%d&EventId=%d">Edit GMs</a>',
+	      DISPLAY_GM_LIST, $EventId);
+      echo " page.</p>\n";
+      break;
+      
+    case 1:
+      $row = mysql_fetch_object($result);
+      $name = trim("$row->FirstName $row->LastName");
+      echo "<p>$name is comped for this game. You can comp one more\n";
+      echo "user using the ";
+      printf ('<a href="Schedule.php?action=%d&EventId=%d">Edit GMs</a>',
+	      DISPLAY_GM_LIST, $EventId);
+      echo " page.</p>\n";
+      break;
+
+    default:
+      $row =  mysql_fetch_object($result);
+      $name = trim("$row->FirstName $row->LastName");
+      echo "<p>$name";
+      $i = 1;
+      while ($row = mysql_fetch_object($result))
+      {
+	$i++;
+	if ($i < $comp_count)
+	  echo ', ';
+	else
+	  echo ' and ';
+
+	$name = trim("$row->FirstName $row->LastName");
+	echo $name;
+      }
+      echo " are comped for this game.</p>\n";
+      break;
+  }
+}
+
 /*
  * show_game
  *
@@ -1627,6 +1679,9 @@ function show_game ()
 
   echo "  </tr>\n";
   echo "</table><p>\n";
+
+  if ($can_edit_game)
+    display_comp_info($EventId);
 
   $num_gms = 0;
 
