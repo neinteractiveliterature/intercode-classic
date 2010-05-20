@@ -1820,9 +1820,6 @@ function can_show_schedule ()
   session_register (SESSION_TIMEOUT);
   $_SESSION[SESSION_TIMEOUT] = $now + 180;
 
-  printf ("<!-- Timeout set - %d  at %d-->\n",
-	  $_SESSION[SESSION_TIMEOUT], $now);
-
   session_register (SESSION_CON_LAST_UPDATED);
   $_SESSION[SESSION_CON_LAST_UPDATED] = $row->LastUpdated;
 
@@ -2732,6 +2729,189 @@ function confirm_withdraw_from_game ()
   return true;
 }
 
+function display_available_games ()
+{
+  // Fetch whether signups are allowed.  The they're not, or they're
+  // restricted, then we're done
+
+  $result = mysql_query ('SELECT SignupsAllowed FROM Con');
+  if (! $result)
+    return display_mysql_error ('Failed to get SignupsAllowed');
+
+  $row = mysql_fetch_object ($result);
+  if ("Yes" != $row->SignupsAllowed)
+    return;
+
+  // Get the max players for each game
+
+  $sql = 'SELECT EventId,';
+  $sql .= ' MaxPlayersMale + MaxPlayersFemale + MaxPlayersNeutral AS Players';
+  $sql .= '  FROM Events';
+  $sql .= '  WHERE SpecialEvent=0';
+  $sql .= '    AND IsOps="N"';
+
+  $result = mysql_query ($sql);
+  if (! $result)
+    return display_mysql_error ('Failed to get player count', $sql);
+
+  $max_players = array ();
+  while ($row = mysql_fetch_object ($result))
+  {
+    $max_players[$row->EventId] = $row->Players;
+  }
+
+//dump_array ('max_players', $max_players);
+
+  // OK, now get the runs with the number of players signed up for each
+
+  $sql = 'SELECT COUNT(*) AS Count,';
+  $sql .= ' Events.EventId, Events.Title, Runs.Day, Runs.StartHour';
+  $sql .= ' FROM Signup, Runs, Events';
+  $sql .= ' WHERE Signup.State="Confirmed"';
+  $sql .= '   AND Signup.Counted="Y"';
+  $sql .= '   AND Runs.RunId=Signup.RunId';
+  $sql .= '   AND Events.EventId=Runs.EventId';
+  $sql .= '   AND Events.IsOps="N"';
+  $sql .= '   AND Events.IsConSuite="N"';
+  $sql .= '   AND Events.SpecialEvent=0';
+  $sql .= ' GROUP BY Signup.RunId';
+  $sql .= ' ORDER BY Runs.Day, Runs.StartHour';
+
+  $result = mysql_query ($sql);
+  if (! $result)
+    return display_mysql_error ('Failed to get signedup counts', $sql);
+
+  $header_shown = false;
+
+  while ($row = mysql_fetch_object ($result))
+  {
+//echo "<!-- EventId: $row->EventId, Count: $row->Count, Title: $row->Title -->\n";
+
+    if ($row->Count < $max_players[$row->EventId])
+    {
+      if (! $header_shown)
+      {
+	$header_shown = true;
+	echo "<p><b>There are still openings in these great games!</b><br>\n";
+      }
+
+      printf ("&#149;&nbsp;&nbsp;%s - %s&nbsp;%s<br>\n",
+	      $row->Title,
+	      $row->Day,
+	      start_hour_to_24_hour ($row->StartHour));
+    }
+  }
+  echo "<br>\n";
+}
+
+/*
+ * display_login_form
+ *
+ * Display the login form for a user
+ */
+
+function display_login_form ($error='', $dest='')
+{
+  if (('' == $dest) && (array_key_exists ('dest', $_REQUEST)))
+    $dest = $_REQUEST['dest'];
+
+  //  echo "dest: $dest\n";
+
+  if ('' == $dest)
+  {
+    printf ("Welcome to the home of %s, the premiere multi-genre\n", CON_NAME);
+    echo "<A HREF=Static.php?page=faq>Live Action Role Playing</A> (LARP)\n";
+    printf ("convention in the world.  %s is the\n", CON_NAME);
+    printf ("<a href=\"http://www.interactiveliterature.org/NEIL/conventions.html\" target=\"_blank\">%s</a> Intercon in the Boston\n",
+	    CON_NUMBER);
+    echo "area, and we're planning on making it the best ever. If you love to\n";
+    printf ("LARP, then %s is the place you want to be. If you've always\n",
+	    CON_NAME);
+    echo "wanted to try LARPing, then come join us! You won't regret it!<P>\n";
+    printf ("If you're already signed up for %s, or have attended a previous\n",
+	    CON_NAME);
+    echo "New England Intercon you can login here.<BR>\n";
+  }
+
+  // If there's an error from a prior screen, display it now
+
+  if ('' != $error)
+  {
+    echo "<P>\n";
+    display_error ($error);
+  }
+
+  // Build the login form
+
+  echo "<form method=POST action=\"index.php\">\n";
+  form_add_sequence ();
+  form_hidden_value('action', LOGIN_USER);
+  form_hidden_value('dest', $dest);
+  echo "<table border=\"0\">\n";
+  form_text (64, 'EMail');
+  form_password (30, 'Password');
+  form_submit ("Login");
+  echo "</table>\n";
+  echo "</form>\n";
+
+  if ('' != $dest)
+    return false;
+
+  // Show a list of available games
+
+  display_available_games ();
+
+  echo "<table cellSpacing=2 cellPadding=2 border=0 width=600>\n";
+  echo "<tbody>\n";
+  echo "<tr valign=top>\n";
+  echo "  <td nowrap><i>Need the latest flyer?</i></td>\n";
+  echo "  <td>Download it <a href=\"InterconFlyer.pdf\">here</a>!</td>\n";
+  echo "</tr>\n";
+  echo "<tr valign=top>\n";
+  echo "  <td nowrap><i>Have questions?</i></td>\n";
+  echo "  <td>Check out our <a href=\"Static.php?page=faq\">FAQ</a>!</td>\n";
+  echo "</tr>\n";
+  echo "<tr valign=top>\n";
+  echo "  <td nowrap><i>Want to contact the con?</i></td>\n";
+  echo "  <td>Take a look at the <a href=\"Contacts.php\">contact list</a>,\n";
+  printf ("or drop a note to our <a href=%s>Con&nbsp;Chair</a> %s</td>\n",
+	  mailto_url (EMAIL_CON_CHAIR, 'I have a question'),
+	  NAME_CON_CHAIR);
+  echo "</tr>\n";
+  echo "<tr valign=top>\n";
+  echo "  <td nowrap><i>Want to volunteer?</i></td>\n";
+  printf ("<td>Fantastic! Just <a href=%s>tell us</a> what you're\n",
+	  mailto_url (EMAIL_CON_CHAIR, 'Volunteer!'));
+  printf ("interested in doing, or just <a href=%s>tell us</a>\n", 
+	  mailto_url (EMAIL_CON_CHAIR, 'Volunteer!'));
+  echo "that you want to <a href=\"Static.php?page=volunteering\">volunteer</a>!\n";
+  echo "NO EXPERIENCE IS NECESSARY!</td>\n";
+  echo "</tr>\n</tbody>\n</table>\n";
+  printf ("<p>%s is brought to you by\n", CON_NAME);
+  echo "<a href=\"http://www.interactiveliterature.org\">NEIL</a>,\n";
+  echo "New England Interactive Literature, as one of the semi-annual Live\n";
+  echo "Action Role-Playing conventions of the\n";
+  echo "<a href=\"http://www.larpaweb.net\" target=_blank>Live Action\n";
+  echo "RolePlayers Association</a>. It's a convention dedicated to LARPs,\n";
+  echo "LARPers and LARPing. It's also more than just games, though! There\n";
+  echo "will be vendors, parties, social get-togethers, and other\n";
+  echo "LARP-related events.</p>\n";
+  echo "<p>Our goal is to bring together the best LARPs we can find, of all\n";
+  echo "styles and genres, in one weekend, so that you can't help but find\n";
+  echo "a game or three (or five!) that you just have to play. We are\n";
+  echo "<a href=\"Bids.php\">always looking</a> for new and different\n";
+  echo "styles of games, for short games, long games, small games and\n";
+  echo "bigger games.  We always have a great crowd of wonderful LARPers\n";
+  echo "waiting to get into character and costume. It doesn't matter if\n";
+  echo "this is your first experience with a LARP convention or if you're\n";
+  echo "an old hand; there's something for everyone, and we try to help\n";
+  echo "newcomers fit right in.</p>\n";
+  echo "<p>Intercons are organized and run by a large group of volunteers,\n";
+  echo "all of whom are LARP enthusiasts. We\n";
+  echo "<a href=\"Static.php?page=volunteering\">welcome new people</a> to\n";
+  echo "the process.</p>\n";
+}
+
 /*
  * display_access_error
  *
@@ -2740,7 +2920,13 @@ function confirm_withdraw_from_game ()
 
 function display_access_error ()
 {
-  return display_error ('You are not allowed to access this page');
+  if (is_logged_in())
+    return display_error ('You are not allowed to access this page');
+
+  //  dump_array ('SERVER', $_SERVER);
+
+  return display_login_form('You must be logged in to access this page',
+			    $_SERVER['REQUEST_URI']);
 }
 
 /*
@@ -3025,7 +3211,7 @@ function include_alumni ()
     $_SESSION['IncludeAlumni'] = $alumni;
   }
 
-  dump_array ('SESSION', $_SESSION);
+  //  dump_array ('SESSION', $_SESSION);
 
   if ($alumni)
     $alumni_checked = 'CHECKED';
