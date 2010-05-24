@@ -524,11 +524,11 @@ function dump_array ($description, $array)
 
 function navbar_start($priv) {
   if ($priv)
-    $cls = 'priv_menu';
+    $cls = 'priv';
   else
-    $cls = 'public_menu';
+    $cls = 'public';
 
-  echo "<ul class=\"$cls\">\n";
+  echo "<ul class=\"menu $cls\">\n";
 }
 
 function navbar_title ($priv, $text)

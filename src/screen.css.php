@@ -23,11 +23,22 @@ body
 	left: 9px;
 	margin: 0;
 	padding: 0;
-	text-align: center;
 }
 
-.navbar ul {
-    list-style-type: none;
+.navbar ul.menu {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+#game_admin {
+  float: right;
+  width: 150px;
+}
+
+ul.menu {
+    margin: 0;
+	  text-align: center;
+	  list-style-type: none;
     margin-left: 0;
     padding-left: 0;
     border: 2px <?echo COLOR_MENU_PUBLIC_FG; ?> solid;
@@ -44,7 +55,7 @@ body
     -webkit-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PUBLIC_FG; ?>;
 }
 
-.navbar ul.priv_menu {
+ul.menu.priv {
     border-color: <?echo COLOR_MENU_PRIV_FG; ?>;
 
     background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(<?echo COLOR_MENU_PRIV_BG; ?>));
@@ -55,34 +66,34 @@ body
     -webkit-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>;
 }
 
-.navbar li {
+ul.menu li {
     border-bottom: 1px <?echo COLOR_MENU_PUBLIC_FG; ?> solid;
 }
 
-.navbar li a {
+ul.menu li a {
     display: block;
     padding: 3px;
     font-size: 90%;
 }
 
-.navbar li a:hover {
+ul.menu li a:hover {
     background-color: rgba(255, 255, 0, 0.2);
 }
 
-.navbar li a, .navbar li a:visited {
+ul.menu li a, ul.menu li a:visited {
     color: black;
     text-decoration: none;
 }
 
-.navbar ul.priv_menu li {
+ul.menu.priv li {
     border-bottom-color: <?echo COLOR_MENU_PRIV_FG; ?>;
 }
 
-.navbar ul li:last-child {
+ul.menu li:last-child {
     border-bottom: none;
 }
 
-.navbar ul li.title
+ul.menu li.title
 {
 	background-color: <?echo COLOR_MENU_PUBLIC_FG; ?>;
 	color: #FFFFFF;
@@ -90,9 +101,19 @@ body
         border-bottom: none;
 }
 
-.navbar ul.priv_menu li.title
+ul.menu.priv li.title
 {
 	background-color: <?echo COLOR_MENU_PRIV_FG; ?>;
+}
+
+ul.menu li.alert {
+  background-color: rgba(255, 0, 0, 0.3);
+}
+
+ul.menu li.info {
+  background-color: rgba(255, 255, 255, 0.5);
+  font-size: 80%;
+  padding: 2px;
 }
 
 .print_logo

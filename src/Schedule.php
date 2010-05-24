@@ -1508,25 +1508,23 @@ function display_comp_info($EventId)
   switch ($comp_count)
   {
     case 0:
-      echo "<p>No users are comped for this game. You can comp\n";
-      echo "2 users using the ";
-      printf ('<a href="Schedule.php?action=%d&EventId=%d">Edit GMs</a>',
+      echo "<li class=\"alert\">";
+      printf ('<a href="Schedule.php?action=%d&EventId=%d">2 comps available!</a>',
 	      DISPLAY_GM_LIST, $EventId);
-      echo " page.</p>\n";
+      echo "</li>\n";
       break;
       
     case 1:
       $row = mysql_fetch_object($result);
-      $name = trim("$row->FirstName $row->LastName");
-      echo "<p>$name is comped for this game. You can comp one more\n";
-      echo "user using the ";
-      printf ('<a href="Schedule.php?action=%d&EventId=%d">Edit GMs</a>',
+//      $name = trim("$row->FirstName $row->LastName");
+      echo "<li class=\"alert\">";
+      printf ('<a href="Schedule.php?action=%d&EventId=%d">1 comp available!</a>',
 	      DISPLAY_GM_LIST, $EventId);
-      echo " page.</p>\n";
+      echo "</li>\n";
       break;
 
     default:
-      $row =  mysql_fetch_object($result);
+/*      $row =  mysql_fetch_object($result);
       $name = trim("$row->FirstName $row->LastName");
       echo "<p>$name";
       $i = 1;
@@ -1541,7 +1539,7 @@ function display_comp_info($EventId)
 	$name = trim("$row->FirstName $row->LastName");
 	echo $name;
       }
-      echo " are comped for this game.</p>\n";
+      echo " are comped for this game.</p>\n"; */
       break;
   }
 }
@@ -1652,36 +1650,43 @@ function show_game ()
 
   $_SESSION['GameTitle'] = $game_row->Title;
 
-  // Display the game title
-
-  echo "<table width=\"100%\">\n";
-  echo "  <tr>\n";
-  echo "    <td><h2><i>$game_row->Title</i></h2></td>\n";
-
   if ($can_edit_game)
   {
-    echo '    <td align="right" nowrap>';
-    printf ('[<a href="Schedule.php?action=%d&EventId=%d">Edit Game</a>]',
+    echo '<ul id="game_admin" class="menu priv">';
+    echo '<li class="title">Game Admin</li>';
+    printf ('<li><a href="Schedule.php?action=%d&EventId=%d">Edit Game</a></li>',
 	    EDIT_GAME, $EventId);
-    echo "</td>\n";
-    echo '    <td align="right" nowrap>';
-    printf ('[<a href="Schedule.php?action=%d&EventId=%d">Edit GMs</a>]',
+    printf ('<li><a href="Schedule.php?action=%d&EventId=%d">Edit GMs</a></li>',
 	    DISPLAY_GM_LIST, $EventId);
-    echo "</td>\n";
     if ($is_iron_gm)
     {
-      echo '    <td align="right" nowrap>';
-      printf ('[<a href="Schedule.php?action=%d&EventId=%d">Edit Iron GM Teams</a>]',
+      printf ('<li><a href="Schedule.php?action=%d&EventId=%d">Edit Iron GM Teams</a></li>',
 	      SCHEDULE_IRON_GM_TEAM_LIST, $EventId);
-      echo "</td>\n";
     }
+    display_comp_info($EventId);
+    
+    $updater_name = '<Unknown>';
+
+    $sql = 'SELECT FirstName, LastName';
+    $sql .= ' FROM Users';
+    $sql .= " WHERE UserId=$game_row->UpdatedById";
+
+    $updated_result = mysql_query ($sql);
+    if (! $updated_result)
+      display_mysql_error ('Failed to fetch last updater\'s name');
+    else
+    {
+      if ($updated_row = mysql_fetch_object ($updated_result))
+	      $name = trim ("$updated_row->FirstName $updated_row->LastName");
+      mysql_free_result ($updated_result);
+    }
+    echo "<li class=\"info\"><b>Last updated</b><br/>$game_row->Timestamp<br/>by $name</li>";
+    echo '</ul>';
   }
 
-  echo "  </tr>\n";
-  echo "</table><p>\n";
+  // Display the game title
 
-  if ($can_edit_game)
-    display_comp_info($EventId);
+  echo "<h2><i>$game_row->Title</i></h2>\n";
 
   $num_gms = 0;
 
@@ -1707,7 +1712,7 @@ function show_game ()
     // Fetch the list of GMs
 
     $sql = 'SELECT DISTINCT Users.FirstName, Users.LastName,';
-    $sql .= ' Users.Nickname, Users.EMail, GMs.DisplayEMail';
+    $sql .= ' Users.Nickname, Users.EMail, GMs.DisplayEMail, Users.CompEventId';
     $sql .= ' FROM GMs, Users';
     $sql .= " WHERE GMs.EventId=$EventId";
     $sql .= "   AND GMs.DisplayAsGM='Y'";
@@ -1742,6 +1747,13 @@ function show_game ()
 
 	echo "          <TD>$name</TD>\n";
 	echo "          <TD>$EMail</TD>\n";
+	if ($can_edit_game) {
+    echo "<TD>";
+    if ($gm_row->CompEventId == $EventId) {
+      echo "&nbsp;&nbsp;&nbsp;(Comp for this game)";
+    }
+    echo "</TD>";
+	}
 	echo "        </TR>\n";
       }
       echo "      </TABLE>\n    </TD>\n  </TR>\n";
@@ -2087,27 +2099,6 @@ function show_game ()
   }
     
   echo "<p>\n<hr>\n";
-
-  if ($can_edit_game)
-  {
-    $updater_name = '<Unknown>';
-
-    $sql = 'SELECT FirstName, LastName';
-    $sql .= ' FROM Users';
-    $sql .= " WHERE UserId=$game_row->UpdatedById";
-
-    $updated_result = mysql_query ($sql);
-    if (! $updated_result)
-      display_mysql_error ('Failed to fetch last updater\'s name');
-    else
-    {
-      if ($updated_row = mysql_fetch_object ($updated_result))
-	$name = trim ("$updated_row->FirstName $updated_row->LastName");
-      mysql_free_result ($updated_result);
-    }
-    echo "<p><b>Last updated:</b> $game_row->Timestamp by $name\n";
-    echo "<p>\n<hr>\n";
-  }
 
   if ($is_iron_gm)
     show_iron_gms();
