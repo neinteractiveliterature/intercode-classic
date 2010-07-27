@@ -40,7 +40,7 @@ ul.menu, ul.menu ul.subhead {
 	  text-align: center;
 	  list-style-type: none;
     margin-left: 0;
-    padding-left: 0;
+    padding: 0;
     border: 2px <?echo COLOR_MENU_PUBLIC_FG; ?> solid;
     
     border-radius: 5px;
