@@ -275,7 +275,7 @@ function display_navbar() {
   // GM section
   if (user_is_gm() || user_has_priv(PRIV_GM_LIAISON) || user_has_priv(PRIV_CON_COM)) {
     $gmSection = new SubNavBar(NavBarItem::newStatic("GM Information", "GMPolicies"));
-    $gmSection->push(NavBarItem::newStatic("GM Benefits and Policies"), "GMPolicies");
+    $gmSection->push(NavBarItem::newStatic("GM Benefits and Policies", "GMPolicies"));
     
     if (user_is_gm())
       $gmSection->push(NavBarItem::newAction("Edit My Bio", "index.php", EDIT_BIO));
