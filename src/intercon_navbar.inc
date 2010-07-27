@@ -296,24 +296,7 @@ function display_navbar() {
     }
     $navbar->push($shirtsSection);
   }
-  
-  // ConCom section
-  if (user_has_priv(PRIV_CON_COM)) {
-    $concomSection = new SubNavBar(NavBarItem::newAction("ConCom Tools", "ConComSchedule.php"));
-    $concomSection->push(NavBarItem::newAction('Referring Sites', 'Referrers.php', VIEW_REFERRERS));
-    $concomSection->push(NavBarItem::newAction('Referring Site Summary',
-		  'Referrers.php', SUMMARIZE_REFERRERS));
-    $concomSection->push(NavBarItem::newExternal("Intercon Wiki", "http://www.interactiveliterature.org/Wiki"));
-    $concomSection->push(NavBarItem::newExternal(CON_NAME . " Google Login", "http://www.google.com/a/" . CON_DOMAIN));
-    if (defined ('PROGRAM_PDF_PREFIX'))
-    {
-      $concomSection->push(NavBarItem::newProgram("Program Cover", PROGRAM_PDF_PREFIX, "Cover.pdf"));
-      $concomSection->push(NavBarItem::newProgram("Program Interior", PROGRAM_PDF_PREFIX, "Interior.pdf"));
-    }
-		  
-    $navbar->push($concomSection);
-  }
-  
+    
   // Bids section
   if (ACCEPTING_BIDS || user_has_priv(PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON)) {
     $bidGameItem = NavBarItem::newAction("Bid a Game!", "biddingAGame.php");
@@ -381,7 +364,7 @@ function display_navbar() {
 
   if (user_has_priv (PRIV_CON_COM))
   {
-    $opsSection = new SubNavBar(NavBarItem::newAction("Ops Reports", "Reports.php", REPORT_OPS_TRACK));
+    $opsSection = new SubNavBar(NavBarItem::newAction("Print Materials", "Reports.php", REPORT_OPS_TRACK));
     if (defined ('PROGRAM_PUB_PREFIX'))
     {
       $opsSection->push('Program Cover.pub', NavBarItem::newProgram(PROGRAM_PUB_PREFIX, 'Cover.pub'));
@@ -397,6 +380,11 @@ function display_navbar() {
     $opsSection->push(NavBarItem::newAction('Registration Report', 'Reports.php', REPORT_REGISTRATION));
     if (THURSDAY_ENABLED)
       $opsSection->push(NavBarItem::newAction('PreCon Events Report', 'Thursday.php', THURSDAY_REPORT));
+    if (defined ('PROGRAM_PDF_PREFIX'))
+    {
+      $opsSection->push(NavBarItem::newProgram("Program Cover", PROGRAM_PDF_PREFIX, "Cover.pdf"));
+      $opsSection->push(NavBarItem::newProgram("Program Interior", PROGRAM_PDF_PREFIX, "Interior.pdf"));
+    }
 
     $navbar->push($opsSection);
   }
@@ -438,9 +426,17 @@ function display_navbar() {
     $plugsSection->push(NavBarItem::newAction('Manage Shameless Plugs', 'Plugs.php', PLUGS_MANAGE_PLUGS));
   $navbar->push($plugsSection);
 
-    
-  if (user_has_priv(PRIV_STAFF))
-    $navbar->push(NavBarItem::newAction('Change Con Settings', 'Status.php'));
+
+  // Website Section
+  if (user_has_priv(PRIV_CON_COM) || user_has_priv(PRIV_STAFF)) {
+    $websiteSection = new SubNavBar(NavBarItem::newAction("Web Site", 'Referrers.php', VIEW_REFERRERS));
+    $websiteSection->push(NavBarItem::newAction('Referring Sites', 'Referrers.php', VIEW_REFERRERS));
+    $websiteSection->push(NavBarItem::newAction('Referring Site Summary',
+  	  'Referrers.php', SUMMARIZE_REFERRERS));
+    if (user_has_priv(PRIV_STAFF))
+      $websiteSection->push(NavBarItem::newAction('Change Con Settings', 'Status.php'));
+    $navbar->push($websiteSection);
+  }
 
   echo $navbar->render();
 
@@ -449,6 +445,10 @@ function display_navbar() {
   $links->push(NavBarItem::newExternal("Forums", "http://forums.interactiveliterature.org"));
   $links->push(NavBarItem::newExternal('New England Interactive Literature',
 			  'http://www.interactiveliterature.org'));
+	if (user_has_priv(PRIV_CON_COM)) {
+	  $links->push(NavBarItem::newExternal("Intercon Wiki", "http://www.interactiveliterature.org/Wiki"));
+    $links->push(NavBarItem::newExternal(CON_NAME . " Google Login", "http://www.google.com/a/" . CON_DOMAIN));
+	}
 	echo $links->render("menu links");
 
   echo "</div> <!-- navbar -->\n\n";
