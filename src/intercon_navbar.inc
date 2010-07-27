@@ -3,8 +3,7 @@
 class NavBar {
   public $items;
   
-  function __construct($title) {
-    $this->title = $title;
+  function __construct() {
     $this->items = array();
   }
   
