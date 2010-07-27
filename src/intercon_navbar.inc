@@ -427,8 +427,6 @@ function display_navbar() {
   $aboutSection->push(NavBarItem::newStatic("Volunteering", "volunteering"));
   $aboutSection->push(NavBarItem::newAction("ConCom Schedule", "ConComSchedule.php"));
   $aboutSection->push(NavBarItem::newAction(CON_NAME.' Flyer', 'InterconFlyer.pdf'));
-  $aboutSection->push(NavBarItem::newExternal('New England Interactive Literature',
-			  'http://www.interactiveliterature.org'));
   $navbar->push($aboutSection);
   
   // Shameless Plugs section
@@ -446,6 +444,12 @@ function display_navbar() {
 
   echo $navbar->render();
 
+  $links = new NavBar();
+  $links->push(new NavBarTitle("Links"));
+  $links->push(NavBarItem::newExternal("Forums", "http://forums.interactiveliterature.org"));
+  $links->push(NavBarItem::newExternal('New England Interactive Literature',
+			  'http://www.interactiveliterature.org'));
+	echo $links->render("menu links");
 
   echo "</div> <!-- navbar -->\n\n";
 }

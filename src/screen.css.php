@@ -101,6 +101,22 @@ ul.menu.priv, ul.menu ul.subhead {
     -webkit-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>;
 }
 
+ul.menu.links {
+  border-color: #555;
+  
+  background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#aaa));
+  background: -moz-linear-gradient(top, #fff, #aaa);
+
+  box-shadow: 0px 0px 5px #555;
+  -moz-box-shadow: 0px 0px 5px #555;
+  -webkit-box-shadow: 0px 0px 5px #555;
+}
+
+ul.menu.links li.title
+{
+	background-color: #555;
+}
+
 ul.menu li {
     border-bottom: 1px <?echo COLOR_MENU_PUBLIC_FG; ?> solid;
 }
