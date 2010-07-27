@@ -3,6 +3,7 @@ if (strstr($_SERVER["SERVER_NAME"], "interactiveliterature.org")) {
     session_set_cookie_params(0, '/', '.interactiveliterature.org');
 }
 require ('intercon_constants.inc');
+require ('intercon_navbar.inc');
 
 define (SHOW_TSHIRTS, 1);
 define (TSHIRT_DOLLARS, 20);
@@ -338,6 +339,7 @@ function post_int($key, $default=0)
 
 function user_has_priv ($priv, $accept_staff_priv=true)
 {
+  
   // If the session hasn't been setup yet, then the user can't be
   // privileged
 
@@ -522,61 +524,6 @@ function dump_array ($description, $array)
   }
 }
 
-function navbar_start($priv) {
-  if ($priv)
-    $cls = 'priv';
-  else
-    $cls = 'public';
-
-  echo "<ul class=\"menu $cls\">\n";
-}
-
-function navbar_title ($priv, $text)
-{
-    echo "<li class=\"title\">$text</li>\n";
-}
-
-function navbar_entry ($priv, $text, $page, $action=-1)
-{
-  if ($priv)
-    $cls = 'priv_menu_entry';
-  else
-    $cls = 'public_menu_entry';
-
-  echo "<li class=\"$cls\"><a href=\"$page";
-  if (-1 != $action)
-    echo "?action=$action";
-  echo "\">$text</a></li>\n";
-}
-
-function navbar_static ($priv, $text, $page)
-{
-  if ($priv)
-    $cls = 'priv_menu_entry';
-  else
-    $cls = 'public_menu_entry';
-
-  echo "<li class=\"$cls\"><a href=\"Static.php?page=$page\">$text</a></li>\n";
-}
-
-function navbar_external_static ($text, $dest)
-{
-  echo "<li class=\"public_menu_entry\"><a href=\"$dest\" target=\"_blank\">$text</a></li>\n";
-}
-
-function navbar_program_entry ($text, $prefix, $page)
-{
-  printf ("<li class=\"%s\"><a href=\"%s%s\">%s</a></li>\n",
-	  'priv_menu_entry',
-	  $prefix,
-	  $page,
-	  $text);
-}
-
-function navbar_end() {
-    echo "</ul>\n";
-}
-
 /*
  * html_begin
  *
@@ -612,289 +559,7 @@ function html_begin ($bShowLogo=true)
   echo "</HEAD>\n";
   echo "<BODY>\n";
 
-  echo "<div class=navbar>\n";
-
-  // Title the menu
-
-  navbar_start(false);
-  navbar_title (false, 'What Can I Do...');
-
-  // Show these options if the user is logged in
-
-  if (isset ($_SESSION[SESSION_LOGIN_USER_ID]))
-  {
-    navbar_entry (false, 'Home', 'index.php');
-    navbar_static (false, 'Convention Rules', 'ConRules');
-    navbar_entry (false, 'List of Games', 'Schedule.php', LIST_GAMES);
-    if (can_show_schedule ())
-      navbar_entry (false, 'Con Schedule', 'Schedule.php');
-    navbar_entry (false, 'Edit User Information', 'index.php', UPDATE_USER);
-    navbar_entry (false, 'Change Password', 'index.php', CHANGE_PASSWORD);
-    if (ACCEPTING_BIDS)
-      navbar_entry (false, 'Bid a Game', 'biddingAGame.php');
-    if (SHOW_TSHIRTS)
-    {
-      if ('Y' == $_SESSION[SESSION_LOGIN_USER_CAN_SIGNUP])
-	navbar_entry (false, CON_NAME . ' <NOBR>Shirts</NOBR>', 'TShirts.php');
-    }
-    if (THURSDAY_ENABLED)
-      navbar_entry (false, 'Pre-Convention Events', 'Thursday.php');
-    if (IRONGM_ENABLED)
-      navbar_external_static ('Iron GM Contest', 'http://irongm.rachl.in');
-    navbar_entry (false, 'Logout', 'index.php', LOGOUT_USER);
-  }
-  else
-  {
-    // Show these menu items if the user isn't logged in
-
-    navbar_entry (false, 'Login', 'index.php');
-    navbar_entry (false, 'Lost Password', 'index.php', REQUEST_PASSWORD);
-    navbar_static (false, 'Convention Rules', 'ConRules');
-    navbar_entry (false, 'Register for <NOBR>'.CON_NAME.'</NOBR>',
-		     'index.php',
-		     NEW_USER);
-    navbar_entry (false, 'List of Games', 'Schedule.php', LIST_GAMES);
-    if (can_show_schedule ())
-      navbar_entry (false, 'Con Schedule', 'Schedule.php');
-    if (ACCEPTING_BIDS)
-      navbar_entry (false, 'Bid a Game', 'biddingAGame.php');
-    if (THURSDAY_ENABLED)
-      navbar_entry (false, 'Pre-Convention Events', 'Thursday.php');
-  }
-  navbar_end();
-
-  // Add the GM menu, if this user is a GM
-
-  if (user_is_gm())
-  {
-      navbar_start(true);
-      navbar_title (true, 'GM Information');
-      navbar_static (true, 'GM Benefits and Policies', 'GMPolicies');
-      navbar_entry (true, 'Edit My Bio', 'index.php', EDIT_BIO);
-      navbar_end();
-  }
-  
-  // Add the GM Liaison menu, if this user is the GM Liaison
-  
-  if (user_has_priv (PRIV_GM_LIAISON))
-  {
-      navbar_start(true);
-    navbar_title (true, 'GM Liaison');
-    navbar_static (true, 'GM Benefits and Policies', 'GMPolicies');
-    navbar_entry (true, 'Status of Bids', 'Bids.php', BID_REVIEW_BIDS);
-    navbar_entry (true, 'BidCom Feedback Summary',
-		  'Bids.php', BID_FEEDBACK_SUMMARY);
-    navbar_end();
-  }
-
-  // Add these menu items if the user has BidCom privilege
-
-  if (user_has_priv (PRIV_BID_COM))
-  {
-      navbar_start(true);
-    navbar_title (true, 'Bid Committee');
-    navbar_entry (true, 'Status of Bids', 'Bids.php', BID_REVIEW_BIDS);
-    navbar_entry (true, 'BidCom Feedback Summary',
-		  'Bids.php', BID_FEEDBACK_SUMMARY);
-    navbar_static (true, 'Bid Committee Responsibilites', 'BidCommittee');
-    navbar_end();
-  }
-
-  // Add these menu items if the user has ConCom privilege
-
-  if (user_has_priv (PRIV_CON_COM))
-  {
-      navbar_start(true);
-    navbar_title (true, 'ConCom');
-    if (can_show_schedule ())
-    {
-      navbar_entry (true, 'Schedule with Counts',
-		    'Schedule.php', SCHEDULE_WITH_COUNTS);
-      navbar_entry (true, 'Player Signups', 'UserSignupScan.php');
-      navbar_entry (true, 'Last 100 Signups', 'SignupSpy.php');
-    }
-
-    if (defined ('PROGRAM_PDF_PREFIX'))
-    {
-      navbar_program_entry ('Program Cover',
-			    PROGRAM_PDF_PREFIX,
-			    'Cover.pdf');
-      navbar_program_entry ('Program Interior',
-			    PROGRAM_PDF_PREFIX,
-			    'Interior.pdf');
-    }
-    navbar_entry (true, 'View User', 'index.php', SELECT_USER_TO_VIEW);
-    navbar_entry (true, "Comp'd Users", 'index.php', SHOW_COMPED_USERS);
-    navbar_entry (true, 'Referring Sites', 'Referrers.php', VIEW_REFERRERS);
-    navbar_entry (true, 'Referring Site Summary',
-		  'Referrers.php', SUMMARIZE_REFERRERS);
-    navbar_entry (true, 'Bio Report', 'index.php', BIO_REPORT);
-    navbar_entry (true, 'Attendence by Payment Amount', 'Attendees.php');
-    navbar_entry (true, 'How Users Heard', 'Reports.php', REPORT_HOW_HEARD);
-    navbar_entry (true, 'Intercon Wiki', '../Wiki');
-    navbar_external_static (CON_NAME . ' Google Login',
-                            'http://www.google.com/a/' . CON_DOMAIN);
-
-    // If the user has any privileges (and hasn't already gotten the chance
-    // to edit his/her bio, provide it now
-
-    if (! user_is_gm())
-    {
-      navbar_entry (true, 'Edit My Bio', 'index.php', EDIT_BIO);
-      navbar_static (true, 'GM Benefits and Policies', 'GMPolicies');
-    }
-    navbar_end();
-
-    navbar_start(true);
-    navbar_title (true, 'Analysis');
-    navbar_entry (true, 'All Signups', 'SignupSpy.php', SHOW_ALL_SIGNUPS);
-    navbar_entry (true, 'Signups with Choice #s', 'Choice1.php');
-    navbar_entry (true, 'Games by Choice', 'Choice3.php');
-    navbar_end();
-  }
-
-  // Add these menu items if the user has any of the mail privileges
-
-  if (user_has_any_mail_priv ())
-  {
-      navbar_start(true);
-    navbar_title (true, 'Mail');
-    navbar_entry (true, 'Show Lists', 'MailTo.php', MAIL_LISTS);
-    navbar_entry (true, 'GM Lists', 'MailTo.php', MAIL_GM_LISTS);
-    navbar_entry (true, 'Iron GM List', 'MailTo.php', MAIL_IRON_GM_LIST);
-    navbar_entry (true, 'Bid Submitters', 'MailTo.php', MAIL_BID_SUBMITTERS);
-    navbar_entry (true, 'Bio Lists', 'MailTo.php', MAIL_BIO_LISTS);
-    navbar_entry (true, 'Waitlisted Players', 'MailTo.php', MAIL_WAITLISTED);
-    navbar_entry (true, 'Who\'s Not Playing When',
-		  'Reports.php', REPORT_WHOS_NOT_PLAYING_FORM);
-    navbar_end();
-  }
-
-  // If a user has ConCom priv, they can see the Ops reports
-
-  if (user_has_priv (PRIV_CON_COM))
-  {
-      navbar_start(true);
-    navbar_title (true, 'Ops Reports');
-    if (defined ('PROGRAM_PUB_PREFIX'))
-    {
-      navbar_program_entry ('Program Cover.pub',
-			    PROGRAM_PUB_PREFIX,
-			    'Cover.pub');
-      navbar_program_entry ('Program Interior.pub',
-			    PROGRAM_PUB_PREFIX,
-			    'Interior.pub');
-    }
-    navbar_entry (true, 'Shirt Order Summary',
-		  'TShirts.php', SHOW_TSHIRT_SUMMARY);
-    navbar_entry (true, 'Per User Report', 'Reports.php', REPORT_PER_USER);
-    navbar_entry (true, 'Per Game Report', 'Reports.php', REPORT_PER_GAME);
-    navbar_entry (true, 'Per Room Report', 'Reports.php', REPORT_PER_ROOM);
-    navbar_entry (true, 'Ops Report', 'Reports.php', REPORT_OPS_TRACK);
-    navbar_entry (true, 'ConSuite Report', 'Reports.php',
-		  REPORT_CONSUITE_TRACK);
-    navbar_entry (true, 'Games by Time', 'Reports.php', REPORT_GAMES_BY_TIME);
-    navbar_entry (true, 'Users CSV', 'Reports.php', REPORT_USERS_CSV);
-    navbar_entry (true, 'Registration Report', 'Reports.php', REPORT_REGISTRATION);
-    if (THURSDAY_ENABLED)
-      navbar_entry (true, 'PreCon Events Report', 'Thursday.php', THURSDAY_REPORT);
-    navbar_end();
-  }
-
-  // Add this menu if the user has Registrar privilege
-
-  if (user_has_priv (PRIV_REGISTRAR))
-  {
-      navbar_start(true);
-    navbar_title (true, 'Registrar');
-    navbar_entry (true, 'Add or Edit a User',
-		  'index.php', SELECT_USER_TO_EDIT);
-    navbar_entry (true, 'Set User Password',
-		  'index.php', SELECT_USER_TO_SET_PASSWORD);
-    navbar_entry (true, 'Delete a User', 'index.php', SELECT_USER_TO_DELETE);
-    navbar_entry (true, 'Users By Age', 'Reports.php', REPORT_BY_AGE);
-    navbar_entry (true, 'Shirt Order Report',
-		  'TShirts.php', SHOW_TSHIRT_REPORT);
-    if (THURSDAY_ENABLED)
-      navbar_entry (true, 'Edit User PreCon Event Info', 'Thursday.php',
-		    THURSDAY_SELECT_USER);
-    navbar_end();
-  }
-
-  // Add these menu items if the user has scheduling privilege
-
-  if (user_has_priv (PRIV_SCHEDULING))
-  {
-      navbar_start(true);
-    navbar_title (true, 'Scheduling');
-    navbar_entry (true, 'Manage Schedule', 'ListGames.php');
-    navbar_entry (true, 'Schedule Ops', 'ListGames.php', LIST_ADD_OPS);
-    navbar_entry (true, 'Schedule ConSuite', 'ListGames.php',
-		  LIST_ADD_CONSUITE);
-//    navbar_entry (true, 'Add a Parallel Run', 'ListGames.php',
-//		  LIST_TO_ADD_PARALLEL_RUN);
-    navbar_entry (true, 'Add Special Event', 'SpecialEvents.php');
-    navbar_entry (true, 'Manage Special Events',
-		  'SpecialEvents.php', SPECIAL_EVENT_LIST);
-    navbar_entry (true, 'Manage Bid Page Info', 'biddingAGame.php',
-		  BAG_SHOW_FORM);
-    navbar_end();
-  }
-
-  // Add this menu if the user is staff
-
-  if (user_has_priv (PRIV_STAFF))
-  {
-      navbar_start(true);
-    navbar_title (true, 'Website Staff');
-    navbar_entry (true, 'Become User',
-		  'index.php', SELECT_USER_TO_BECOME);
-    navbar_entry (true, 'Change Con Settings', 'Status.php');
-    navbar_entry (true, 'Manage Shameless Plugs',
-		  'Plugs.php', PLUGS_MANAGE_PLUGS);
-/*
- * Should never be needed again!
-    navbar_entry (true, 'Convert Age To Year',
-		  'index.php', CONVERT_AGE_TO_YEAR);
-*/
-    navbar_end();
-  }
-
-  // Add this menu if user has PRECON_SCHEDULING priv
-
-
-  if (user_has_priv (PRIV_PRECON_SCHEDULING))
-  {
-      navbar_start(true);
-    navbar_title (true, 'PreCon Event Scheduling');
-    navbar_entry (true, 'Manage PreCon Event Schedule',
-		  'Thursday.php', PRECON_MANAGE_EVENTS);
-    navbar_end();
-  }
-
-  // Add the static pages
-
-  navbar_start(false);
-  navbar_title (false, 'Information');
-  //  navbar_static (false, 'What Does It Cost?', 'cost');
-  navbar_entry (false, 'What Does It Cost?', 'cost.php');
-  navbar_entry (false, 'Contacts', 'Contacts.php');
-  navbar_static (false, 'Frequently Asked Questions', 'faq');
-  navbar_entry (false, 'Hotel Info', 'hotel.php');
-  navbar_entry (false, 'Who\'s Who', 'index.php', WHO_IS_WHO);
-  navbar_external_static ('New England Interactive Literature',
-			  'http://www.interactiveliterature.org');
-  navbar_external_static ('LARPA', 'http://www.larpaweb.net');
-  navbar_external_static ('Intercon Mid-Atlantic',
-		          'http://www.larpaweb.org');
-  navbar_static (false, 'Volunteering', 'volunteering');
-  navbar_entry (false, 'ConCom Schedule', 'ConComSchedule.php');
-  navbar_entry (false, CON_NAME.' Flyer', 'InterconFlyer.pdf');
-  navbar_entry (false, 'Shameless Plugs', 'Plugs.php');
-//  navbar_entry (false, CON_NAME . ' Vendors', 'Vendors.php');
-  navbar_end();
-
-  echo "</div> <!-- navbar -->\n\n";
+  display_navbar();
 
   if (DEVELOPMENT_VERSION)
     printf ("<p class=dev_warning>Development Version  %s@%s</p>\n",
@@ -2849,10 +2514,21 @@ function display_login_form ($error='', $dest='')
   form_hidden_value('dest', $dest);
   echo "<table border=\"0\">\n";
   form_text (64, 'EMail');
-  form_password (30, 'Password');
-  form_submit ("Login");
+  
+  // Yeah, yeah, I copied and pasted this from form_password.  I wanted to add a "forgot your password?"
+  // link and didn't want to break other pages that use the function. - Nat
+  print ("  <TR>\n");
+  printf ("    <TD ALIGN=RIGHT>Password:</TD>\n");
+  printf ("    <TD ALIGN=LEFT><INPUT TYPE=PASSWORD NAME=%s SIZE=%d MAXLENGTH=%d>\n",
+	  "Password", 30, 30);
+  echo "<a href=\"index.php?action=".REQUEST_PASSWORD."\" style=\"font-style: italic; font-size: 90%\">Forgot your password?</a>";
+  echo "</TD>\n";
+  print ("  </TR>\n");
+  form_submit("Login");
   echo "</table>\n";
   echo "</form>\n";
+  
+  
 
   if ('' != $dest)
     return false;

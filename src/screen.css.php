@@ -35,7 +35,7 @@ body
   width: 150px;
 }
 
-ul.menu {
+ul.menu, ul.menu ul.subhead {
     margin: 0;
 	  text-align: center;
 	  list-style-type: none;
@@ -50,12 +50,47 @@ ul.menu {
     background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(<? echo COLOR_MENU_PUBLIC_BG; ?>));
     background: -moz-linear-gradient(top, #fff, <?echo COLOR_MENU_PUBLIC_BG; ?>);
 
-    box-shadow: 0px 0px 5px <?echo COLOR_MENU_PUBLIC_FG; ?>;
     -moz-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PUBLIC_FG; ?>;
     -webkit-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PUBLIC_FG; ?>;
+    box-shadow: 0px 0px 5px <?echo COLOR_MENU_PUBLIC_FG; ?>;
 }
 
-ul.menu.priv {
+ul.accountControl li a {
+  font-size: 90%;
+  font-weight: bold;
+  text-align: right;
+  padding: 3px;
+  display: block;
+  text-decoration: none;
+  color: black;
+}
+
+/*
+ul.menu li.subhead > a {
+  text-align: left;
+  font-weight: bold;
+}
+
+ul.menu ul.subhead {
+  text-align: left;
+  list-style-type: square;
+  list-style-position: inside;
+  margin-left: 0;
+  padding-left: 10px;
+  font-size: 90%;
+}
+
+ul.menu ul.subhead li {
+  border-bottom: none;
+}
+*/
+
+ul.menu li.subhead {
+  font-size: 90%;
+  padding: 3px;
+}
+
+ul.menu.priv, ul.menu ul.subhead {
     border-color: <?echo COLOR_MENU_PRIV_FG; ?>;
 
     background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(<?echo COLOR_MENU_PRIV_BG; ?>));
@@ -85,7 +120,11 @@ ul.menu li a, ul.menu li a:visited {
     text-decoration: none;
 }
 
-ul.menu.priv li {
+ul.menu li.current a {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+ul.menu.priv li, ul.subhead li {
     border-bottom-color: <?echo COLOR_MENU_PRIV_FG; ?>;
 }
 
@@ -93,7 +132,7 @@ ul.menu li:last-child {
     border-bottom: none;
 }
 
-ul.menu li.title
+ul.menu li.title, ul.menu li.subhead li.title a
 {
 	background-color: <?echo COLOR_MENU_PUBLIC_FG; ?>;
 	color: #FFFFFF;
@@ -101,7 +140,7 @@ ul.menu li.title
         border-bottom: none;
 }
 
-ul.menu.priv li.title
+ul.menu.priv li.title, ul.menu li.subhead li.title a
 {
 	background-color: <?echo COLOR_MENU_PRIV_FG; ?>;
 }
