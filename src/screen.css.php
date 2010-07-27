@@ -14,6 +14,10 @@ body
 	font-family: sans-serif;
 }
 
+a img {
+  border: 0;
+}
+
 .navbar
 {
 	position: absolute;
