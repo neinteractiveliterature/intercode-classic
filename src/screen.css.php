@@ -39,7 +39,7 @@ a img {
   width: 150px;
 }
 
-ul.menu, ul.menu ul.subhead {
+ul.menu, ul.subhead {
     margin: 0;
 	  text-align: center;
 	  list-style-type: none;
@@ -47,16 +47,34 @@ ul.menu, ul.menu ul.subhead {
     padding: 0;
     border: 2px <?echo COLOR_MENU_PUBLIC_FG; ?> solid;
     
-    border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
-
+    border-radius: 5px;
+    
     background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(<? echo COLOR_MENU_PUBLIC_BG; ?>));
     background: -moz-linear-gradient(top, #fff, <?echo COLOR_MENU_PUBLIC_BG; ?>);
 
     -moz-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PUBLIC_FG; ?>;
     -webkit-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PUBLIC_FG; ?>;
     box-shadow: 0px 0px 5px <?echo COLOR_MENU_PUBLIC_FG; ?>;
+}
+
+ul.subhead {
+  border: 1px #666 solid;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+  
+/*  -moz-box-shadow: 0px 0px 3px black;
+  -webkit-box-shadow: 0px 0px 3px black;
+  box-shadow: 0px 0px 3px black; */
+  
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  
+  background: #aaa;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 ul.accountControl li a {
@@ -94,7 +112,7 @@ ul.menu li.subhead {
   padding: 3px;
 }
 
-ul.menu.priv, ul.menu ul.subhead {
+ul.menu.priv {
     border-color: <?echo COLOR_MENU_PRIV_FG; ?>;
 
     background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(<?echo COLOR_MENU_PRIV_BG; ?>));
@@ -121,6 +139,13 @@ ul.menu.links li.title
 	background-color: #555;
 }
 
+ul.menu li.expandable a {
+  background-image: url(bullet_toggle_plus.png);
+  background-repeat: no-repeat;
+  background-position: right center;
+  padding-right: 14px;
+}
+
 ul.menu li {
     border-bottom: 1px <?echo COLOR_MENU_PUBLIC_FG; ?> solid;
 }
@@ -144,15 +169,19 @@ ul.menu li.current a {
   background-color: rgba(0, 0, 0, 0.1);
 }
 
-ul.menu.priv li, ul.subhead li {
+ul.menu.priv li {
     border-bottom-color: <?echo COLOR_MENU_PRIV_FG; ?>;
+}
+
+ul.subhead li {
+  border-bottom-color: #666;
 }
 
 ul.menu li:last-child {
     border-bottom: none;
 }
 
-ul.menu li.title, ul.menu li.subhead li.title a
+ul.menu li.title
 {
 	background-color: <?echo COLOR_MENU_PUBLIC_FG; ?>;
 	color: #FFFFFF;
@@ -160,9 +189,13 @@ ul.menu li.title, ul.menu li.subhead li.title a
         border-bottom: none;
 }
 
-ul.menu.priv li.title, ul.menu li.subhead li.title a
+ul.menu.priv li.title
 {
 	background-color: <?echo COLOR_MENU_PRIV_FG; ?>;
+}
+
+ul.subhead li.title {
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 ul.menu li.alert {

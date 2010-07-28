@@ -57,6 +57,8 @@ class SubNavBar extends NavBar {
       $html .= "</li>";
       return $html;
       
+    } elseif ($this->haveMultipleItems()) {
+      return $this->headItem->render("expandable");
     } else {
       return $this->headItem->render();
     }
