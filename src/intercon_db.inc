@@ -1482,16 +1482,10 @@ function can_show_schedule ()
     return FALSE;
   }
 
-  session_register (SESSION_TIMEOUT);
   $_SESSION[SESSION_TIMEOUT] = $now + 180;
-
-  session_register (SESSION_CON_LAST_UPDATED);
   $_SESSION[SESSION_CON_LAST_UPDATED] = $row->LastUpdated;
-
-  session_register (SESSION_CON_NEWS);
   $_SESSION[SESSION_CON_NEWS] = $row->News;
 
-  session_register (SESSION_CON_SHOW_SCHEDULE);
   switch ($row->ShowSchedule)
   {
     // All users can see the schedule
