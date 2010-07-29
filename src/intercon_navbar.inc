@@ -350,8 +350,8 @@ function display_navbar() {
   if (user_has_priv (PRIV_CON_COM))
   {
     $opsSection = new SubNavBar("Print Materials");
-    $opsSection->push(NavBarItem::newAction('Per User Report', 'Reports.php', REPORT_PER_USER));
     $opsSection->push(NavBarItem::newAction('Per Game Report', 'Reports.php', REPORT_PER_GAME));
+    $opsSection->push(NavBarItem::newAction('Per User Report', 'Reports.php', REPORT_PER_USER));
     $opsSection->push(NavBarItem::newAction('Per Room Report', 'Reports.php', REPORT_PER_ROOM));
     $opsSection->push(NavBarItem::newAction('Ops Report', 'Reports.php', REPORT_OPS_TRACK));
     $opsSection->push(NavBarItem::newAction('ConSuite Report', 'Reports.php', REPORT_CONSUITE_TRACK));
@@ -427,7 +427,7 @@ function display_navbar() {
 	}
 	
   // Shameless Plugs section
-  $plugsSection = new SubNavBar("Shameless Plugs");
+  $plugsSection = new SubNavBar("Community Links");
   $plugsSection->push(NavBarItem::newAction("Shameless Plugs", "Plugs.php"));
   if (user_has_priv(PRIV_STAFF))
     $plugsSection->push(NavBarItem::newAction('Manage Shameless Plugs', 'Plugs.php', PLUGS_MANAGE_PLUGS));
