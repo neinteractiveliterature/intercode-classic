@@ -401,15 +401,6 @@ function display_navbar() {
   $aboutSection->push(NavBarItem::newAction("ConCom Schedule", "ConComSchedule.php"));
   $aboutSection->push(NavBarItem::newAction(CON_NAME.' Flyer', 'InterconFlyer.pdf'));
   $navbar->push($aboutSection);
-  
-  // Shameless Plugs section
-  $plugsSection = new SubNavBar("Shameless Plugs");
-  $plugsSection->push(NavBarItem::newAction("Shameless Plugs", "Plugs.php"));
-  if (user_has_priv(PRIV_STAFF))
-    $plugsSection->push(NavBarItem::newAction('Manage Shameless Plugs', 'Plugs.php', PLUGS_MANAGE_PLUGS));
-  $plugsSection->push(NavBarItem::newExternal("LARPA", "http://www.larpaweb.net"));
-  $plugsSection->push(NavBarItem::newExternal("Intercon Mid-Atlantic", "http://www.larpaweb.net"));
-  $navbar->push($plugsSection);
 
 
   // Website Section
@@ -434,6 +425,16 @@ function display_navbar() {
 	  $links->push(NavBarItem::newExternal("Intercon Wiki", "http://www.interactiveliterature.org/Wiki"));
     $links->push(NavBarItem::newExternal(CON_NAME . " Google Login", "http://www.google.com/a/" . CON_DOMAIN));
 	}
+	
+  // Shameless Plugs section
+  $plugsSection = new SubNavBar("Shameless Plugs");
+  $plugsSection->push(NavBarItem::newAction("Shameless Plugs", "Plugs.php"));
+  if (user_has_priv(PRIV_STAFF))
+    $plugsSection->push(NavBarItem::newAction('Manage Shameless Plugs', 'Plugs.php', PLUGS_MANAGE_PLUGS));
+  $plugsSection->push(NavBarItem::newExternal("LARPA", "http://www.larpaweb.net"));
+  $plugsSection->push(NavBarItem::newExternal("Intercon Mid-Atlantic", "http://www.larpaweb.net"));
+  $links->push($plugsSection);
+	
 	echo $links->render("menu links");
 
   echo "</div> <!-- navbar -->\n\n";

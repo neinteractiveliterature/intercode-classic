@@ -214,6 +214,13 @@ ul.menu li.title
         border-bottom: none;
 }
 
+ul.menu li.external a {
+  background-image: url(external.png);
+  background-position: right center;
+  background-repeat: no-repeat;
+  padding-right: 13px;
+}
+
 ul.menu.priv li.title
 {
 	background-color: <?echo COLOR_MENU_PRIV_FG; ?>;
