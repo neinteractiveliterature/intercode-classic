@@ -2620,7 +2620,6 @@ function increment_sequence_number ()
 {
   if (! array_key_exists (SESSION_SEQUENCE_NUMBER, $_SESSION))
   {
-    session_register (SESSION_SEQUENCE_NUMBER);
     $_SESSION[SESSION_SEQUENCE_NUMBER] = 0;
   }
 

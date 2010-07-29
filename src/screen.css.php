@@ -79,12 +79,36 @@ ul.subhead {
 
 ul.accountControl li a {
   font-size: 90%;
-  font-weight: bold;
-  text-align: right;
+/*  font-weight: bold;
+  text-align: right; */
   padding: 3px;
   display: block;
   text-decoration: none;
   color: black;
+  padding-right: 16px !important;
+  background-position: right center;
+  background-repeat: no-repeat;
+  
+}
+
+ul.accountControl li.login a {
+  background-image: url(door_open.png);
+}
+
+ul.accountControl li.profile a {
+  background-image: url(user.png);
+}
+
+ul.accountControl li.logout a {
+  background-image: url(door.png);
+}
+
+ul.accountControl li.register a {
+  background-image: url(user_edit.png);
+}
+
+ul.accountControl li.bio a {
+  background-image: url(book_edit.png);
 }
 
 /*
@@ -166,7 +190,8 @@ ul.menu li a, ul.menu li a:visited {
 }
 
 ul.menu li.current a {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: white;
+  font-weight: bold;
 }
 
 ul.menu.priv li {
@@ -196,6 +221,10 @@ ul.menu.priv li.title
 
 ul.subhead li.title {
   background-color: rgba(0, 0, 0, 0.3);
+}
+
+ul.subhead li.title.current a {
+  background-color: transparent;
 }
 
 ul.menu li.alert {

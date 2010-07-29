@@ -28,24 +28,24 @@ class NavBar {
 }
 
 class SubNavBar extends NavBar {
-  public $headItem;
+  public $title;
   
-  function __construct($headItem) {
-    $this->headItem = $headItem;
+  function __construct($title) {
+    $this->title = $title;
     parent::__construct();
   }
   
   function haveMultipleItems() {
-    if (count($this->items) > 1)
-      return true;
-    if (count($this->items) == 1 && $this->items[0]->url != $this->headItem->url)
-      return true;
-    
-    return false;
+    return (count($this->items) > 1);
+  }
+  
+  function getHeadItem() {
+    $firstItem = $this->items[0];
+    return new NavBarItem($this->title, $firstItem->url, $firstItem->class);
   }
   
   function renderInner() {
-    $html = $this->headItem->render("title");
+    $html = $this->getHeadItem()->render("title");
     $html .= parent::renderInner();
     return $html;
   }
@@ -58,16 +58,13 @@ class SubNavBar extends NavBar {
       return $html;
       
     } elseif ($this->haveMultipleItems()) {
-      return $this->headItem->render("expandable");
+      return $this->getHeadItem()->render("expandable");
     } else {
-      return $this->headItem->render();
+      return $this->getHeadItem()->render();
     }
   }
   
   function isCurrent() {
-    if ($this->headItem->isCurrent())
-      return true;
-    
     foreach ($this->items as $item) {
       if ($item->isCurrent())
         return true;
@@ -224,47 +221,41 @@ function display_navbar() {
   $accountControl = new NavBar();
   if (is_logged_in()) {
     $userName = $_SESSION[SESSION_LOGIN_USER_NAME];
-    $accountControl->push(NavBarItem::newAction("<img src=\"user.png\" alt=\"User\"/> $userName", "index.php", UPDATE_USER));
-    $accountControl->push(NavBarItem::newAction("Log Out", "index.php", LOGOUT_USER));
+    $accountControl->push(new NavBarTitle($userName));
+    $accountControl->push(NavBarItem::newAction("Log Out", "index.php", LOGOUT_USER, "logout"));
+    $accountControl->push(NavBarItem::newAction("My Profile", "index.php", UPDATE_USER, "profile"));
+    if (user_is_gm())
+      $accountControl->push(NavBarItem::newAction("Edit My Bio", "index.php", EDIT_BIO, "bio"));
   } else {
-    $accountControl->push(NavBarItem::newAction('Login', 'index.php'));
-    $accountControl->push(NavBarItem::newAction('Register for <NOBR>'.CON_NAME.'</NOBR>', 'index.php', NEW_USER));
+    $accountControl->push(NavBarItem::newAction('Login', 'index.php', NULL, "login"));
+    $accountControl->push(NavBarItem::newAction('Register for <NOBR>'.CON_NAME.'</NOBR>', 'index.php', NEW_USER, "register"));
   }
   echo $accountControl->render("menu accountControl priv");
 
   // Title the menu
   $navbar = new NavBar();
   $navbar->push(new NavBarTitle("Navigation"));
-
-  // Show these options if the user is logged in
-
-  if (is_logged_in()) {
-    $navbar->push(NavBarItem::newAction('Home', 'index.php'));
-  } else {
-   
-  }
+  $navbar->push(NavBarItem::newAction('Home', 'index.php'));
   
   // LARPs section
-  $larpSection = new SubNavBar(NavBarItem::newAction("LARPs at <NOBR>".CON_NAME."</NOBR>",
-    "Schedule.php", can_show_schedule() ? NULL : LIST_GAMES));
+  $larpSection = new SubNavBar("LARPs at <NOBR>".CON_NAME."</NOBR>");
+  if (can_show_schedule())
+      $larpSection->push(NavBarItem::newAction("Con Schedule", "Schedule.php"));    
   $larpSection->push(NavBarItem::newAction("List of Games", "Schedule.php", LIST_GAMES));
   if (IRONGM_ENABLED)
     $larpSection->push(NavBarItem::newExternal('Iron GM Contest', 'http://irongm.rachl.in'));
-  if (can_show_schedule()) {
-    $larpSection->push(NavBarItem::newAction("Con Schedule", "Schedule.php"));
-    if (user_has_priv(PRIV_CON_COM)) {
-      $larpSection->push(NavBarItem::newAction("Schedule with Counts", "Schedule.php", SCHEDULE_WITH_COUNTS));            
-      $larpSection->push(NavBarItem::newAction('Player Signups', 'UserSignupScan.php'));
-      $larpSection->push(NavBarItem::newAction('Last 100 Signups', 'SignupSpy.php'));    
-      $larpSection->push(NavBarItem::newAction('All Signups', 'SignupSpy.php', SHOW_ALL_SIGNUPS));
-      $larpSection->push(NavBarItem::newAction('Signups with Choice #s', 'Choice1.php'));
-      $larpSection->push(NavBarItem::newAction('Games by Choice', 'Choice3.php'));
-    }
+  if (can_show_schedule() && user_has_priv(PRIV_CON_COM)) {
+    $larpSection->push(NavBarItem::newAction("Schedule with Counts", "Schedule.php", SCHEDULE_WITH_COUNTS));            
+    $larpSection->push(NavBarItem::newAction('Player Signups', 'UserSignupScan.php'));
+    $larpSection->push(NavBarItem::newAction('Last 100 Signups', 'SignupSpy.php'));    
+    $larpSection->push(NavBarItem::newAction('All Signups', 'SignupSpy.php', SHOW_ALL_SIGNUPS));
+    $larpSection->push(NavBarItem::newAction('Signups with Choice #s', 'Choice1.php'));
+    $larpSection->push(NavBarItem::newAction('Games by Choice', 'Choice3.php'));
   }
   $navbar->push($larpSection);
   
   if (THURSDAY_ENABLED) {
-    $thursdaySection = new SubNavBar(NavBarItem::newAction("Pre-Convention", "Thursday.php"));
+    $thursdaySection = new SubNavBar("Pre-Convention");
     $thursdaySection->push(NavBarItem::newAction('Pre-Convention Events', 'Thursday.php'));
     if (user_has_priv(PRIV_PRECON_SCHEDULING))
       $thursdaySection->push(NavBarItem::newAction('Manage PreCon Event Schedule', 'Thursday.php', PRECON_MANAGE_EVENTS));
@@ -276,21 +267,18 @@ function display_navbar() {
   
   // GM section
   if (user_is_gm() || user_has_priv(PRIV_GM_LIAISON) || user_has_priv(PRIV_CON_COM)) {
-    $gmSection = new SubNavBar(NavBarItem::newStatic("GM Information", "GMPolicies"));
+    $gmSection = new SubNavBar("GM Information");
     $gmSection->push(NavBarItem::newStatic("GM Benefits and Policies", "GMPolicies"));
-    
-    if (user_is_gm())
-      $gmSection->push(NavBarItem::newAction("Edit My Bio", "index.php", EDIT_BIO));
       
     if (user_has_priv(PRIV_CON_COM))
-      $gmSection->push(NavBarItem::newAction('Bio Report', 'index.php', BIO_REPORT));
+      
       
     $navbar->push($gmSection);
   }
   
   if ((SHOW_TSHIRTS && is_logged_in()) || user_has_priv(PRIV_CON_COM))
   {
-    $shirtsSection = new SubNavBar(NavBarItem::newAction(CON_NAME . " <NOBR>Shirts</NOBR>", "TShirts.php"));
+    $shirtsSection = new SubNavBar(CON_NAME . " <NOBR>Shirts</NOBR>");
     $shirtsSection->push(NavBarItem::newAction("Order Shirts", "TShirts.php"));
     if (user_has_priv(PRIV_CON_COM)) {
       $shirtsSection->push(NavBarItem::newAction('Shirt Order Summary', 'TShirts.php', SHOW_TSHIRT_SUMMARY));
@@ -301,19 +289,13 @@ function display_navbar() {
     
   // Bids section
   if (ACCEPTING_BIDS || user_has_priv(PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON)) {
-    $bidGameItem = NavBarItem::newAction("Bid a Game!", "biddingAGame.php");
-    
+    $bidsSection = new SubNavBar("Bids");
     if (user_has_priv(PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON))
-      $bidSectionHead = NavBarItem::newAction("Bids", "Bids.php", BID_REVIEW_BIDS);
-    else
-      $bidSectionHead = $bidGameItem;
-      
-    $bidsSection = new SubNavBar($bidSectionHead);
-    $bidsSection->push($bidGameItem);
+      $bidsSection->push(NavBarItem::newAction("Status of Bids", "Bids.php", BID_REVIEW_BIDS));
+    $bidsSection->push(NavBarItem::newAction("Bid a Game!", "biddingAGame.php"));
     
     if (user_has_priv (PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON))
     {  
-      $bidsSection->push(NavBarItem::newAction("Status of Bids", "Bids.php", BID_REVIEW_BIDS));
       $bidsSection->push(NavBarItem::newAction("BidCom Feedback Summary", "Bids.php", BID_FEEDBACK_SUMMARY));
       if (user_has_priv(PRIV_GM_LIAISON))
         $bidsSection->push(NavBarItem::newStatic("Bid Commmittee Responsibilities", "BidCommittee"));
@@ -327,7 +309,7 @@ function display_navbar() {
   
   // Attendees section
   if (user_has_priv(PRIV_CON_COM)) {
-    $usersSection = new SubNavBar(NavBarItem::newAction("Attendees", "index.php", SELECT_USER_TO_VIEW));
+    $usersSection = new SubNavBar("Attendees");
     $usersSection->push(NavBarItem::newAction("View User", "index.php", SELECT_USER_TO_VIEW));
     if (user_has_priv(PRIV_REGISTRAR)) {
       $usersSection->push(NavBarItem::newAction('Add or Edit a User', 'index.php', SELECT_USER_TO_EDIT));
@@ -337,6 +319,7 @@ function display_navbar() {
     $usersSection->push(NavBarItem::newAction("Comp'd Users", 'index.php', SHOW_COMPED_USERS));
     $usersSection->push(NavBarItem::newAction('Attendence by Payment Amount', 'Attendees.php'));
     $usersSection->push(NavBarItem::newAction('How Users Heard', 'Reports.php', REPORT_HOW_HEARD));
+    $usersSection->push(NavBarItem::newAction('Bio Report', 'index.php', BIO_REPORT));
 
     if (user_has_priv(PRIV_REGISTRAR))
       $usersSection->push(NavBarItem::newAction('Users By Age', 'Reports.php', REPORT_BY_AGE));
@@ -350,7 +333,7 @@ function display_navbar() {
 
   // Mail section
   if (user_has_any_mail_priv ()) {
-    $mailSection = new SubNavBar(NavBarItem::newAction('Mail', "MailTo.php", MAIL_LISTS));
+    $mailSection = new SubNavBar('Mail');
     $mailSection->push(NavBarItem::newAction('Show Lists', 'MailTo.php', MAIL_LISTS));
     $mailSection->push(NavBarItem::newAction('GM Lists', 'MailTo.php', MAIL_GM_LISTS));
     $mailSection->push(NavBarItem::newAction('Iron GM List', 'MailTo.php', MAIL_IRON_GM_LIST));
@@ -366,12 +349,7 @@ function display_navbar() {
 
   if (user_has_priv (PRIV_CON_COM))
   {
-    $opsSection = new SubNavBar(NavBarItem::newAction("Print Materials", "Reports.php", REPORT_OPS_TRACK));
-    if (defined ('PROGRAM_PUB_PREFIX'))
-    {
-      $opsSection->push('Program Cover.pub', NavBarItem::newProgram(PROGRAM_PUB_PREFIX, 'Cover.pub'));
-      $opsSection->push('Program Interior.pub', NavBarItem::newProgram(PROGRAM_PUB_PREFIX, 'Interior.pub'));
-    }
+    $opsSection = new SubNavBar("Print Materials");
     $opsSection->push(NavBarItem::newAction('Per User Report', 'Reports.php', REPORT_PER_USER));
     $opsSection->push(NavBarItem::newAction('Per Game Report', 'Reports.php', REPORT_PER_GAME));
     $opsSection->push(NavBarItem::newAction('Per Room Report', 'Reports.php', REPORT_PER_ROOM));
@@ -382,6 +360,11 @@ function display_navbar() {
     $opsSection->push(NavBarItem::newAction('Registration Report', 'Reports.php', REPORT_REGISTRATION));
     if (THURSDAY_ENABLED)
       $opsSection->push(NavBarItem::newAction('PreCon Events Report', 'Thursday.php', THURSDAY_REPORT));
+    if (defined ('PROGRAM_PUB_PREFIX'))
+    {
+      $opsSection->push('Program Cover.pub', NavBarItem::newProgram(PROGRAM_PUB_PREFIX, 'Cover.pub'));
+      $opsSection->push('Program Interior.pub', NavBarItem::newProgram(PROGRAM_PUB_PREFIX, 'Interior.pub'));
+    }
     if (defined ('PROGRAM_PDF_PREFIX'))
     {
       $opsSection->push(NavBarItem::newProgram("Program Cover", PROGRAM_PDF_PREFIX, "Cover.pdf"));
@@ -395,7 +378,7 @@ function display_navbar() {
 
   if (user_has_priv (PRIV_SCHEDULING))
   {
-    $scheduleSection = new SubNavBar(NavBarItem::newAction("Scheduling", "ListGames.php"));
+    $scheduleSection = new SubNavBar("Scheduling");
     $scheduleSection->push(NavBarItem::newAction('Manage Schedule', 'ListGames.php'));
     $scheduleSection->push(NavBarItem::newAction('Schedule Ops', 'ListGames.php', LIST_ADD_OPS));
     $scheduleSection->push(NavBarItem::newAction('Schedule ConSuite', 'ListGames.php', LIST_ADD_CONSUITE));
@@ -407,7 +390,7 @@ function display_navbar() {
   }
     
   // About Intercon section
-  $aboutSection = new SubNavBar(NavBarItem::newStatic("About <NOBR>".CON_NAME."</NOBR>", "faq"));
+  $aboutSection = new SubNavBar("About <NOBR>".CON_NAME."</NOBR>");
   $aboutSection->push(NavBarItem::newStatic("Frequently Asked Questions", "faq"));
   $aboutSection->push(NavBarItem::newStatic("Convention Rules", "ConRules"));
   $aboutSection->push(NavBarItem::newAction("What Does It Cost?", "cost.php"));
@@ -420,23 +403,23 @@ function display_navbar() {
   $navbar->push($aboutSection);
   
   // Shameless Plugs section
-  $plugsSection = new SubNavBar(NavBarItem::newAction("Shameless Plugs", "Plugs.php"));
-  $plugsSection->push(NavBarItem::newExternal("LARPA", "http://www.larpaweb.net"));
-  $plugsSection->push(NavBarItem::newExternal("Intercon Mid-Atlantic", "http://www.larpaweb.net"));
+  $plugsSection = new SubNavBar("Shameless Plugs");
   $plugsSection->push(NavBarItem::newAction("Shameless Plugs", "Plugs.php"));
   if (user_has_priv(PRIV_STAFF))
     $plugsSection->push(NavBarItem::newAction('Manage Shameless Plugs', 'Plugs.php', PLUGS_MANAGE_PLUGS));
+  $plugsSection->push(NavBarItem::newExternal("LARPA", "http://www.larpaweb.net"));
+  $plugsSection->push(NavBarItem::newExternal("Intercon Mid-Atlantic", "http://www.larpaweb.net"));
   $navbar->push($plugsSection);
 
 
   // Website Section
   if (user_has_priv(PRIV_CON_COM) || user_has_priv(PRIV_STAFF)) {
-    $websiteSection = new SubNavBar(NavBarItem::newAction("Web Site", 'Referrers.php', VIEW_REFERRERS));
+    $websiteSection = new SubNavBar("Web Site");
+    if (user_has_priv(PRIV_STAFF))
+      $websiteSection->push(NavBarItem::newAction('Change Con Settings', 'Status.php'));
     $websiteSection->push(NavBarItem::newAction('Referring Sites', 'Referrers.php', VIEW_REFERRERS));
     $websiteSection->push(NavBarItem::newAction('Referring Site Summary',
   	  'Referrers.php', SUMMARIZE_REFERRERS));
-    if (user_has_priv(PRIV_STAFF))
-      $websiteSection->push(NavBarItem::newAction('Change Con Settings', 'Status.php'));
     $navbar->push($websiteSection);
   }
 

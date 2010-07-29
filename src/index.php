@@ -373,7 +373,6 @@ function log_referrer ()
 
   $referrer_id = mysql_insert_id();
 
-  session_register (SESSION_REFERRER_ID);
   $_SESSION[SESSION_REFERRER_ID] = $referrer_id;
 
   return $referrer_id;
@@ -489,25 +488,12 @@ function login_with_data ($row, $EMail)
 
   // Create the session variables and set them
 
-  session_register (SESSION_LOGIN_USER_ID);
   $_SESSION[SESSION_LOGIN_USER_ID] = $UserId;
-
-  session_register (SESSION_LOGIN_USER_PRIVS);
   $_SESSION[SESSION_LOGIN_USER_PRIVS] = ",$row->Priv,";
-
-  session_register (SESSION_LOGIN_USER_GENDER);
   $_SESSION[SESSION_LOGIN_USER_GENDER] = $Gender;
-
-  session_register (SESSION_LOGIN_USER_CAN_SIGNUP);
   $_SESSION[SESSION_LOGIN_USER_CAN_SIGNUP] = $CanSignup;
-
-  session_register (SESSION_LOGIN_USER_NAME);
   $_SESSION[SESSION_LOGIN_USER_NAME] = $name;
-
-  session_register (SESSION_LOGIN_USER_EMAIL);
   $_SESSION[SESSION_LOGIN_USER_EMAIL] = $EMail;
-
-  session_register ('IncludeAlumni');
   $_SESSION['IncludeAlumni'] = 0;
 
   // Initialize the session information from the Con table
@@ -515,8 +501,6 @@ function login_with_data ($row, $EMail)
   can_show_schedule ();
 
   // Check whether this is a GM
-
-  session_register (SESSION_LOGIN_USER_GM);
 
   $sql = 'SELECT GMId FROM GMs';
   $sql .= " WHERE UserId=$UserId";
@@ -1872,28 +1856,16 @@ function add_user ()
     // Update the session variables
 
     $UserId = mysql_insert_id ();
-    session_register (SESSION_LOGIN_USER_ID);
     $_SESSION[SESSION_LOGIN_USER_ID] = $UserId;
-
-    session_register (SESSION_LOGIN_USER_PRIVS);
     $_SESSION[SESSION_LOGIN_USER_PRIVS] = ',,';
-
-    session_register (SESSION_LOGIN_USER_GENDER);
     $_SESSION[SESSION_LOGIN_USER_GENDER] = $_POST['Gender'];
 
     $name = $_POST['FirstName'] . ' ' . $_POST['LastName'];
-    session_register (SESSION_LOGIN_USER_NAME);
     $_SESSION[SESSION_LOGIN_USER_NAME] = trim ($name);
-
-    session_register (SESSION_LOGIN_USER_EMAIL);
     $_SESSION[SESSION_LOGIN_USER_EMAIL] = $_POST['EMail'];
 
     // Users who've just registered can't have paid or be GMs
-
-    session_register (SESSION_LOGIN_USER_CAN_SIGNUP);
     $_SESSION[SESSION_LOGIN_USER_CAN_SIGNUP] = 'N';
-
-    session_register (SESSION_LOGIN_USER_GM);
     $_SESSION[SESSION_LOGIN_USER_GM] = 0;
 
     if (array_key_exists (SESSION_REFERRER_ID, $_SESSION))
