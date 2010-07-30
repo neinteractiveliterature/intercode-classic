@@ -85,7 +85,7 @@ ul.accountControl li a {
   display: block;
   text-decoration: none;
   color: black;
-  padding-right: 16px !important;
+  padding-right: 18px !important;
   background-position: right center;
   background-repeat: no-repeat;
   
