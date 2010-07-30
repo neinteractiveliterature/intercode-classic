@@ -29,9 +29,11 @@ class NavBar {
 
 class SubNavBar extends NavBar {
   public $title;
+  public $useFirstItemTitleIfSingle;
   
-  function __construct($title) {
+  function __construct($title, $useFirstItemTitleIfSingle=false) {
     $this->title = $title;
+    $this->useFirstItemTitleIfSingle = $useFirstItemTitleIfSingle;
     parent::__construct();
   }
   
@@ -41,7 +43,12 @@ class SubNavBar extends NavBar {
   
   function getHeadItem() {
     $firstItem = $this->items[0];
-    return new NavBarItem($this->title, $firstItem->url, $firstItem->class);
+    if ($this->useFirstItemTitleIfSingle && !$this->haveMultipleItems()) {
+      $title = $firstItem->title;
+    } else {
+      $title = $this->title;
+    }
+    return new NavBarItem($title, $firstItem->url, $firstItem->class);
   }
   
   function renderInner() {
@@ -215,9 +222,171 @@ function navbar_end() {
     echo "</ul>\n";
 }
 
-function display_navbar() {
-  echo "<div class=navbar>\n";
+function build_larps_subnavbar() {
+  $larpSection = new SubNavBar("LARPs at <NOBR>".CON_NAME."</NOBR>");
+  if (can_show_schedule()) {
+    $larpSection->push(NavBarItem::newAction("Con Schedule", "Schedule.php"));    
+    if (user_has_priv(PRIV_CON_COM))
+      $larpSection->push(NavBarItem::newAction("Schedule with Counts", "Schedule.php", SCHEDULE_WITH_COUNTS));            
+  }
+  $larpSection->push(NavBarItem::newAction("List of Games", "Schedule.php", LIST_GAMES));
+  if (IRONGM_ENABLED)
+    $larpSection->push(NavBarItem::newExternal('Iron GM Contest', 'http://irongm.rachl.in'));
+  if (can_show_schedule() && user_has_priv(PRIV_CON_COM)) {
+    $larpSection->push(NavBarItem::newAction('Player Signups', 'UserSignupScan.php'));
+    $larpSection->push(NavBarItem::newAction('Last 100 Signups', 'SignupSpy.php'));    
+    $larpSection->push(NavBarItem::newAction('All Signups', 'SignupSpy.php', SHOW_ALL_SIGNUPS));
+    $larpSection->push(NavBarItem::newAction('Signups with Choice #s', 'Choice1.php'));
+    $larpSection->push(NavBarItem::newAction('Games by Choice', 'Choice3.php'));
+  }
+  return $larpSection;
+}
+
+function build_precon_subnavbar() {
+  $thursdaySection = new SubNavBar("Pre-Convention");
+  $thursdaySection->push(NavBarItem::newAction('Pre-Convention Events', 'Thursday.php'));
+  if (user_has_priv(PRIV_PRECON_SCHEDULING))
+    $thursdaySection->push(NavBarItem::newAction('Manage PreCon Event Schedule', 'Thursday.php', PRECON_MANAGE_EVENTS));
+  if (user_has_priv(PRIV_REGISTRAR))
+    $thursdaySection->push(NavBarItem::newAction('Edit User PreCon Event Info', 'Thursday.php', THURSDAY_SELECT_USER));
+  return $thursdaySection;
+}
+
+function build_gm_subnavbar() {
+  $gmSection = new SubNavBar("GM Information");
+  $gmSection->push(NavBarItem::newStatic("GM Benefits and Policies", "GMPolicies"));
+  return $gmSection;
+}
+
+function build_shirts_subnavbar() {
+  $shirtsSection = new SubNavBar(CON_NAME . " <NOBR>Shirts</NOBR>");
+  $shirtsSection->push(NavBarItem::newAction("Order Shirts", "TShirts.php"));
+  if (user_has_priv(PRIV_CON_COM)) {
+    $shirtsSection->push(NavBarItem::newAction('Shirt Order Summary', 'TShirts.php', SHOW_TSHIRT_SUMMARY));
+    $shirtsSection->push(NavBarItem::newAction('Shirt Order Report', 'TShirts.php', SHOW_TSHIRT_REPORT));
+  }
+  return $shirtsSection;
+}
+
+function build_bids_subnavbar() {
+  $bidsSection = new SubNavBar("Bids", true);
+  if (user_has_priv(PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON))
+    $bidsSection->push(NavBarItem::newAction("Status of Bids", "Bids.php", BID_REVIEW_BIDS));
   
+  if (user_has_priv (PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON)) {  
+    $bidsSection->push(NavBarItem::newAction("BidCom Feedback Summary", "Bids.php", BID_FEEDBACK_SUMMARY));
+    if (user_has_priv(PRIV_GM_LIAISON))
+      $bidsSection->push(NavBarItem::newStatic("Bid Commmittee Responsibilities", "BidCommittee"));
+  }
+  
+  if (user_has_priv (PRIV_SCHEDULING))
+    $bidsSection->push(NavBarItem::newAction('Manage Bid Page Info', 'biddingAGame.php', BAG_SHOW_FORM));
+
+  $bidsSection->push(NavBarItem::newAction("Bid a Game!", "biddingAGame.php"));
+    
+  return $bidsSection;
+}
+
+function build_attendees_subnavbar() {
+  $usersSection = new SubNavBar("Attendees");
+  $usersSection->push(NavBarItem::newAction("View User", "index.php", SELECT_USER_TO_VIEW));
+  if (user_has_priv(PRIV_REGISTRAR)) {
+    $usersSection->push(NavBarItem::newAction('Add or Edit a User', 'index.php', SELECT_USER_TO_EDIT));
+    $usersSection->push(NavBarItem::newAction('Set User Password', 'index.php', SELECT_USER_TO_SET_PASSWORD));
+    $usersSection->push(NavBarItem::newAction('Delete a User', 'index.php', SELECT_USER_TO_DELETE));
+  }
+  $usersSection->push(NavBarItem::newAction("Comp'd Users", 'index.php', SHOW_COMPED_USERS));
+  $usersSection->push(NavBarItem::newAction('Attendence by Payment Amount', 'Attendees.php'));
+  $usersSection->push(NavBarItem::newAction('How Users Heard', 'Reports.php', REPORT_HOW_HEARD));
+  $usersSection->push(NavBarItem::newAction('Bio Report', 'index.php', BIO_REPORT));
+
+  if (user_has_priv(PRIV_REGISTRAR))
+    $usersSection->push(NavBarItem::newAction('Users By Age', 'Reports.php', REPORT_BY_AGE));
+    
+  if (user_has_priv(PRIV_STAFF))
+    $usersSection->push(NavBarItem::newAction('Become User', 'index.php', SELECT_USER_TO_BECOME));
+    
+  return $usersSection;
+}
+
+function build_mail_subnavbar() {
+  $mailSection = new SubNavBar('Mail');
+  $mailSection->push(NavBarItem::newAction('Show Lists', 'MailTo.php', MAIL_LISTS));
+  $mailSection->push(NavBarItem::newAction('GM Lists', 'MailTo.php', MAIL_GM_LISTS));
+  $mailSection->push(NavBarItem::newAction('Iron GM List', 'MailTo.php', MAIL_IRON_GM_LIST));
+  $mailSection->push(NavBarItem::newAction('Bid Submitters', 'MailTo.php', MAIL_BID_SUBMITTERS));
+  $mailSection->push(NavBarItem::newAction('Bio Lists', 'MailTo.php', MAIL_BIO_LISTS));
+  $mailSection->push(NavBarItem::newAction('Waitlisted Players', 'MailTo.php', MAIL_WAITLISTED));
+  $mailSection->push(NavBarItem::newAction('Who\'s Not Playing When', 'Reports.php', REPORT_WHOS_NOT_PLAYING_FORM));
+  
+  return $mailSection;
+}
+
+function build_print_materials_subnavbar() {
+  $opsSection = new SubNavBar("Print Materials");
+  $opsSection->push(NavBarItem::newAction('Per Game Report', 'Reports.php', REPORT_PER_GAME));
+  $opsSection->push(NavBarItem::newAction('Per User Report', 'Reports.php', REPORT_PER_USER));
+  $opsSection->push(NavBarItem::newAction('Per Room Report', 'Reports.php', REPORT_PER_ROOM));
+  $opsSection->push(NavBarItem::newAction('Ops Report', 'Reports.php', REPORT_OPS_TRACK));
+  $opsSection->push(NavBarItem::newAction('ConSuite Report', 'Reports.php', REPORT_CONSUITE_TRACK));
+  $opsSection->push(NavBarItem::newAction('Games by Time', 'Reports.php', REPORT_GAMES_BY_TIME));
+  $opsSection->push(NavBarItem::newAction('Users CSV', 'Reports.php', REPORT_USERS_CSV));
+  $opsSection->push(NavBarItem::newAction('Registration Report', 'Reports.php', REPORT_REGISTRATION));
+  if (THURSDAY_ENABLED)
+    $opsSection->push(NavBarItem::newAction('PreCon Events Report', 'Thursday.php', THURSDAY_REPORT));
+  if (defined ('PROGRAM_PUB_PREFIX'))
+  {
+    $opsSection->push('Program Cover.pub', NavBarItem::newProgram(PROGRAM_PUB_PREFIX, 'Cover.pub'));
+    $opsSection->push('Program Interior.pub', NavBarItem::newProgram(PROGRAM_PUB_PREFIX, 'Interior.pub'));
+  }
+  if (defined ('PROGRAM_PDF_PREFIX'))
+  {
+    $opsSection->push(NavBarItem::newProgram("Program Cover", PROGRAM_PDF_PREFIX, "Cover.pdf"));
+    $opsSection->push(NavBarItem::newProgram("Program Interior", PROGRAM_PDF_PREFIX, "Interior.pdf"));
+  }
+  
+  return $opsSection;
+}
+
+function build_schedule_subnavbar() {
+  $scheduleSection = new SubNavBar("Scheduling");
+  $scheduleSection->push(NavBarItem::newAction('Manage Schedule', 'ListGames.php'));
+  $scheduleSection->push(NavBarItem::newAction('Schedule Ops', 'ListGames.php', LIST_ADD_OPS));
+  $scheduleSection->push(NavBarItem::newAction('Schedule ConSuite', 'ListGames.php', LIST_ADD_CONSUITE));
+//    $scheduleSection->push(NavBarItem::newAction('Add a Parallel Run', 'ListGames.php', LIST_TO_ADD_PARALLEL_RUN));
+  $scheduleSection->push(NavBarItem::newAction('Add Special Event', 'SpecialEvents.php'));
+  $scheduleSection->push(NavBarItem::newAction('Manage Special Events', 'SpecialEvents.php', SPECIAL_EVENT_LIST));
+  
+  return $scheduleSection;
+}
+
+function build_about_subnavbar() {
+  $aboutSection = new SubNavBar("About <NOBR>".CON_NAME."</NOBR>");
+  $aboutSection->push(NavBarItem::newStatic("Frequently Asked Questions", "faq"));
+  $aboutSection->push(NavBarItem::newStatic("Convention Rules", "ConRules"));
+  $aboutSection->push(NavBarItem::newAction("What Does It Cost?", "cost.php"));
+  $aboutSection->push(NavBarItem::newAction("Contacts", "Contacts.php"));
+  $aboutSection->push(NavBarItem::newAction("Hotel Info", "hotel.php"));
+  $aboutSection->push(NavBarItem::newAction("Who's Who", "index.php", WHO_IS_WHO));
+  $aboutSection->push(NavBarItem::newStatic("Volunteering", "volunteering"));
+  $aboutSection->push(NavBarItem::newAction("ConCom Schedule", "ConComSchedule.php"));
+  $aboutSection->push(NavBarItem::newAction(CON_NAME.' Flyer', 'InterconFlyer.pdf'));
+  
+  return $aboutSection;
+}
+
+function build_website_subnavbar() {
+  $websiteSection = new SubNavBar("Web Site");
+  if (user_has_priv(PRIV_STAFF))
+    $websiteSection->push(NavBarItem::newAction('Change Con Settings', 'Status.php'));
+  $websiteSection->push(NavBarItem::newAction('Referring Sites', 'Referrers.php', VIEW_REFERRERS));
+  $websiteSection->push(NavBarItem::newAction('Referring Site Summary',
+	  'Referrers.php', SUMMARIZE_REFERRERS));
+	  
+	return $websiteSection;
+}
+
+function display_account_control_navbar() {
   $accountControl = new NavBar();
   if (is_logged_in()) {
     $userName = $_SESSION[SESSION_LOGIN_USER_NAME];
@@ -231,191 +400,39 @@ function display_navbar() {
     $accountControl->push(NavBarItem::newAction('Register for <NOBR>'.CON_NAME.'</NOBR>', 'index.php', NEW_USER, "register"));
   }
   echo $accountControl->render("menu accountControl priv");
+}
 
+function display_main_navbar() {
   // Title the menu
   $navbar = new NavBar();
   $navbar->push(new NavBarTitle("Navigation"));
   $navbar->push(NavBarItem::newAction('Home', 'index.php'));
   
-  // LARPs section
-  $larpSection = new SubNavBar("LARPs at <NOBR>".CON_NAME."</NOBR>");
-  if (can_show_schedule())
-      $larpSection->push(NavBarItem::newAction("Con Schedule", "Schedule.php"));    
-  $larpSection->push(NavBarItem::newAction("List of Games", "Schedule.php", LIST_GAMES));
-  if (IRONGM_ENABLED)
-    $larpSection->push(NavBarItem::newExternal('Iron GM Contest', 'http://irongm.rachl.in'));
-  if (can_show_schedule() && user_has_priv(PRIV_CON_COM)) {
-    $larpSection->push(NavBarItem::newAction("Schedule with Counts", "Schedule.php", SCHEDULE_WITH_COUNTS));            
-    $larpSection->push(NavBarItem::newAction('Player Signups', 'UserSignupScan.php'));
-    $larpSection->push(NavBarItem::newAction('Last 100 Signups', 'SignupSpy.php'));    
-    $larpSection->push(NavBarItem::newAction('All Signups', 'SignupSpy.php', SHOW_ALL_SIGNUPS));
-    $larpSection->push(NavBarItem::newAction('Signups with Choice #s', 'Choice1.php'));
-    $larpSection->push(NavBarItem::newAction('Games by Choice', 'Choice3.php'));
-  }
-  $navbar->push($larpSection);
-  
-  if (THURSDAY_ENABLED) {
-    $thursdaySection = new SubNavBar("Pre-Convention");
-    $thursdaySection->push(NavBarItem::newAction('Pre-Convention Events', 'Thursday.php'));
-    if (user_has_priv(PRIV_PRECON_SCHEDULING))
-      $thursdaySection->push(NavBarItem::newAction('Manage PreCon Event Schedule', 'Thursday.php', PRECON_MANAGE_EVENTS));
-    if (user_has_priv(PRIV_REGISTRAR))
-      $thursdaySection->push(NavBarItem::newAction('Edit User PreCon Event Info', 'Thursday.php', THURSDAY_SELECT_USER));
-      
-    $navbar->push($thursdaySection);
-	}
-  
-  // GM section
-  if (user_is_gm() || user_has_priv(PRIV_GM_LIAISON) || user_has_priv(PRIV_CON_COM)) {
-    $gmSection = new SubNavBar("GM Information");
-    $gmSection->push(NavBarItem::newStatic("GM Benefits and Policies", "GMPolicies"));
-      
-    if (user_has_priv(PRIV_CON_COM))
-      
-      
-    $navbar->push($gmSection);
-  }
-  
+  $navbar->push(build_about_subnavbar());
+  $navbar->push(build_larps_subnavbar());
+  if (ACCEPTING_BIDS || user_has_priv(PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON))
+    $navbar->push(build_bids_subnavbar());
+  if (user_is_gm() || user_has_priv(PRIV_GM_LIAISON) || user_has_priv(PRIV_CON_COM))
+    $navbar->push(build_gm_subnavbar());
+  if (THURSDAY_ENABLED)
+    $navbar->push(build_precon_subnavbar());
   if ((SHOW_TSHIRTS && is_logged_in()) || user_has_priv(PRIV_CON_COM))
-  {
-    $shirtsSection = new SubNavBar(CON_NAME . " <NOBR>Shirts</NOBR>");
-    $shirtsSection->push(NavBarItem::newAction("Order Shirts", "TShirts.php"));
-    if (user_has_priv(PRIV_CON_COM)) {
-      $shirtsSection->push(NavBarItem::newAction('Shirt Order Summary', 'TShirts.php', SHOW_TSHIRT_SUMMARY));
-      $shirtsSection->push(NavBarItem::newAction('Shirt Order Report', 'TShirts.php', SHOW_TSHIRT_REPORT));
-    }
-    $navbar->push($shirtsSection);
-  }
-    
-  // Bids section
-  if (ACCEPTING_BIDS || user_has_priv(PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON)) {
-    $bidsSection = new SubNavBar("Bids");
-    if (user_has_priv(PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON))
-      $bidsSection->push(NavBarItem::newAction("Status of Bids", "Bids.php", BID_REVIEW_BIDS));
-    $bidsSection->push(NavBarItem::newAction("Bid a Game!", "biddingAGame.php"));
-    
-    if (user_has_priv (PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON))
-    {  
-      $bidsSection->push(NavBarItem::newAction("BidCom Feedback Summary", "Bids.php", BID_FEEDBACK_SUMMARY));
-      if (user_has_priv(PRIV_GM_LIAISON))
-        $bidsSection->push(NavBarItem::newStatic("Bid Commmittee Responsibilities", "BidCommittee"));
-    }
-    
-    if (user_has_priv (PRIV_SCHEDULING))
-      $bidsSection->push(NavBarItem::newAction('Manage Bid Page Info', 'biddingAGame.php', BAG_SHOW_FORM));
-
-    $navbar->push($bidsSection);
-  }
-  
-  // Attendees section
-  if (user_has_priv(PRIV_CON_COM)) {
-    $usersSection = new SubNavBar("Attendees");
-    $usersSection->push(NavBarItem::newAction("View User", "index.php", SELECT_USER_TO_VIEW));
-    if (user_has_priv(PRIV_REGISTRAR)) {
-      $usersSection->push(NavBarItem::newAction('Add or Edit a User', 'index.php', SELECT_USER_TO_EDIT));
-      $usersSection->push(NavBarItem::newAction('Set User Password', 'index.php', SELECT_USER_TO_SET_PASSWORD));
-      $usersSection->push(NavBarItem::newAction('Delete a User', 'index.php', SELECT_USER_TO_DELETE));
-    }
-    $usersSection->push(NavBarItem::newAction("Comp'd Users", 'index.php', SHOW_COMPED_USERS));
-    $usersSection->push(NavBarItem::newAction('Attendence by Payment Amount', 'Attendees.php'));
-    $usersSection->push(NavBarItem::newAction('How Users Heard', 'Reports.php', REPORT_HOW_HEARD));
-    $usersSection->push(NavBarItem::newAction('Bio Report', 'index.php', BIO_REPORT));
-
-    if (user_has_priv(PRIV_REGISTRAR))
-      $usersSection->push(NavBarItem::newAction('Users By Age', 'Reports.php', REPORT_BY_AGE));
-      
-    if (user_has_priv(PRIV_STAFF))
-      $usersSection->push(NavBarItem::newAction('Become User', 'index.php', SELECT_USER_TO_BECOME));
-
-    $navbar->push($usersSection);
-    
-  }
-
-  // Mail section
-  if (user_has_any_mail_priv ()) {
-    $mailSection = new SubNavBar('Mail');
-    $mailSection->push(NavBarItem::newAction('Show Lists', 'MailTo.php', MAIL_LISTS));
-    $mailSection->push(NavBarItem::newAction('GM Lists', 'MailTo.php', MAIL_GM_LISTS));
-    $mailSection->push(NavBarItem::newAction('Iron GM List', 'MailTo.php', MAIL_IRON_GM_LIST));
-    $mailSection->push(NavBarItem::newAction('Bid Submitters', 'MailTo.php', MAIL_BID_SUBMITTERS));
-    $mailSection->push(NavBarItem::newAction('Bio Lists', 'MailTo.php', MAIL_BIO_LISTS));
-    $mailSection->push(NavBarItem::newAction('Waitlisted Players', 'MailTo.php', MAIL_WAITLISTED));
-    $mailSection->push(NavBarItem::newAction('Who\'s Not Playing When', 'Reports.php', REPORT_WHOS_NOT_PLAYING_FORM));
-    
-    $navbar->push($mailSection);
-  }
-  
-  // Ops section
-
+    $navbar->push(build_shirts_subnavbar());
+  if (user_has_priv(PRIV_CON_COM))
+    $navbar->push(build_attendees_subnavbar());
+  if (user_has_any_mail_priv ())
+    $navbar->push(build_mail_subnavbar());
   if (user_has_priv (PRIV_CON_COM))
-  {
-    $opsSection = new SubNavBar("Print Materials");
-    $opsSection->push(NavBarItem::newAction('Per Game Report', 'Reports.php', REPORT_PER_GAME));
-    $opsSection->push(NavBarItem::newAction('Per User Report', 'Reports.php', REPORT_PER_USER));
-    $opsSection->push(NavBarItem::newAction('Per Room Report', 'Reports.php', REPORT_PER_ROOM));
-    $opsSection->push(NavBarItem::newAction('Ops Report', 'Reports.php', REPORT_OPS_TRACK));
-    $opsSection->push(NavBarItem::newAction('ConSuite Report', 'Reports.php', REPORT_CONSUITE_TRACK));
-    $opsSection->push(NavBarItem::newAction('Games by Time', 'Reports.php', REPORT_GAMES_BY_TIME));
-    $opsSection->push(NavBarItem::newAction('Users CSV', 'Reports.php', REPORT_USERS_CSV));
-    $opsSection->push(NavBarItem::newAction('Registration Report', 'Reports.php', REPORT_REGISTRATION));
-    if (THURSDAY_ENABLED)
-      $opsSection->push(NavBarItem::newAction('PreCon Events Report', 'Thursday.php', THURSDAY_REPORT));
-    if (defined ('PROGRAM_PUB_PREFIX'))
-    {
-      $opsSection->push('Program Cover.pub', NavBarItem::newProgram(PROGRAM_PUB_PREFIX, 'Cover.pub'));
-      $opsSection->push('Program Interior.pub', NavBarItem::newProgram(PROGRAM_PUB_PREFIX, 'Interior.pub'));
-    }
-    if (defined ('PROGRAM_PDF_PREFIX'))
-    {
-      $opsSection->push(NavBarItem::newProgram("Program Cover", PROGRAM_PDF_PREFIX, "Cover.pdf"));
-      $opsSection->push(NavBarItem::newProgram("Program Interior", PROGRAM_PDF_PREFIX, "Interior.pdf"));
-    }
-
-    $navbar->push($opsSection);
-  }
-  
-  // Add these menu items if the user has scheduling privilege
-
+    $navbar->push(build_print_materials_subnavbar());
   if (user_has_priv (PRIV_SCHEDULING))
-  {
-    $scheduleSection = new SubNavBar("Scheduling");
-    $scheduleSection->push(NavBarItem::newAction('Manage Schedule', 'ListGames.php'));
-    $scheduleSection->push(NavBarItem::newAction('Schedule Ops', 'ListGames.php', LIST_ADD_OPS));
-    $scheduleSection->push(NavBarItem::newAction('Schedule ConSuite', 'ListGames.php', LIST_ADD_CONSUITE));
-//    $scheduleSection->push(NavBarItem::newAction('Add a Parallel Run', 'ListGames.php', LIST_TO_ADD_PARALLEL_RUN));
-    $scheduleSection->push(NavBarItem::newAction('Add Special Event', 'SpecialEvents.php'));
-    $scheduleSection->push(NavBarItem::newAction('Manage Special Events', 'SpecialEvents.php', SPECIAL_EVENT_LIST));
-    
-    $navbar->push($scheduleSection);
-  }
-    
-  // About Intercon section
-  $aboutSection = new SubNavBar("About <NOBR>".CON_NAME."</NOBR>");
-  $aboutSection->push(NavBarItem::newStatic("Frequently Asked Questions", "faq"));
-  $aboutSection->push(NavBarItem::newStatic("Convention Rules", "ConRules"));
-  $aboutSection->push(NavBarItem::newAction("What Does It Cost?", "cost.php"));
-  $aboutSection->push(NavBarItem::newAction("Contacts", "Contacts.php"));
-  $aboutSection->push(NavBarItem::newAction("Hotel Info", "hotel.php"));
-  $aboutSection->push(NavBarItem::newAction("Who's Who", "index.php", WHO_IS_WHO));
-  $aboutSection->push(NavBarItem::newStatic("Volunteering", "volunteering"));
-  $aboutSection->push(NavBarItem::newAction("ConCom Schedule", "ConComSchedule.php"));
-  $aboutSection->push(NavBarItem::newAction(CON_NAME.' Flyer', 'InterconFlyer.pdf'));
-  $navbar->push($aboutSection);
-
-
-  // Website Section
-  if (user_has_priv(PRIV_CON_COM) || user_has_priv(PRIV_STAFF)) {
-    $websiteSection = new SubNavBar("Web Site");
-    if (user_has_priv(PRIV_STAFF))
-      $websiteSection->push(NavBarItem::newAction('Change Con Settings', 'Status.php'));
-    $websiteSection->push(NavBarItem::newAction('Referring Sites', 'Referrers.php', VIEW_REFERRERS));
-    $websiteSection->push(NavBarItem::newAction('Referring Site Summary',
-  	  'Referrers.php', SUMMARIZE_REFERRERS));
-    $navbar->push($websiteSection);
-  }
+    $navbar->push(build_schedule_subnavbar());
+  if (user_has_priv(PRIV_CON_COM) || user_has_priv(PRIV_STAFF))
+    $navbar->push(build_website_subnavbar());
 
   echo $navbar->render();
+}
 
+function display_links_navbar() {
   $links = new NavBar();
   $links->push(new NavBarTitle("Links"));
   $links->push(NavBarItem::newExternal("Forums", "http://forums.interactiveliterature.org"));
@@ -436,7 +453,15 @@ function display_navbar() {
   $links->push($plugsSection);
 	
 	echo $links->render("menu links");
+}
 
+function display_navbar() {
+  echo "<div class=navbar>\n";
+  
+  display_account_control_navbar();
+  display_main_navbar();
+  display_links_navbar();
+  
   echo "</div> <!-- navbar -->\n\n";
 }
 
