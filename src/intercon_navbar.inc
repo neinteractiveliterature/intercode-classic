@@ -399,7 +399,7 @@ function display_account_control_navbar() {
     $accountControl->push(NavBarItem::newAction('Login', 'index.php', NULL, "login"));
     $accountControl->push(NavBarItem::newAction('Register for <NOBR>'.CON_NAME.'</NOBR>', 'index.php', NEW_USER, "register"));
   }
-  echo $accountControl->render("menu accountControl priv");
+  echo $accountControl->render("accountControl priv");
 }
 
 function display_main_navbar() {
@@ -456,9 +456,10 @@ function display_links_navbar() {
 }
 
 function display_navbar() {
+  display_account_control_navbar();
+
   echo "<div class=navbar>\n";
   
-  display_account_control_navbar();
   display_main_navbar();
   display_links_navbar();
   

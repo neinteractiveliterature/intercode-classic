@@ -153,7 +153,7 @@ define (BIO_DUE_DATE, "December&nbsp;25,&nbsp;2009");
 define (COLOR_MENU_PUBLIC_FG, "#224099");
 define (COLOR_MENU_PUBLIC_BG, "#b9d1ec");
 define (COLOR_MENU_PRIV_FG, "#ca9a00");
-define (COLOR_MENU_PRIV_BG, "#fbc926");
+define (COLOR_MENU_PRIV_BG, "#FADB5E");
 
 // 1 (true) if we're accepting bids, 0 if we're not
 

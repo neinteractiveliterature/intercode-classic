@@ -4,7 +4,7 @@ header("Content-type: text/css");
 ?>
 body
 {
-	margin: 135px 0 0 0;
+	margin: 160px 0 0 0;
 	padding: 0 7% 0 180px;
 	background-image: url("PageBanner.png");
 	background-repeat: no-repeat;
@@ -23,7 +23,7 @@ a img {
 	position: absolute;
 	z-index: 5;
 	width: 150px;
-	top: 120px;
+	top: 145px;
 	left: 9px;
 	margin: 0;
 	padding: 0;
@@ -51,8 +51,9 @@ ul.menu, ul.subhead {
     -webkit-border-radius: 5px;
     border-radius: 5px;
     
-    background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(<? echo COLOR_MENU_PUBLIC_BG; ?>));
-    background: -moz-linear-gradient(top, #fff, <?echo COLOR_MENU_PUBLIC_BG; ?>);
+    background-color: <? echo COLOR_MENU_PUBLIC_BG; ?>;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(<? echo COLOR_MENU_PUBLIC_BG; ?>));
+    background-image: -moz-linear-gradient(top, #fff, <?echo COLOR_MENU_PUBLIC_BG; ?>);
 
     -moz-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PUBLIC_FG; ?>;
     -webkit-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PUBLIC_FG; ?>;
@@ -73,8 +74,38 @@ ul.subhead {
   -webkit-box-shadow: none;
   box-shadow: none;
   
-  background: #aaa;
-  background: rgba(0, 0, 0, 0.1);
+  background-color: #aaa;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+ul.accountControl {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+  position: absolute;
+  left: 9px;
+  top: 130px;
+  height: 22px;
+  width: 850px;
+  
+  border-bottom: 2px <? echo COLOR_MENU_PRIV_FG; ?> solid;
+}
+
+ul.accountControl li {
+  width: 200px;
+  height: 22px;
+  display: -moz-inline-stack;
+  display: inline-block;
+  text-align: center;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-left: 1px <? echo COLOR_MENU_PRIV_BG; ?> solid;  
+  
+  <!--[if IE lt 8]>
+  zoom: 1;
+  *display: inline;
+  <![endif]-->
 }
 
 ul.accountControl li a {
@@ -88,7 +119,6 @@ ul.accountControl li a {
   padding-right: 18px !important;
   background-position: right center;
   background-repeat: no-repeat;
-  
 }
 
 ul.accountControl li.login a {
@@ -136,22 +166,24 @@ ul.menu li.subhead {
   padding: 3px;
 }
 
-ul.menu.priv {
+ul.priv {
     border-color: <?echo COLOR_MENU_PRIV_FG; ?>;
 
-    background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(<?echo COLOR_MENU_PRIV_BG; ?>));
-    background: -moz-linear-gradient(top, #fff, <?echo COLOR_MENU_PRIV_BG; ?>);
+    background-color: <?echo COLOR_MENU_PRIV_BG ?>;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(<?echo COLOR_MENU_PRIV_BG; ?>));
+    background-image: -moz-linear-gradient(top, #fff, <?echo COLOR_MENU_PRIV_BG; ?>);
 
-    box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>;
+/*    box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>;
     -moz-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>;
-    -webkit-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>;
+    -webkit-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>; */
 }
 
 ul.menu.links {
   border-color: #555;
   
-  background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#aaa));
-  background: -moz-linear-gradient(top, #fff, #aaa);
+  background-color: #aaa;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#aaa));
+  background-image: -moz-linear-gradient(top, #fff, #aaa);
 
   box-shadow: 0px 0px 5px #555;
   -moz-box-shadow: 0px 0px 5px #555;
@@ -160,7 +192,7 @@ ul.menu.links {
 
 ul.menu.links li.title
 {
-	background-color: #555;
+	background-color: #555 !important;
 }
 
 ul.menu li.expandable a {
@@ -180,7 +212,7 @@ ul.menu li a {
     font-size: 90%;
 }
 
-ul.menu li a:hover {
+ul.menu li a:hover, ul.accountControl li a:hover {
     background-color: rgba(255, 255, 0, 0.2);
 }
 
@@ -189,12 +221,12 @@ ul.menu li a, ul.menu li a:visited {
     text-decoration: none;
 }
 
-ul.menu li.current a {
+ul.menu li.current a, ul.accountControl li.current {
   background-color: white;
   font-weight: bold;
 }
 
-ul.menu.priv li {
+ul.priv li {
     border-bottom-color: <?echo COLOR_MENU_PRIV_FG; ?>;
 }
 
@@ -221,12 +253,14 @@ ul.menu li.external a {
   padding-right: 13px;
 }
 
-ul.menu.priv li.title
+ul.accountControl li.title
 {
-	background-color: <?echo COLOR_MENU_PRIV_FG; ?>;
+  font-style: italic;
+  border-left: none;
 }
 
 ul.subhead li.title {
+  background-color: #aaa;
   background-color: rgba(0, 0, 0, 0.3);
 }
 
