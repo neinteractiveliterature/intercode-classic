@@ -386,20 +386,28 @@ function build_website_subnavbar() {
 	return $websiteSection;
 }
 
+function display_login_logout_navbar() {
+  $accountControl = new NavBar();
+  if (is_logged_in()) {
+    $accountControl->push(NavBarItem::newAction("Log Out", "index.php", LOGOUT_USER, "logout"));
+  } else {
+    $accountControl->push(NavBarItem::newAction('Login', 'index.php', NULL, "login"));
+  }
+  echo $accountControl->render("loginBar accountControl priv");
+}
+
 function display_account_control_navbar() {
   $accountControl = new NavBar();
   if (is_logged_in()) {
     $userName = $_SESSION[SESSION_LOGIN_USER_NAME];
     $accountControl->push(new NavBarTitle($userName));
-    $accountControl->push(NavBarItem::newAction("Log Out", "index.php", LOGOUT_USER, "logout"));
     $accountControl->push(NavBarItem::newAction("My Profile", "index.php", UPDATE_USER, "profile"));
     if (user_is_gm())
       $accountControl->push(NavBarItem::newAction("Edit My Bio", "index.php", EDIT_BIO, "bio"));
   } else {
-    $accountControl->push(NavBarItem::newAction('Login', 'index.php', NULL, "login"));
     $accountControl->push(NavBarItem::newAction('Register for <NOBR>'.CON_NAME.'</NOBR>', 'index.php', NEW_USER, "register"));
   }
-  echo $accountControl->render("accountControl priv");
+  echo $accountControl->render("menu accountControl priv");
 }
 
 function display_main_navbar() {
@@ -456,11 +464,12 @@ function display_links_navbar() {
 }
 
 function display_navbar() {
-  display_account_control_navbar();
+  display_login_logout_navbar();
 
   echo "<div class=navbar>\n";
   
   display_main_navbar();
+  display_account_control_navbar();
   display_links_navbar();
   
   echo "</div> <!-- navbar -->\n\n";

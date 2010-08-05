@@ -60,6 +60,12 @@ ul.menu, ul.subhead {
     box-shadow: 0px 0px 5px <?echo COLOR_MENU_PUBLIC_FG; ?>;
 }
 
+ul.menu.priv {
+  -moz-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>;
+  -webkit-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>;
+  box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>;
+}
+
 ul.subhead {
   border: 1px #666 solid;
   -moz-border-radius: 0;
@@ -78,7 +84,7 @@ ul.subhead {
   background-color: rgba(0, 0, 0, 0.1);
 }
 
-ul.accountControl {
+ul.loginBar {
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -89,18 +95,17 @@ ul.accountControl {
   height: 22px;
   width: 850px;
   
-  border-bottom: 2px <? echo COLOR_MENU_PRIV_FG; ?> solid;
+  border-bottom: 1px <? echo COLOR_MENU_PRIV_FG; ?> solid;
 }
 
-ul.accountControl li {
+ul.loginBar li {
   width: 200px;
   height: 22px;
   display: -moz-inline-stack;
   display: inline-block;
-  text-align: center;
+  text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  border-left: 1px <? echo COLOR_MENU_PRIV_BG; ?> solid;  
   
   <!--[if IE lt 8]>
   zoom: 1;
@@ -119,6 +124,14 @@ ul.accountControl li a {
   padding-right: 18px !important;
   background-position: right center;
   background-repeat: no-repeat;
+}
+
+ul.accountControl.loginBar li a {
+  padding-right: 22px !important;
+}
+
+ul.loginBar li {
+  background-color: transparent !important;
 }
 
 ul.accountControl li.login a {
@@ -244,6 +257,12 @@ ul.menu li.title
 	color: #FFFFFF;
 	font-weight: bold;
         border-bottom: none;
+}
+
+ul.menu.priv li.title
+{
+	background-color: <?echo COLOR_MENU_PRIV_FG; ?>;
+	font-style: normal;
 }
 
 ul.menu li.external a {
