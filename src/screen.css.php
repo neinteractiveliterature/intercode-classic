@@ -283,6 +283,11 @@ ul.subhead li.title {
   background-color: rgba(0, 0, 0, 0.3);
 }
 
+ul.subhead.priv li.title {
+  font-style: normal !important;
+  background-color: <? echo COLOR_MENU_PRIV_BG ?>;
+}
+
 ul.subhead li.title.current a {
   background-color: transparent;
 }

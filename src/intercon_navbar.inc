@@ -30,9 +30,11 @@ class NavBar {
 class SubNavBar extends NavBar {
   public $title;
   public $useFirstItemTitleIfSingle;
+  public $class;
   
-  function __construct($title, $useFirstItemTitleIfSingle=false) {
+  function __construct($title, $useFirstItemTitleIfSingle=false, $class=NULL) {
     $this->title = $title;
+    $this->class = $class;
     $this->useFirstItemTitleIfSingle = $useFirstItemTitleIfSingle;
     parent::__construct();
   }
@@ -57,7 +59,12 @@ class SubNavBar extends NavBar {
     return $html;
   }
   
-  function render($class="subhead") {
+  function render($class=NULL) {
+    if ($class === NULL) {
+      $class = $this->class;
+    }
+    $class = "subhead $class";
+    
     if ($this->haveMultipleItems() && $this->isCurrent()) {
       $html = "<li class=\"$class\">";
       $html .= parent::render($class);
@@ -396,18 +403,17 @@ function display_login_logout_navbar() {
   echo $accountControl->render("loginBar accountControl priv");
 }
 
-function display_account_control_navbar() {
-  $accountControl = new NavBar();
+function build_account_control_subnavbar() {
+  $accountControl = new SubNavBar("My Account", true, "accountControl priv");
   if (is_logged_in()) {
     $userName = $_SESSION[SESSION_LOGIN_USER_NAME];
-    $accountControl->push(new NavBarTitle($userName));
     $accountControl->push(NavBarItem::newAction("My Profile", "index.php", UPDATE_USER, "profile"));
     if (user_is_gm())
       $accountControl->push(NavBarItem::newAction("Edit My Bio", "index.php", EDIT_BIO, "bio"));
   } else {
     $accountControl->push(NavBarItem::newAction('Register for <NOBR>'.CON_NAME.'</NOBR>', 'index.php', NEW_USER, "register"));
   }
-  echo $accountControl->render("menu accountControl priv");
+  return $accountControl;
 }
 
 function display_main_navbar() {
@@ -417,6 +423,7 @@ function display_main_navbar() {
   $navbar->push(NavBarItem::newAction('Home', 'index.php'));
   
   $navbar->push(build_about_subnavbar());
+  $navbar->push(build_account_control_subnavbar());
   $navbar->push(build_larps_subnavbar());
   if (ACCEPTING_BIDS || user_has_priv(PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON))
     $navbar->push(build_bids_subnavbar());
@@ -469,7 +476,7 @@ function display_navbar() {
   echo "<div class=navbar>\n";
   
   display_main_navbar();
-  display_account_control_navbar();
+/*  display_account_control_navbar(); */
   display_links_navbar();
   
   echo "</div> <!-- navbar -->\n\n";
