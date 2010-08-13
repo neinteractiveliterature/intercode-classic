@@ -393,27 +393,20 @@ function build_website_subnavbar() {
 	return $websiteSection;
 }
 
-function display_login_logout_navbar() {
+function display_account_control_navbar() {
   $accountControl = new NavBar();
   if (is_logged_in()) {
-    $accountControl->push(NavBarItem::newAction("Log Out", "index.php", LOGOUT_USER, "logout"));
-  } else {
-    $accountControl->push(NavBarItem::newAction('Login', 'index.php', NULL, "login"));
-  }
-  echo $accountControl->render("loginBar accountControl priv");
-}
-
-function build_account_control_subnavbar() {
-  $accountControl = new SubNavBar("My Account", true, "accountControl priv");
-  if (is_logged_in()) {
     $userName = $_SESSION[SESSION_LOGIN_USER_NAME];
+    $accountControl->push(new NavBarTitle($userName));
+    $accountControl->push(NavBarItem::newAction("Log Out", "index.php", LOGOUT_USER, "logout"));
     $accountControl->push(NavBarItem::newAction("My Profile", "index.php", UPDATE_USER, "profile"));
     if (user_is_gm())
       $accountControl->push(NavBarItem::newAction("Edit My Bio", "index.php", EDIT_BIO, "bio"));
   } else {
+    $accountControl->push(NavBarItem::newAction('Login', 'index.php', NULL, "login"));
     $accountControl->push(NavBarItem::newAction('Register for <NOBR>'.CON_NAME.'</NOBR>', 'index.php', NEW_USER, "register"));
   }
-  return $accountControl;
+  echo $accountControl->render("menu accountControl priv");
 }
 
 function display_main_navbar() {
@@ -423,7 +416,6 @@ function display_main_navbar() {
   $navbar->push(NavBarItem::newAction('Home', 'index.php'));
   
   $navbar->push(build_about_subnavbar());
-  $navbar->push(build_account_control_subnavbar());
   $navbar->push(build_larps_subnavbar());
   if (ACCEPTING_BIDS || user_has_priv(PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON))
     $navbar->push(build_bids_subnavbar());
@@ -450,7 +442,7 @@ function display_main_navbar() {
 function display_links_navbar() {
   $links = new NavBar();
   $links->push(new NavBarTitle("Links"));
-  $links->push(NavBarItem::newExternal("Forums", "http://forums.interactiveliterature.org"));
+  $links->push(NavBarItem::newExternal("NEIL Forum", "http://forums.interactiveliterature.org"));
   $links->push(NavBarItem::newExternal('New England Interactive Literature',
 			  'http://www.interactiveliterature.org'));
 	if (user_has_priv(PRIV_CON_COM)) {
@@ -471,12 +463,10 @@ function display_links_navbar() {
 }
 
 function display_navbar() {
-  display_login_logout_navbar();
-
   echo "<div class=navbar>\n";
   
+  display_account_control_navbar();
   display_main_navbar();
-/*  display_account_control_navbar(); */
   display_links_navbar();
   
   echo "</div> <!-- navbar -->\n\n";
