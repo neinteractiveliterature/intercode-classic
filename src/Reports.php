@@ -85,9 +85,10 @@ switch ($action)
     break;
 
   case REPORT_USERS_CSV:
-    html_begin (true);
+    header("Content-type: text/csv");
+    header("Content-Disposition: attachment; filename=\"".CON_NAME." Users.csv\"");
     report_users_csv ();
-    break;
+    exit();
 
   case REPORT_REGISTRATION:
     html_begin (true);
@@ -1200,7 +1201,7 @@ function report_users_csv ()
   if (! $result)
     return display_mysql_error ('Query for users failed');
 
-  echo "\"LastName\",\"FirstName\",\"Nickname\",\"EMail\",\"Status\",\"ShirtOrder\"<br>\n";
+  echo "\"LastName\",\"FirstName\",\"Nickname\",\"EMail\",\"Status\",\"ShirtOrder\"\n";
 
   while ($row = mysql_fetch_object ($result))
   {
@@ -1255,7 +1256,7 @@ function report_users_csv_tshirts ($user_id)
 
   mysql_free_result ($result);
 
-  echo "\"$order\"<br>\n";
+  echo "\"$order\"\n";
 }
 
 /*
