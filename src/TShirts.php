@@ -603,8 +603,8 @@ function show_shirt_payment_link()
   echo "    <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>\n";
   printf ("    <td><b>%s<br>c/o %s<br>%s</b></td>\n",
 	  CON_NAME,
-	  NAME_CON_CHAIR,
-	  ADDR_CON_CHAIR);
+	  NAME_SEND_CHECKS,
+	  ADDR_SEND_CHECKS);
   echo "  </tr>\n";
   echo "</table>\n";
   echo "<p>\n";

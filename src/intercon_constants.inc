@@ -76,6 +76,9 @@ define (NAME_CON_CHAIR, 'Tim Lasko');
 define (EMAIL_CON_CHAIR, 'conchair@' . CON_DOMAIN);
 define (ADDR_CON_CHAIR, '88 Perry Street, Unit 281<br>Putnam, CT 06260');
 
+define (NAME_SEND_CHECKS, 'Chad Bergeron');
+define (ADDR_SEND_CHECKS, '123 Fake St<br>Fake, MA 90210');
+
 // EMail Addresses
 
 define (NAME_ADVERTISING, '');
@@ -126,10 +129,10 @@ define (FRI_DATE, '12-Mar-2010');
 
 // Deadlines - Format is YYYY-MM-DD
 
-define (REGISTRATION_CLOSE, '2010-02-24');
-define (CON_OVER, '2010-03-14');
-define (SHIRT_CLOSE, '2010-02-01');
-define (BIO_CLOSE, '2009-12-25');
+define (REGISTRATION_CLOSE, '2011-02-24');
+define (CON_OVER, '2011-03-14');
+define (SHIRT_CLOSE, '2011-02-01');
+define (BIO_CLOSE, '2010-12-25');
 
 // Information about the next convention for people who can't sign up for this one
 define (NEXT_CON_INFO, "Registration for Intercon L will open in March 2011.");
