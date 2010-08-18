@@ -1192,7 +1192,7 @@ function report_users_csv ()
 {
   // Fetch the list of users
 
-  $sql = 'SELECT UserId, FirstName, Nickname, LastName, EMail, CanSignup FROM Users';
+  $sql = 'SELECT UserId, FirstName, Nickname, LastName, EMail, CanSignup, LastLogin FROM Users';
 //  $sql .= ' WHERE CanSignup<>"Alumni"';
 //  $sql .= '   AND LastName<>"Admin"';
   $sql .= ' ORDER BY LastName, FirstName';
@@ -1201,7 +1201,7 @@ function report_users_csv ()
   if (! $result)
     return display_mysql_error ('Query for users failed');
 
-  echo "\"LastName\",\"FirstName\",\"Nickname\",\"EMail\",\"Status\",\"ShirtOrder\"\n";
+  echo "\"LastName\",\"FirstName\",\"Nickname\",\"EMail\",\"Status\",\"LastLogin\",\"ShirtOrder\"\n";
 
   while ($row = mysql_fetch_object ($result))
   {
@@ -1210,6 +1210,7 @@ function report_users_csv ()
     echo "\"$row->Nickname\",";
     echo "\"$row->EMail\",";
     echo "\"$row->CanSignup\",";
+    echo "\"$row->LastLogin\",";
     
     report_users_csv_tshirts ($row->UserId);
   }
