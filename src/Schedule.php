@@ -869,9 +869,9 @@ function schedule_day ($day, $away_all_day, $away_hours,
 		  $total_waitlisted[$h] = 0;
 		}
 	
-		$avail_min[$h] += $row->Min;
-		$avail_pref[$h] += $row->Pref;
-		$avail_max[$h] += $row->Max;
+	    $avail_min[$h] += ($row->MinPlayersMale + $row->MinPlayersFemale + $row->MinPlayersNeutral);
+	    $avail_pref[$h] += ($row->PrefPlayersMale + $row->PrefPlayersFemale + $row->PrefPlayersNeutral);
+	    $avail_max[$h] += ($row->MaxPlayersMale + $row->MaxPlayersFemale + $row->MaxPlayersNeutral);
 	
 		$total_confirmed[$h] += $run_counts["Male"];
 		$total_confirmed[$h] += $run_counts["Female"];
