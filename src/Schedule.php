@@ -596,11 +596,12 @@ function display_event ($hour, $away_all_day, $away_hours,
              " F:$avail_female" .
 	     " N:$avail_neutral";
 
-//    if (user_has_priv (PRIV_SCHEDULING))
+    if (user_has_priv (PRIV_SCHEDULING)) {
 //      $text .= sprintf ('<br><font color=red>Track: %d, Span: %d</font>',
 //		       $row->Track,
 //		       $row->Span);
       $text .= "<br>RunId: $row->RunId";
+    }
   }
   
   echo "<div style=\"".$dimensions->getCSS()."\">";
