@@ -1690,6 +1690,20 @@ function show_user_homepage ()
 function add_user ()
 {
   $update = isset ($_SESSION[SESSION_LOGIN_USER_ID]);
+  
+  // If this is a new registration, check the CAPTCHA
+  if (!$update) {
+      require_once('recaptchalib.php');
+      $resp = recaptcha_check_answer (RECAPTCHA_PRIVATE_KEY,
+                                $_SERVER["REMOTE_ADDR"],
+                                $_POST["recaptcha_challenge_field"],
+                                $_POST["recaptcha_response_field"]);
+
+      if (!$resp->is_valid) {
+          // What happens when the CAPTCHA was entered incorrectly
+          return "Sorry, the two words you entered for the reCAPTCHA check were incorrect.  Please try again.";
+      }
+  }
 
   // If the user asked to reset the form, just wipe out the $_POST array and return
 
@@ -2047,6 +2061,13 @@ function display_user_form ($returning_alumni, $errors='')
   form_text (64, 'Best Time to Call', 'BestTime', 128);
   form_preferred_contact ('Preferred Contact', 'PreferredContact');
   form_text (64, 'How did you hear about ' . CON_NAME . '?', 'HowHeard');
+  
+  if (! $update) {
+      require_once('recaptchalib.php');
+      echo "<tr><td></td><td>";
+      echo recaptcha_get_html(RECAPTCHA_PUBLIC_KEY);
+      echo "</td></tr>\n";
+  }
 
   if (! $update)
     $button_title = 'Register Now!';
