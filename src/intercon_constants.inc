@@ -38,7 +38,7 @@ define (DB_USER_PWD, '');
 // When DEVELOPMENT_VERSION is set to 1, all mail will be diverted to this
 // address
 
-define (DEVELOPMENT_MAIL_ADDR, 'barry.tannenbaum@gmail.com');
+define (DEVELOPMENT_MAIL_ADDR, 'natbudin@gmail.com');
 
 // Set to 0 to disable the poll
 
@@ -161,6 +161,9 @@ define (COLOR_MENU_PRIV_BG, "#FADB5E");
 // 1 (true) if we're accepting bids, 0 if we're not
 
 define (ACCEPTING_BIDS, 1);
+
+define (RECAPTCHA_PUBLIC_KEY, "6Ld3_70SAAAAABWMABItLF0iRTQlzk9KoQtBCCY7");
+define (RECAPTCHA_PRIVATE_KEY, "6Ld3_70SAAAAAPLq2uF5DdkW4DBF5g46svK7IH1o");
 
 function parse_date ($d)
 {
