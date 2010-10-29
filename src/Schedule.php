@@ -3276,7 +3276,7 @@ function list_games_alphabetically ()
 {
   // Always shill for games!
 
-  if (ACCEPTING_BIDS)
+  if (accepting_bids())
   {
     echo "<p>\n";
     echo "We're looking for a wide and varied slate of games to fill\n";

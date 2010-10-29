@@ -2,10 +2,13 @@ set :application, "intercon-k"
 set :user, "neiladmin"
 set :domain, "#{user}@apocalypse.dreamhost.com"
 set :repository, "file:///home/#{user}/svn/intercon/trunk/src"
-set :deploy_to, "/home/#{user}/#{application}"
 
 task :sandbox do
   set :deploy_to, "/home/#{user}/sandbox.interactiveliterature.org"
+end
+
+task :production do
+  set :deploy_to, "/home/#{user}/#{application}"
 end
 
 namespace :vlad do

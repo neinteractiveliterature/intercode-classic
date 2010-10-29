@@ -39,7 +39,7 @@ a img {
   width: 150px;
 }
 
-ul.menu, ul.subhead {
+ul.menu, ul.subhead, .menulike {
     margin: 0;
 	  text-align: center;
 	  list-style-type: none;
@@ -251,7 +251,7 @@ ul.menu li:last-child {
     border-bottom: none;
 }
 
-ul.menu li.title
+ul.menu li.title, .menulike .title
 {
 	background-color: <?echo COLOR_MENU_PUBLIC_FG; ?>;
 	color: #FFFFFF;

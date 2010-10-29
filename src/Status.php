@@ -122,6 +122,34 @@ function form_signups_allowed ($display, $key)
   echo "  </TR>   \n";
 }
 
+/*
+ * form_bids_allowed
+ *
+ * Display the Bids Allowed field in the form being built
+ */
+
+function form_bids_allowed ($display, $key)
+{
+  $sel_yes = '';
+  $sel_no = '';
+
+  switch ($_POST[$key])
+  {
+    default:
+    case 'Yes':    $sel_yes = 'SELECTED';    break;
+    case 'No':     $sel_no = 'SELECTED'; break;
+  }
+
+  echo "  <TR>\n";
+  echo "    <TD COLSPAN=2>$display\n";
+  echo "      <SELECT NAME=$key SIZE=1>\n";
+  echo "        <option value=Yes $sel_yes>Yes</option>\n";
+  echo "        <option value=No $sel_no>No</option>\n";
+  echo "      </SELECT>\n";
+  echo "    </TD>\n";
+  echo "  </TR>   \n";
+}
+
 function show_price_dates ($price, $start_date, $end_date)
 {
 
@@ -161,6 +189,7 @@ function show_status ()
   $sql = 'SELECT Con.SignupsAllowed, Con.ShowSchedule, Con.News,';
   $sql .= ' Con.ConComMeetings,';
   $sql .= ' DATE_FORMAT(Con.LastUpdated , "%d-%b-%Y %H:%i") AS TimeStamp,';
+  $sql .= ' Con.PreconBidsAllowed, Con.AcceptingBids,';
   $sql .= ' Users.FirstName, Users.LastName';
   $sql .= ' FROM Con, Users';
   $sql .= ' WHERE Users.UserId=Con.UpdatedById';
@@ -209,6 +238,8 @@ function show_status ()
 
   form_section ('Site Control');
   form_signups_allowed ('Signups Allowed:', 'SignupsAllowed');
+  form_bids_allowed ('Accepting Game Bids:', 'AcceptingBids');
+  form_bids_allowed ('Accepting Pre-Con Event Bids:', 'PreconBidsAllowed');
   form_show_schedule ('Show Schedule of Games:', 'ShowSchedule');
   form_textarea ('News', 'News', 20);
 
@@ -240,6 +271,8 @@ function update_status ()
   $sql .= build_sql_string ('News', '', FALSE);
   $sql .= build_sql_string ('ConComMeetings');
   $sql .= build_sql_string ('SignupsAllowed');
+  $sql .= build_sql_string ('AcceptingBids');
+  $sql .= build_sql_string ('PreconBidsAllowed');
   $sql .= build_sql_string ('ShowSchedule');
   $sql .= build_sql_string ('UpdatedById', $_SESSION[SESSION_LOGIN_USER_ID]);
 

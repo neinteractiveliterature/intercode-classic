@@ -417,7 +417,7 @@ function display_main_navbar() {
   
   $navbar->push(build_about_subnavbar());
   $navbar->push(build_larps_subnavbar());
-  if (ACCEPTING_BIDS || user_has_priv(PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON))
+  if (accepting_bids() || user_has_priv(PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON))
     $navbar->push(build_bids_subnavbar());
   if (user_is_gm() || user_has_priv(PRIV_GM_LIAISON) || user_has_priv(PRIV_CON_COM))
     $navbar->push(build_gm_subnavbar());

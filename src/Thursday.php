@@ -252,104 +252,110 @@ function thursday_thing()
   
   echo "<style type=\"text/css\">\n";
   echo "#precon_top { border-spacing: 5px; }\n";
-  echo "#precon_top td { border: 2px #4b067a solid; vertical-align: top; padding: 0; width: 50%; }\n";
-  echo "#precon_top td > * { padding: 2px; }\n";
-  echo "#precon_top td h3 { background-color: black; color: white; font-size: 100%; padding: 0; text-align: center; }\n";
+  echo "#precon_top td { vertical-align: top; padding: 0; width: 50%; text-align: left !important; font-size: 90%; }\n";
+  echo "#precon_top td > * { padding: 5px; }\n";
+  echo "#precon_top td .title { text-align: center; font-size: 100%; margin-bottom: 0; }\n";
+//  echo "#precon_top td h3 { background-color: black; color: white; font-size: 100%; padding: 0; text-align: center; }\n";
   echo "</style>\n";
 
   echo "<table id=\"precon_top\"><tr>";
   $paid = false;
   $url = '';
-
-  echo "<td id=\"precon_bid\">";
-  echo "<h3>Bid a Pre-Convention Event!</h3>\n";
-  if (isset ($_SESSION[SESSION_LOGIN_USER_ID]))
-  {
-    if (0)
-    {
-      echo "<p>If you'd like to propose a panel, discussion or workshop\n";
-      printf ("please contact %s at %s.</p>\n",
-	      NAME_THURSDAY,
-	      mailto_or_obfuscated_email_address (EMAIL_THURSDAY));
-    }
-    else
-    {
-      echo "Want to propose a panel, discussion or workshop?</a>\n";
-      echo "We'd love to hear about it!\n";
-      
-      echo "<p>";
-      printf ('<a href="Thursday.php?action=%d">',
-	      PRECON_SHOW_EVENT_FORM);
-      echo "To bid an event, please fill out this quick form and we'll get back";
-      echo " to you by email.</a>  Thanks!</p>";
-      
-    }
-    
-    $sql = 'SELECT * FROM Thursday';
-    $sql .= ' WHERE UserId=' . $_SESSION[SESSION_LOGIN_USER_ID];
-
-    $result = mysql_query($sql);
-    if (! $result)
-      return display_mysql_error ('Query for PreCon record failed',
-				  $sql);
-    if (0 != mysql_num_rows($result))
-    {
-      $row = mysql_fetch_object($result);
-      if ('Paid' == $row->Status)
+  
+  if (precon_bids_allowed()) {
+      echo "<td id=\"precon_bid\" class=\"menulike\">";
+      echo "<p class=\"title\">Bid a Pre-Convention Event!</p>\n";
+      if (isset ($_SESSION[SESSION_LOGIN_USER_ID]))
       {
-        $paid = true;
+        if (0)
+        {
+          echo "<p>If you'd like to propose a panel, discussion or workshop\n";
+          printf ("please contact %s at %s.</p>\n",
+    	      NAME_THURSDAY,
+    	      mailto_or_obfuscated_email_address (EMAIL_THURSDAY));
+        }
+        else
+        {
+          echo "<p>Want to propose a panel, discussion or workshop?\n";
+          echo "We'd love to hear about it!</p>\n";
+      
+          echo "<p>";
+          printf ('<a href="Thursday.php?action=%d">',
+    	      PRECON_SHOW_EVENT_FORM);
+          echo "To bid an event, please fill out this quick form and we'll get back";
+          echo " to you by email.</a>  Thanks!</p>";
+      
+        }
+    
+        $sql = 'SELECT * FROM Thursday';
+        $sql .= ' WHERE UserId=' . $_SESSION[SESSION_LOGIN_USER_ID];
+
+        $result = mysql_query($sql);
+        if (! $result)
+          return display_mysql_error ('Query for PreCon record failed',
+    				  $sql);
+        if (0 != mysql_num_rows($result))
+        {
+          $row = mysql_fetch_object($result);
+          if ('Paid' == $row->Status)
+          {
+            $paid = true;
+          }
+        }
+
+
+        // Build the URL for the PayPal links.  If the user cancels, just return
+        // to index.php which will default to his homepage
+
+        $path_parts = pathinfo($_SERVER['PHP_SELF']);
+        $dirname = '';
+        if ("/" != $path_parts['dirname'])
+          $dirname = $path_parts['dirname'];
+
+        $return_url = sprintf ('http://%s%s/index.php',
+    			   $_SERVER['SERVER_NAME'],
+    			   $dirname);
+        //  echo "dirname: $dirname<br>\n";
+        //  echo "return_url: $return_url<br>\n";
+        $cancel_url = $return_url;
+
+        $url = 'https://www.paypal.com/cgi-bin/webscr?';
+        $url .= build_url_string ('cmd', '_xclick');
+        $url .= build_url_string ('business', 'InteractiveLit@yahoo.com');
+        $url .= build_url_string ('item_name', PAYPAL_ITEM_THURSDAY);
+        $url .= build_url_string ('no_note', '0');
+        $url .= build_url_string ('cn', 'Any notes about your payment?');
+        $url .= build_url_string ('no_shipping', '1');
+        $url .= build_url_string ('custom', $_SESSION[SESSION_LOGIN_USER_ID]);
+        $url .= build_url_string ('currency_code', 'USD');
+        $url .= build_url_string ('amount', $cost);
+        $url .= build_url_string ('rm', '2');
+        $url .= build_url_string ('cancel_return', $cancel_url);
+        $url .= build_url_string ('return', $return_url, FALSE);
+
+        //  echo "Return URL: $return_url<br>\n";
+        //  echo "Encoded URL: $url<p>\n";
+        //  printf ("%d characters<p>\n", strlen ($url));
+
+      } else {
+        echo "<p>Want to run an event at the Pre-Convention?  We'd love to hear ";
+        echo "about it!  But you'll need to <a href=\"index.php\">log in</a> to ";
+        echo "tell us.</p>\n";
       }
-    }
-
-
-    // Build the URL for the PayPal links.  If the user cancels, just return
-    // to index.php which will default to his homepage
-
-    $path_parts = pathinfo($_SERVER['PHP_SELF']);
-    $dirname = '';
-    if ("/" != $path_parts['dirname'])
-      $dirname = $path_parts['dirname'];
-
-    $return_url = sprintf ('http://%s%s/index.php',
-			   $_SERVER['SERVER_NAME'],
-			   $dirname);
-    //  echo "dirname: $dirname<br>\n";
-    //  echo "return_url: $return_url<br>\n";
-    $cancel_url = $return_url;
-
-    $url = 'https://www.paypal.com/cgi-bin/webscr?';
-    $url .= build_url_string ('cmd', '_xclick');
-    $url .= build_url_string ('business', 'InteractiveLit@yahoo.com');
-    $url .= build_url_string ('item_name', PAYPAL_ITEM_THURSDAY);
-    $url .= build_url_string ('no_note', '0');
-    $url .= build_url_string ('cn', 'Any notes about your payment?');
-    $url .= build_url_string ('no_shipping', '1');
-    $url .= build_url_string ('custom', $_SESSION[SESSION_LOGIN_USER_ID]);
-    $url .= build_url_string ('currency_code', 'USD');
-    $url .= build_url_string ('amount', $cost);
-    $url .= build_url_string ('rm', '2');
-    $url .= build_url_string ('cancel_return', $cancel_url);
-    $url .= build_url_string ('return', $return_url, FALSE);
-
-    //  echo "Return URL: $return_url<br>\n";
-    //  echo "Encoded URL: $url<p>\n";
-    //  printf ("%d characters<p>\n", strlen ($url));
-
+      echo "</td>\n";
   } else {
-    echo "<p>Want to run an event at the Pre-Convention?  We'd love to hear ";
-    echo "about it!  But you'll need to <a href=\"index.php\">log in</a> to ";
-    echo "tell us.</p>\n";
+      // precon is not accepting bids.  Put an empty placeholder cell here.
+      echo "<td></td>\n";
   }
-  echo "</td>\n";
 
-  echo "<td id=\"precon_reg\">";
+  echo "<td id=\"precon_reg\" class=\"menulike\">";
   if ($paid) {
-    echo "<h3>You're Pre-Registered for the Pre-Convention!</h3>\n";
+    echo "<p class=\"title\">You're Pre-Registered for the Pre-Convention!</h3>\n";
     echo "<p>Thanks for registering ahead of time.  We've already got your";
     echo " name in our database, so you'll have a badge waiting for you when";
     echo " you arrive at the Pre-Convention.</p>";
   } else {
-    echo "<h3>Registration</h3>";
+    echo "<p class=\"title\">Registration</h3>";
     
     printf ("<p>Registration for the %s Pre-Convention costs <b>\$$cost</b>.</p>\n",
         CON_NAME);
@@ -1489,7 +1495,7 @@ function show_precon_event()
   echo "</table>\n";
 
   $name = trim("$row->FirstName $row->LastName");
-  echo "<p><b>Submitted by:</b> $name</p>";
+//  echo "<p><b>Submitted by:</b> $name</p>";
   echo "<p>$row->Description</p>\n";
 
   if ($can_edit_event)

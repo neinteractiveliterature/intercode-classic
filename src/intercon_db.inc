@@ -489,7 +489,7 @@ function intercon_db_connect ($forceadmin=0)
     $user = DB_USER_USR;
     $pass = DB_USER_PWD;
   }
-
+  
   $link = @mysql_connect (DB_SERVER, $user, $pass);
   if ($link && mysql_select_db (DB_NAME))
     return $link;
@@ -1534,6 +1534,52 @@ function can_show_schedule ()
   //  dump_array ("SESSION", $_SESSION);
 
   return $_SESSION[SESSION_CON_SHOW_SCHEDULE];
+}
+
+// Get the contents of the single row in Con.  If we already did this, return the cached copy.
+function get_con_settings() {
+    if (!isset($GLOBALS['CACHED_CON'])) {
+        $sql = 'SELECT * FROM Con';
+        
+        $result = mysql_query ($sql);
+        if (! $result)
+        {
+          echo "<!-- $sql -->\n";
+          echo '<!-- Query for Con.PreconBidsAllowed failed: ' . mysql_error () . "-->\n";
+          return FALSE;
+        }
+
+        $row = mysql_fetch_object ($result);
+        if (! $row)
+        {
+          echo "<!-- No rows fetched for Con.ShowSchedule -->\n";
+          return FALSE;
+        }
+        
+        $GLOBALS['CACHED_CON'] = $row;
+    }
+    
+    return $GLOBALS['CACHED_CON'];
+}
+
+/*
+ * precon_bids_allowed
+ *
+ * Query the Con table to see if the pre-con is accepting bids
+ */
+
+function precon_bids_allowed () {
+    return get_con_settings()->PreconBidsAllowed == "Yes";
+}
+
+/*
+ * accepting_bids
+ *
+ * Query the Con table to see if the con is accepting bids
+ */
+
+function accepting_bids () {
+    return get_con_settings()->AcceptingBids == "Yes";
 }
 
 /*
@@ -3200,8 +3246,7 @@ function form_con_rooms($display, $key)
   echo "          <td>\n";
   room_check($rooms, 'Alcott');
   room_check($rooms, 'Belmont');
-  room_check($rooms, 'Cambridge East');
-  room_check($rooms, 'Cambridge West');
+  room_check($rooms, 'Cambridge');
   room_check($rooms, 'Concord');
   echo "          </td>\n";
   echo "          <td>\n";
@@ -3215,6 +3260,7 @@ function form_con_rooms($display, $key)
   echo "          </td>\n";
   echo "          <td>\n";
   room_check($rooms, 'Emerson');
+  room_check($rooms, 'Garfield');
   room_check($rooms, 'Hawthorne');
   room_check($rooms, 'Lincoln East');
   room_check($rooms, 'Lincoln West');
