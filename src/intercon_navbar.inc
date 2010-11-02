@@ -400,7 +400,7 @@ function display_account_control_navbar() {
     $accountControl->push(new NavBarTitle($userName));
     $accountControl->push(NavBarItem::newAction("Log Out", "index.php", LOGOUT_USER, "logout"));
     $accountControl->push(NavBarItem::newAction("My Profile", "index.php", UPDATE_USER, "profile"));
-    if (user_is_gm())
+    if (user_is_gm() || user_has_priv(PRIV_CON_COM, true))
       $accountControl->push(NavBarItem::newAction("Edit My Bio", "index.php", EDIT_BIO, "bio"));
   } else {
     $accountControl->push(NavBarItem::newAction('Login', 'index.php', NULL, "login"));
