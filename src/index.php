@@ -1283,12 +1283,12 @@ function show_con_attendence()
   if (! user_has_priv (PRIV_CON_COM))
     return;
 
-  // Only do this the first time the user logs in
+/*  // Only do this the first time the user logs in
 
   if (isset ($_SESSION[SESSION_ATTENDENCE_SHOWN]))
     return;
 
-  $_SESSION[SESSION_ATTENDENCE_SHOWN] = 1;
+  $_SESSION[SESSION_ATTENDENCE_SHOWN] = 1; */
 
   // Get a summary of users
 
