@@ -2789,7 +2789,7 @@ function intercon_mail ($to, $subject, $msg, $reply_to='')
     "Reply-To" => $reply_to,
     "X-Priority" => "1",
     "X-MSMail-Priority" => "High",
-    "X-Mailer" => "php"
+    "X-Mailer" => "php",
     "Errors-To" => EMAIL_WEBMASTER,
     "Return-Path" => EMAIL_WEBMASTER);
 
