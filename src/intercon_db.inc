@@ -2806,14 +2806,18 @@ function intercon_mail ($to, $subject, $msg, $reply_to='')
 //echo "headers: $headers<br>\n";
 //echo "message: $msg<br>\n";
 
-  $smtp = Mail::factory('smtp', array(
-      'host' => 'ssl://' . SMTP_HOST,
-      'port' => 465,
-      'auth' => true,
-      'username' => SMTP_USERNAME,
-      'password' => SMTP_PASSWORD
-      ));
-  $result = $smtp->send($to, $headers, $msg);
+  if (MAIL_BACKEND == "smtp") {
+      $mail = Mail::factory('smtp', array(
+          'host' => 'ssl://' . SMTP_HOST,
+          'port' => 465,
+          'auth' => true,
+          'username' => SMTP_USERNAME,
+          'password' => SMTP_PASSWORD
+          ));
+  } else {
+      $mail = Mail::factory(MAIL_BACKEND);
+  }
+  $result = $mail->send($to, $headers, $msg);
   return !(PEAR::isError($result));
 }
 

@@ -165,6 +165,10 @@ define (ACCEPTING_BIDS, 1);
 define (RECAPTCHA_PUBLIC_KEY, "6Ld3_70SAAAAABWMABItLF0iRTQlzk9KoQtBCCY7");
 define (RECAPTCHA_PRIVATE_KEY, "6Ld3_70SAAAAAPLq2uF5DdkW4DBF5g46svK7IH1o");
 
+// Backend for PEAR::Mail to use.  Should be either "mail", "sendmail", or "smtp"
+define(MAIL_BACKEND, "sendmail");
+
+// Define these if you specified "smtp" above.
 // Must be an SSL-enabled SMTP server listening on port 485
 define(SMTP_HOST, "smtp.gmail.com");
 define(SMTP_USERNAME, "web@intercon-k.org");
