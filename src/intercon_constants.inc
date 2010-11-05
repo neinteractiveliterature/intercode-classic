@@ -6,14 +6,6 @@
 session_name ('intercon_j');
 session_start ();
 
-$SMTP_CONFIGURATION = array(
-    'host' => 'ssl://smtp.gmail.com',
-    'port' => 465,
-    'auth' => true,
-    'username' => 'web@intercon-k.org',
-    'password' => null // fill this in on deployment
-    );
-
 // Setting DEVELOPMENT_VERSION turns on additional error checking, as well
 // as diverting all mail to the DEVELOPMENT_MAIL_ADDR
 
@@ -172,6 +164,12 @@ define (ACCEPTING_BIDS, 1);
 
 define (RECAPTCHA_PUBLIC_KEY, "6Ld3_70SAAAAABWMABItLF0iRTQlzk9KoQtBCCY7");
 define (RECAPTCHA_PRIVATE_KEY, "6Ld3_70SAAAAAPLq2uF5DdkW4DBF5g46svK7IH1o");
+
+// Must be an SSL-enabled SMTP server listening on port 485
+define(SMTP_HOST, "smtp.gmail.com");
+define(SMTP_USERNAME, "web@intercon-k.org");
+define(SMTP_PASSWORD, "");
+
 
 function parse_date ($d)
 {
