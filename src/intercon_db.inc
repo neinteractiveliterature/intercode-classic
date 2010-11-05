@@ -4,6 +4,7 @@ if (strstr($_SERVER["SERVER_NAME"], "interactiveliterature.org")) {
 }
 require ('intercon_constants.inc');
 require ('intercon_navbar.inc');
+require ('Mail.php');
 
 define (SHOW_TSHIRTS, 1);
 define (TSHIRT_DOLLARS, 20);
@@ -2779,15 +2780,18 @@ function intercon_mail ($to, $subject, $msg, $reply_to='')
     $to = DEVELOPMENT_MAIL_ADDR;
   }
 
-  $headers = sprintf ("From: Intercon Webmaster<%s>\r\n", EMAIL_WEBMASTER);
   if ('' == $reply_to)
     $reply_to = sprintf ('Intercon Webmaster<%s>', EMAIL_WEBMASTER);
-  $headers .= "Reply-To: $reply_to\r\n";
-  $headers .= "X-Priority: 1\r\n";
-  $headers .= "X-MSMail-Priority: High\r\n";
-  $headers .= "X-Mailer: php\r\n";
-  $headers .= sprintf ("Errors-To: %s\r\n", EMAIL_WEBMASTER);
-  $headers .= sprintf ("Return-Path: %s\r\n", EMAIL_WEBMASTER);
+
+  $headers = array("From" => sprintf("Intercon Webmaster<%s>", EMAIL_WEBMASTER),
+    "To" => $to,
+    "Subject" => $subject,
+    "Reply-To" => $reply_to,
+    "X-Priority" => "1",
+    "X-MSMail-Priority" => "High",
+    "X-Mailer" => "php"
+    "Errors-To" => EMAIL_WEBMASTER,
+    "Return-Path" => EMAIL_WEBMASTER);
 
 //  echo "No email sent<p>\n";
 //  return true;
@@ -2802,7 +2806,9 @@ function intercon_mail ($to, $subject, $msg, $reply_to='')
 //echo "headers: $headers<br>\n";
 //echo "message: $msg<br>\n";
 
-  return mail($to, $subject, $msg, $headers);
+  $smtp = Mail::factory('smtp', $SMTP_CONFIGURATION);
+  $result = $smtp->send($to, $headers, $msg);
+  return !(PEAR::isError($result));
 }
 
 /*

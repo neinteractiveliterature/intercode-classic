@@ -6,6 +6,14 @@
 session_name ('intercon_j');
 session_start ();
 
+$SMTP_CONFIGURATION = array(
+    'host' => 'ssl://smtp.gmail.com',
+    'port' => 465,
+    'auth' => true,
+    'username' => 'web@intercon-k.org',
+    'password' => null // fill this in on deployment
+    );
+
 // Setting DEVELOPMENT_VERSION turns on additional error checking, as well
 // as diverting all mail to the DEVELOPMENT_MAIL_ADDR
 
