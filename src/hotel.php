@@ -213,7 +213,7 @@ echo "					balance; we have to guess a year in advance if we can \n";
 echo "					meet our budget if we still let you sign up for as \n";
 echo "					little as $25. You can help us to keep <b>your own</b> \n";
 echo "					registration costs down by reserving your room early, \n";
-echo "					through the Radisson reservation process.</td>\n";
+echo "					through the Westin reservation process.</td>\n";
 echo "				</tr>\n";
 echo "			</table>\n";
 echo "		</td>\n";
