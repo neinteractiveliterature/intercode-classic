@@ -2,6 +2,14 @@
 if (strstr($_SERVER["SERVER_NAME"], "interactiveliterature.org")) {
     session_set_cookie_params(0, '/', '.interactiveliterature.org');
 }
+
+ini_set( 
+  'include_path', 
+  ini_get( 'include_path' ) . PATH_SEPARATOR . "/home/neiladmin/pear/php"
+);
+
+$pear_user_config = '/home/neiladmin/.pearrc';
+
 require ('intercon_constants.inc');
 require ('intercon_navbar.inc');
 require ('Mail.php');
