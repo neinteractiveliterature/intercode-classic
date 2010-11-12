@@ -15,8 +15,12 @@ namespace :vlad do
   Rake.clear_tasks('vlad:update_symlinks')
 
   task :check_deploy_to do
-    puts "No deployment target set.  Please run using either 'sandbox' or 'production'."
-    puts "For example: rake sandbox vlad:update"
+    begin
+      Rake::RemoteTask.fetch :deploy_to
+    rescue Vlad::ConfigurationError
+      puts "No deployment target set.  Please run using either 'sandbox' or 'production'."
+      puts "For example: rake sandbox vlad:update"
+    end
   end
 
   %w{cleanup update rollback migrate setup}.each do |task_name|
