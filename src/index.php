@@ -477,11 +477,6 @@ function login_with_data ($row, $EMail)
       display_mysql_error ('Attempt to update referrer record failed', $sql);
   }
 
-  if (is_unpaid ($row->CanSignup))
-    $CanSignup = 'N';
-  else
-    $CanSignup = 'Y';
-
   // Make sure the session is empty
 
   session_unset ();
@@ -491,7 +486,6 @@ function login_with_data ($row, $EMail)
   $_SESSION[SESSION_LOGIN_USER_ID] = $UserId;
   $_SESSION[SESSION_LOGIN_USER_PRIVS] = ",$row->Priv,";
   $_SESSION[SESSION_LOGIN_USER_GENDER] = $Gender;
-  $_SESSION[SESSION_LOGIN_USER_CAN_SIGNUP] = $CanSignup;
   $_SESSION[SESSION_LOGIN_USER_NAME] = $name;
   $_SESSION[SESSION_LOGIN_USER_EMAIL] = $EMail;
   $_SESSION['IncludeAlumni'] = 0;
@@ -1879,7 +1873,6 @@ function add_user ()
     $_SESSION[SESSION_LOGIN_USER_EMAIL] = $_POST['EMail'];
 
     // Users who've just registered can't have paid or be GMs
-    $_SESSION[SESSION_LOGIN_USER_CAN_SIGNUP] = 'N';
     $_SESSION[SESSION_LOGIN_USER_GM] = 0;
 
     if (array_key_exists (SESSION_REFERRER_ID, $_SESSION))

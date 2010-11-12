@@ -1577,28 +1577,7 @@ function show_game ()
   if (user_has_priv (PRIV_SCHEDULING) || user_has_priv (PRIV_GM_LIAISON))
     $can_edit_game = true;
 
-
-  // Check the flag we stashed in the session info for whether the user can
-  // signup.  This will be true if the user has paid, been comp'd or whatever.
-  //
-  // Note that we're NOT checking whether the user is over his limit here.
-  // That will be checked when they attempt to signup for this game, and
-  // and error message displayed if the signup would push them over their
-  // limit.  I'd tried checking it here, and users complained that they
-  // didn't understand why the links went away.
-  //
-  // GMs signing up for thier games are also checked (and allowed) at that
-  // time.  HOWEVER, it's assumed that if they get to that point, that
-  // we've already checked that they've paid
-
-  $can_signup = false;
-  if (array_key_exists (SESSION_LOGIN_USER_CAN_SIGNUP, $_SESSION))
-  {
-    if ('Y' == $_SESSION[SESSION_LOGIN_USER_CAN_SIGNUP])
-    {
-      $can_signup=true;
-    }
-  }
+  $can_signup = can_signup();
 
   // Get the information about this game
 

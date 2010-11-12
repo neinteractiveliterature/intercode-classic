@@ -289,7 +289,6 @@ define (SUN_MAX, 16);    // 4PM
 define (SESSION_LOGIN_USER_GM, 'LoginUserGM_' . CON_ID);
 define (SESSION_LOGIN_USER_ID, 'LoginUserId_' . CON_ID);
 define (SESSION_LOGIN_USER_PRIVS, 'LoginUserPrivs_' . CON_ID);
-define (SESSION_LOGIN_USER_CAN_SIGNUP, 'LoginUserCanSignup_' . CON_ID);
 define (SESSION_REFERRER_ID, 'ReferrerId_' . CON_ID);
 define (SESSION_LOGIN_USER_GENDER, 'LoginUserGender_' . CON_ID);
 define (SESSION_LOGIN_USER_NAME, 'LoginUserName_' . CON_ID);
@@ -1440,6 +1439,44 @@ function validate_int ($key, $min, $max, $display=0)
     return display_error ("$display must be less than $max");
 
   return TRUE;
+}
+
+/*
+ * can_signup
+ *
+ // Check the database for whether the user can
+ // signup.  This will be true if the user has paid, been comp'd or whatever.
+ //
+ // Note that we're NOT checking whether the user is over his limit here.
+ // That will be checked when they attempt to signup for this game, and
+ // and error message displayed if the signup would push them over their
+ // limit.  I'd tried checking it here, and users complained that they
+ // didn't understand why the links went away.
+ //
+ // GMs signing up for thier games are also checked (and allowed) at that
+ // time.  HOWEVER, it's assumed that if they get to that point, that
+ // we've already checked that they've paid
+ */
+
+function can_signup () {
+    if (!isset($GLOBALS['USER_CAN_SIGNUP'])) {
+        $sql = 'SELECT CanSignup FROM Users WHERE UserId=';
+        $sql .= $_SESSION[SESSION_LOGIN_USER_ID];
+        $result = mysql_query ($sql);
+        if (!$result)
+            display_mysql_error ('Failed to get user information for signup check');
+        if (0 == mysql_num_rows ($result))
+            display_error ('Failed to find UserId ' . $_SESSION[SESSION_LOGIN_USER_ID]);
+
+        $row = mysql_fetch_object ($result);
+    
+        if (is_unpaid ($row->CanSignup))
+            $GLOBALS['USER_CAN_SIGNUP'] = false;
+        else
+            $GLOBALS['USER_CAN_SIGNUP'] = true;
+    }
+    
+    return $GLOBALS['USER_CAN_SIGNUP'];
 }
 
 /*
