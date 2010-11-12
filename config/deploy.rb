@@ -14,6 +14,15 @@ end
 namespace :vlad do
   Rake.clear_tasks('vlad:update_symlinks')
 
+  task :check_deploy_to do
+    puts "No deployment target set.  Please run using either 'sandbox' or 'production'."
+    puts "For example: rake sandbox vlad:update"
+  end
+
+  %w{cleanup update rollback migrate setup}.each do |task_name|
+    task task_name.to_sym => :check_deploy_to
+  end
+
 remote_task :update_symlinks, :roles => :app do
     run <<-EOF
 for f in $(ls #{shared_path}/local/*)
