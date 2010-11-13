@@ -1459,6 +1459,9 @@ function validate_int ($key, $min, $max, $display=0)
  */
 
 function can_signup () {
+    if (!is_logged_in())
+        return false;
+    
     if (!isset($GLOBALS['USER_CAN_SIGNUP'])) {
         $sql = 'SELECT CanSignup FROM Users WHERE UserId=';
         $sql .= $_SESSION[SESSION_LOGIN_USER_ID];
