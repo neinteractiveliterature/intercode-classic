@@ -148,7 +148,7 @@ function list_accepted_events()
 function precon_schedule_day($block, $runs) {  
   // calculate the minimum schedule width in pixels
   $time_width = 70;
-  $events_width = $max_columns * 90;
+  $events_width = $block->maxColumns * 90;
   $full_width = $events_width + $time_width;
   
   $events_width .= "px";
@@ -1015,7 +1015,10 @@ function display_precon_event_form()
   schedule_table_entry ('Thursday', THR_DATE, 21, 3);
   schedule_table_entry ('Thursday', THR_DATE, 22);
   schedule_table_entry ('Thursday', THR_DATE, 23);
-  schedule_table_entry ('Friday',   FRI_DATE, 12, 6);
+  schedule_table_entry ('Friday',   FRI_DATE, 9, 9);
+  schedule_table_entry ('Friday',   FRI_DATE, 10);
+  schedule_table_entry ('Friday',   FRI_DATE, 11);
+  schedule_table_entry ('Friday',   FRI_DATE, 12);
   schedule_table_entry ('Friday',   FRI_DATE, 13);
   schedule_table_entry ('Friday',   FRI_DATE, 14);
   schedule_table_entry ('Friday',   FRI_DATE, 15);
@@ -1114,6 +1117,9 @@ function process_precon_event_form()
   $sql .= build_sql_string('Thursday21');
   $sql .= build_sql_string('Thursday22');
   $sql .= build_sql_string('Thursday23');
+  $sql .= build_sql_string('Friday09');
+  $sql .= build_sql_string('Friday10');
+  $sql .= build_sql_string('Friday11');
   $sql .= build_sql_string('Friday12');
   $sql .= build_sql_string('Friday13');
   $sql .= build_sql_string('Friday14');
@@ -1271,7 +1277,7 @@ function display_event_summary()
 
 function scheduling_preference_row($day, $hour, $ary, $rowspan=0)
 {
-  $row_value = $ary["$day$hour"];
+  $row_value = $ary[sprintf("%s%02d", $day, $hour)];
   $text = "Don't Care";
   $bg = '';
 
@@ -1311,7 +1317,7 @@ function scheduling_start_option($day, $hour, $selection)
   if ($selection == "$day$hour")
     $selected = 'selected';
 
-  printf ("        <option value=\"%s%d\" %s>%s %d:00</option>\n",
+  printf ("        <option value=\"%s%02d\" %s>%s %d:00</option>\n",
 	  $day, $hour,
 	  $selected,
 	  $day, $hour);
@@ -1411,6 +1417,9 @@ function show_status_form()
   scheduling_start_option('Thursday', 21, '');
   scheduling_start_option('Thursday', 22, '');
   scheduling_start_option('Thursday', 23, '');
+  scheduling_start_option('Friday', 9, '');
+  scheduling_start_option('Friday', 10, '');
+  scheduling_start_option('Friday', 11, '');
   scheduling_start_option('Friday', 12, '');
   scheduling_start_option('Friday', 13, '');
   scheduling_start_option('Friday', 14, '');
@@ -1431,7 +1440,10 @@ function show_status_form()
   scheduling_preference_row('Thursday', 21, $ary, 3);
   scheduling_preference_row('Thursday', 22, $ary);
   scheduling_preference_row('Thursday', 23, $ary);
-  scheduling_preference_row('Friday', 12, $ary, 6);
+  scheduling_preference_row('Friday', 9, $ary, 9);
+  scheduling_preference_row('Friday', 10, $ary);
+  scheduling_preference_row('Friday', 11, $ary);
+  scheduling_preference_row('Friday', 12, $ary);
   scheduling_preference_row('Friday', 13, $ary);
   scheduling_preference_row('Friday', 14, $ary);
   scheduling_preference_row('Friday', 15, $ary);
@@ -1585,6 +1597,21 @@ function process_status_form()
       $hour = 23;
       break;
 
+    case 'Friday09':
+      $day = 'Fri';
+      $hour = 9;
+      break;
+
+    case 'Friday10':
+      $day = 'Fri';
+      $hour = 10;
+      break;
+
+    case 'Friday11':
+      $day = 'Fri';
+      $hour = 11;
+      break;
+
     case 'Friday12':
       $day = 'Fri';
       $hour = 12;
@@ -1723,6 +1750,9 @@ function show_run_form()
   scheduling_start_option('Thursday', 21, $start_time_selection);
   scheduling_start_option('Thursday', 22, $start_time_selection);
   scheduling_start_option('Thursday', 23, $start_time_selection);
+  scheduling_start_option('Friday', 9, $start_time_selection);
+  scheduling_start_option('Friday', 10, $start_time_selection);
+  scheduling_start_option('Friday', 11, $start_time_selection);
   scheduling_start_option('Friday', 12, $start_time_selection);
   scheduling_start_option('Friday', 13, $start_time_selection);
   scheduling_start_option('Friday', 14, $start_time_selection);
