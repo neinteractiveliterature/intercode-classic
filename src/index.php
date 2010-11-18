@@ -1249,6 +1249,10 @@ function display_signup_status ()
       echo " games at this time.  &quot;Ops!&quot;, or games that you are\n";
       echo "a GM for do not count towards your total.<p>\n";
       break;
+      
+    case UNLIMITED_SIGNUPS:
+      echo "Game signup is now fully open!  You can sign up for any number of games.";
+      break;
 
     default:
       echo "Game signup is not allowed at this time.\n";
