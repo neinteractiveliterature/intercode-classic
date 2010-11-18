@@ -1251,7 +1251,7 @@ function display_signup_status ()
       break;
       
     case UNLIMITED_SIGNUPS:
-      echo "Game signup is now fully open!  You can sign up for any number of games.";
+      echo "Game signup is now fully open!  You can sign up for any number of games.<p>\n";
       break;
 
     default:
