@@ -608,8 +608,18 @@ function html_end ($bShowCopyright=true)
  *
  * Returns the number of signups allowed now
  */
+ 
+function con_signups_allowed () {
+    // we cache this value not only for performance reasons, but because the SELECT
+    // statement can sometimes fail if tables are locked, as happens late in the
+    // registration functions
+    if (!isset($GLOBALS['CON_SIGNUPS_ALLOWED']))
+        $GLOBALS['CON_SIGNUPS_ALLOWED'] = calculate_con_signups_allowed();
+    
+    return $GLOBALS['CON_SIGNUPS_ALLOWED'];
+}
 
-function con_signups_allowed ()
+function calculate_con_signups_allowed ()
 {
   // If we haven't set the session variables, then the user hasn't logged
   // in, and he can't signup for anything
