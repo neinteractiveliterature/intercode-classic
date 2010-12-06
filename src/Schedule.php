@@ -2464,16 +2464,16 @@ function signup_user_for_game ($RunId, $EventId, $Title,
   else
   {
     $state = 'Confirmed';
-
-    // If the array of conflicting games the user is waitlisted on is not
-    // empty, display a form asking the user to confirm the he wants us to
-    // drop him from the waitlisted games
-
-    //    echo 'Waitlist_conflicts: ' . count($waitlist_conflicts) . "<P>\n";
-
-    if ((0 != count ($waitlist_conflicts)) && (! $withdraw_from_conflicts))
-      return confirm_signup ($waitlist_conflicts, $Title, $EventId, $RunId);
   }
+  
+  // If the array of conflicting games the user is waitlisted on is not
+  // empty, display a form asking the user to confirm the he wants us to
+  // drop him from the waitlisted games
+
+  //    echo 'Waitlist_conflicts: ' . count($waitlist_conflicts) . "<P>\n";
+
+  if ((0 != count ($waitlist_conflicts)) && (! $withdraw_from_conflicts))
+    return confirm_signup ($waitlist_conflicts, $Title, $EventId, $RunId);
 
   //  echo "State: $state<P>\n";
 
