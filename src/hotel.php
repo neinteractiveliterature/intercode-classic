@@ -221,10 +221,7 @@ echo "	</tr>\n";
 echo "</table>\n";
 echo "<p>\n";
 echo "Intercon rents all the conference space available in the hotel. ";
-/*echo "We encourage\n";
-echo "you to review the <a href=\"Static.php?page=HotelLayout\">conference space layout</a>.\n";
-*/
-echo "Conference space layout maps will be available soon.";
+echo "<a href=\"westin-floorplan.png\" target=\"_blank\">Click here for a map of the conference space layout.</a>";
 echo "\n";
 }
 ?>
