@@ -59,6 +59,8 @@ echo "              <tr class=\"reserveBody\">\n";
 echo "                <td>&nbsp;&nbsp;&nbsp;</td>\n";
 echo "                <td>Room:</td>\n";
 echo "                <td>$105/night</td>\n";
+echo "              </tr>\n";
+echo "              <tr class=\"reserveBody\">\n";
 echo "                <td>Suite:</td>\n";
 echo "                <td>$145/night</td>\n";
 echo "              </tr>\n";
