@@ -85,12 +85,12 @@ function dead_dog($manager) {
             echo "<h3>Sign up for the Dead Dog!</h3>";
             
             echo "<div style=\"float: right;\">";
-            $manager->displayPaypalButton(PAYPAL_ITEM_DEADDOG, $cost);
+            $manager->displayPaypalButton(PAYPAL_ITEM_DEAD_DOG, $cost);
             echo "</div>";
 
             echo "<p style=\"margin-top: 0;\">You can pay in\n";
             echo "advance using PayPal by clicking <a href=\"";
-            echo $manager->buildPaypalUrl(PAYPAL_ITEM_DEADDOG, $cost)."\">here</a>.\n";
+            echo $manager->buildPaypalUrl(PAYPAL_ITEM_DEAD_DOG, $cost)."\">here</a>.\n";
             echo "Please note that we cannot guarantee availability unless you\n";
             echo "pay in advance!</p>\n";
         }

@@ -74,7 +74,7 @@ define (CON_MAX, 310);
 define (PAYPAL_ITEM_SHIRT, CON_NAME . ' Shirt Payment');
 define (PAYPAL_ITEM_CON, CON_NAME . ' Registration');
 define (PAYPAL_ITEM_THURSDAY, CON_NAME . ' Thursday');
-define (PAYPAL_ITEM_DEADDOG, CON_NAME . ' Dead Dog');
+define (PAYPAL_ITEM_DEAD_DOG, CON_NAME . ' Dead Dog');
 
 define (CON_MAIL_LETTER, 'j');
 define (NAME_CON_CHAIR, 'Tim Lasko');
