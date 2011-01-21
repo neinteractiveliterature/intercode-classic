@@ -267,6 +267,16 @@ define (PRECON_SHOW_EVENT, 215);
 define (PRECON_SHOW_RUN_FORM, 216);
 define (PRECON_PROCESS_RUN_FORM, 217);
 
+// Action values for Dead Dog
+
+define (DEAD_DOG, 250);
+define (DEAD_DOG_REPORT, 251);
+define (DEAD_DOG_SELECT_USER, 252);
+define (DEAD_DOG_EDIT_USER, 253);
+define (DEAD_DOG_PROCESS_USER, 254);
+define (DEAD_DOG_NEW_USER, 255);
+define (DEAD_DOG_CREATE_USER, 256);
+
 // List types
 
 define (LIST_UNDEFINED, 0);

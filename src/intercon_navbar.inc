@@ -259,6 +259,14 @@ function build_precon_subnavbar() {
   return $thursdaySection;
 }
 
+function build_dead_dog_subnavbar() {
+  $deadDogSection = new SubNavBar("Dead Dog");
+  $deadDogSection->push(NavBarItem::newAction('Dead Dog Info', 'DeadDog.php'));
+  if (user_has_priv(PRIV_REGISTRAR))
+    $deadDogSection->push(NavBarItem::newAction('Edit User Dead Dog Info', 'DeadDog.php', DEAD_DOG_SELECT_USER));
+  return $deadDogSection;
+}
+
 function build_gm_subnavbar() {
   $gmSection = new SubNavBar("GM Information");
   $gmSection->push(NavBarItem::newStatic("GM Benefits and Policies", "GMPolicies"));
@@ -341,6 +349,8 @@ function build_print_materials_subnavbar() {
   $opsSection->push(NavBarItem::newAction('Registration Report', 'Reports.php', REPORT_REGISTRATION));
   if (THURSDAY_ENABLED)
     $opsSection->push(NavBarItem::newAction('PreCon Events Report', 'Thursday.php', THURSDAY_REPORT));
+  if (DEAD_DOG_ENABLED)
+    $opsSection->push(NavBarItem::newAction('Dead Dog Report', 'DeadDog.php', DEAD_DOG_REPORT));
   if (defined ('PROGRAM_PUB_PREFIX'))
   {
     $opsSection->push('Program Cover.pub', NavBarItem::newProgram(PROGRAM_PUB_PREFIX, 'Cover.pub'));
@@ -423,6 +433,8 @@ function display_main_navbar() {
     $navbar->push(build_gm_subnavbar());
   if (THURSDAY_ENABLED)
     $navbar->push(build_precon_subnavbar());
+  if (DEAD_DOG_ENABLED)
+    $navbar->push(build_dead_dog_subnavbar());
   if ((SHOW_TSHIRTS && is_logged_in()) || user_has_priv(PRIV_CON_COM))
     $navbar->push(build_shirts_subnavbar());
   if (user_has_priv(PRIV_CON_COM))
