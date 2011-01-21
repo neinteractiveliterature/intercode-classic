@@ -51,6 +51,7 @@ define (THURSDAY_ENABLED, 1);
 // Set to 0 to disable the Dead Dog
 
 define (DEAD_DOG_ENABLED, 1);
+define (DEAD_DOG_MAX, 100);
 
 // Set to 0 to disable the Iron GM contest
 

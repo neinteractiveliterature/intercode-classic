@@ -46,6 +46,16 @@ class DeadDogManager extends UpchargeItemManager {
     protected function userCanEdit() {
         return user_has_priv(PRIV_REGISTRAR);
     }
+    
+    public function slotsAvailable() {
+        $sql = "SELECT COUNT(*) FROM ".$this->getTableName()." WHERE STATUS = 'Paid'";
+        $result = mysql_query($sql);
+        if (!$result) {
+            return display_mysql_error('Failed to get paid user count', $sql);
+        }
+        $row = mysql_fetch_array($result);
+        return ($row[0] < DEAD_DOG_MAX);
+    }
 }
 
 // Connect to the database
@@ -77,7 +87,7 @@ function dead_dog($manager) {
     if (is_logged_in()) {
         if (count($manager->fetchRowsForLoggedInUser(array("where" => "i.Status = 'Paid'"))) > 0) {
             echo "<p>You are registered and paid for the Dead Dog.  Thank you!</p>";
-        } else {
+        } else if ($manager->slotsAvailable()) {
             $cost = '20.58';  // $20 + 2.9%
               if (DEVELOPMENT_VERSION)
                 $cost= '0.05';
@@ -93,6 +103,10 @@ function dead_dog($manager) {
             echo $manager->buildPaypalUrl(PAYPAL_ITEM_DEAD_DOG, $cost)."\">here</a>.\n";
             echo "Please note that we cannot guarantee availability unless you\n";
             echo "pay in advance!</p>\n";
+        } else {
+            echo "<h3>Sorry, there are no more seats available!</h3>\n";
+            
+            echo "<p>We've sold all the seats in the house.  Sorry to disappoint!</p>\n";
         }
     } else {
         echo "<p>To register for the Dead Dog, please <a href=\"index.php\">log in</a>.</p>";
