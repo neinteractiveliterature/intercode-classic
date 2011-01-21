@@ -44,7 +44,7 @@ abstract class UpchargeItemManager {
         $sql .= implode(", ", $this->getColumnNames("i"));
         $sql .= " FROM ".$this->getTableName().' i';
         $sql .= " LEFT OUTER JOIN Users upd ON i.UpdatedById = upd.UserId";
-        $sql .= " INNER JOIN Users u ON i.UserId = u.UserId";
+        $sql .= " LEFT OUTER JOIN Users u ON i.UserId = u.UserId";
         $sql .= " WHERE i.".$this->getPrimaryKeyColumn()." = '".mysql_real_escape_string($id)."' ";
         
         $result = mysql_query($sql);
@@ -65,8 +65,8 @@ abstract class UpchargeItemManager {
         $sql =  'SELECT u.FirstName, u.LastName, upd.FirstName UpdaterFirstName, upd.LastName UpdaterLastName, ';
         $sql .= implode(", ", $this->getColumnNames("i"));
         $sql .= ' FROM '.$this->getTableName().' i';
-        $sql .= " INNER JOIN Users upd ON i.UpdatedById = upd.UserId";
-        $sql .= " INNER JOIN Users u ON i.UserId = u.UserId";
+        $sql .= " LEFT OUTER JOIN Users upd ON i.UpdatedById = upd.UserId";
+        $sql .= " LEFT OUTER JOIN Users u ON i.UserId = u.UserId";
         if (array_key_exists("where", $options)) {
             $sql .= ' WHERE ('.$options['where'].')';
         }
