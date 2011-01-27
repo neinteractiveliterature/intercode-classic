@@ -122,7 +122,7 @@ class DeadDogManager extends UpchargeItemManager {
     function displayFormFields($row=null) {
         parent::displayFormFields($row);
         form_text(2, 'Number of Tickets', 'Quantity');
-        form_text(256, 'PayPal Transaction ID', 'TxnId');
+        form_text(80, 'PayPal Transaction ID', 'TxnId');
     }
     
     function getSqlSaveFieldsFromPost() {
