@@ -190,9 +190,9 @@ function dead_dog($manager) {
         }
         
         if ($ticketCount > 0) {
-            echo "<p>You have bought $ticketCount Dead Dog ";
+            echo "<h3>You have bought $ticketCount Dead Dog ";
             echo pluralizeTickets($ticketCount);
-            echo ".  Thank you!</p>\n";
+            echo ".  Thank you!</h3>\n";
         }
         
         $availableSlots = $manager->availableSlots();
@@ -200,7 +200,7 @@ function dead_dog($manager) {
             if ($ticketCount == 0) {
                 echo "<h3>Sign up for the Dead Dog!</h3>";
             } else {
-                echo "<h3>Buy additional tickets</h3>";
+                echo "<p><b>Buy additional tickets</b></p>\n";
             }
             
             echo "<p>There are currently <b>".$availableSlots."</b> ";
@@ -215,8 +215,10 @@ function dead_dog($manager) {
             echo "<input type=\"submit\" value=\"Buy Dead Dog Tickets\"/>\n";
             echo "</div>\n";
             
-            echo "<p>Please note that we cannot guarantee availability unless you\n";
-            echo "pay in advance!</p>\n";
+            if ($ticketCount == 0) {
+                echo "<p>Please note that we cannot guarantee availability unless you\n";
+                echo "pay in advance!</p>\n";
+            }
             echo "</form>\n";
         } else {
             if ($ticketCount == 0) {
