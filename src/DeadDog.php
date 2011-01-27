@@ -58,6 +58,7 @@ class DeadDogManager extends UpchargeItemManager {
     function getColumnNames($tableAlias = null) {
         $cols = parent::getColumnNames($tableAlias);
         array_push($cols, "Quantity");
+        array_push($cols, "TxnId");
         return $cols;
     }
     
