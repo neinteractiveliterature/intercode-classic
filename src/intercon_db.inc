@@ -276,6 +276,7 @@ define (DEAD_DOG_EDIT_USER, 253);
 define (DEAD_DOG_PROCESS_USER, 254);
 define (DEAD_DOG_NEW_USER, 255);
 define (DEAD_DOG_CREATE_USER, 256);
+define (DEAD_DOG_PAYPAL_REDIRECT, 257);
 
 // List types
 

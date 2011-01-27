@@ -2,25 +2,185 @@
 
 include("intercon_db.inc");
 
+class UpchargeReportRow {
+    function UpchargeReportRow($data) {
+        $this->values = $this->formatData($data);
+        $this->data = $data;
+    }
+    
+    function formatData($data) {
+        return array(
+            "Name" => "$data->LastName, $data->FirstName",
+            "Status" => $data->Status,
+            "Paid" => sprintf("$%.02f", $data->PaymentAmount / 100),
+            "Notes" => $data->PaymentNote
+        );
+    }
+    
+    function getColumnNames() {
+        return array("Name", "Status", "Paid", "Notes");
+    }
+    
+    function get($col) {
+        return $this->values[$col];
+    }
+}
+
+class UpchargeReportTable {
+    function UpchargeReportTable($rows) {
+        $this->data = $this->getTableData($rows);
+    }
+    
+    function getColumnNames() {
+        if (count($this->data) == 0) {
+            return array();
+        }
+        
+        return $this->data[0]->getColumnNames();
+    }
+    
+    function getReportRow($row) {
+        return new UpchargeReportRow($row);
+    }
+    
+    function getTableData($rows) {
+        $table = array();
+        foreach ($rows as $row) {
+            array_push($table, $this->getReportRow($row));
+        }
+        return $table;
+    }
+}
+
+class UpchargeReportView {
+    function UpchargeReportView($manager, $table) {
+        $this->manager = $manager;
+        $this->table = $table;
+    }
+    
+    function getStatusColor($status) {
+        switch ($status)
+        {
+          case 'Paid':      return get_bgcolor_hex('Confirmed');  // Green
+          case 'Unpaid':    return get_bgcolor_hex('Waitlisted'); // Yellow
+          case 'Cancelled': return get_bgcolor_hex('Away');       // Gray
+          default:          return get_bgcolor_hex('Full');       // Red
+        }
+    }
+    
+    function displayCell($row, $col) {
+        echo "<td>".$row->get($col)."</td>";
+    }
+    
+    function display() {
+        if (count($this->table->data) == 0) {
+            echo "<p>No payments yet for ".$this->manager->getCollectionName().".</p>\n";
+            return;
+        }
+        
+        $cols = $this->table->getColumnNames();
+    
+        echo "<table border=1>\n";
+        echo "<tr>";
+        foreach ($cols as $col) {
+            echo "<th>".$col."</th>";
+        }
+        echo "</tr>\n";
+        foreach ($this->table->data as $row) {
+            echo "<tr bgcolor=\"".$this->getStatusColor($row->get("Status"))."\">";
+            foreach ($cols as $col) {
+                $this->displayCell($row, $col);
+            }
+            echo "</tr>\n";
+        }
+        echo "</table>\n";
+    }
+}
+
+class UpchargeIndexView extends UpchargeReportView {
+    function displayCell($row, $col) {
+        echo "<td>";
+        if ($col == "Name") {
+            if ($this->manager->userCanEdit()) {
+                echo "<a href=\"".$_SERVER["PHP_SELF"]."?action=".$this->manager->getEditUpchargeAction()."&id=";
+                $pkey = $this->manager->getPrimaryKeyColumn();
+                echo $row->data->$pkey."\">".$row->get($col)."</a>";
+            } else {
+                echo $row->get($col);
+            }
+        } else {
+            echo $row->get($col);
+        }
+        echo "</td>";
+    }
+}
+
+class UpchargePaypalLink {
+    function UpchargePaypalLink($itemName, $cost) {
+        $this->itemName = $itemName;
+        $this->cost = $cost;
+    }
+    
+    function getUrl() {
+        // Build the URL for the PayPal links.  If the user cancels, just return
+        // to index.php which will default to his homepage
+
+        $path_parts = pathinfo($_SERVER['PHP_SELF']);
+        $dirname = '';
+        if ("/" != $path_parts['dirname'])
+          $dirname = $path_parts['dirname'];
+
+        $return_url = sprintf ('http://%s%s/index.php',
+    			   $_SERVER['SERVER_NAME'],
+    			   $dirname);
+        //  echo "dirname: $dirname<br>\n";
+        //  echo "return_url: $return_url<br>\n";
+        $cancel_url = $return_url;
+
+        $url = 'https://www.paypal.com/cgi-bin/webscr?';
+        $url .= build_url_string ('cmd', '_xclick');
+        $url .= build_url_string ('business', 'InteractiveLit@yahoo.com');
+        $url .= build_url_string ('item_name', $this->itemName);
+        $url .= build_url_string ('no_note', '0');
+        $url .= build_url_string ('cn', 'Any notes about your payment?');
+        $url .= build_url_string ('no_shipping', '1');
+        $url .= build_url_string ('custom', $_SESSION[SESSION_LOGIN_USER_ID]);
+        $url .= build_url_string ('currency_code', 'USD');
+        $url .= build_url_string ('amount', $this->cost);
+        $url .= build_url_string ('rm', '2');
+        $url .= build_url_string ('cancel_return', $cancel_url);
+        $url .= build_url_string ('return', $return_url, FALSE);
+        
+        return $url;
+    }
+    
+    function displayButton() {
+        echo "<a href=\"".$this->getUrl()."\"><img\n";
+        echo "src=\"http://images.paypal.com/images/x-click-but3.gif\"\n";
+        echo "border=\"0\"\n";
+        printf ('alt=\"Click to pay for the %s.\"></a>', $this->itemName);
+    }
+}
+
 // Subclass this for all upcharge item types (t-shirt, dead dog, thursday thing, etc)
 abstract class UpchargeItemManager {
-    abstract protected function getTableName();
-    abstract protected function getPrimaryKeyColumn();
-    abstract protected function getReportAction();
-    abstract protected function getNewUpchargeAction();
-    abstract protected function getSelectUpchargeAction();
-    abstract protected function getEditUpchargeAction();
-    abstract protected function getProcessUpchargeAction();
-    abstract protected function getCreateUpchargeAction();
-    abstract protected function userCanView();
-    abstract protected function userCanEdit();
-    abstract protected function getCollectionName();
+    abstract function getTableName();
+    abstract function getPrimaryKeyColumn();
+    abstract function getReportAction();
+    abstract function getNewUpchargeAction();
+    abstract function getSelectUpchargeAction();
+    abstract function getEditUpchargeAction();
+    abstract function getProcessUpchargeAction();
+    abstract function getCreateUpchargeAction();
+    abstract function userCanView();
+    abstract function userCanEdit();
+    abstract function getCollectionName();
     
     function getItemName($row) {
         return $this->getCollectionName() . " record for ".$row->FirstName." ".$row->LastName;
     }
 
-    protected function getColumnNames($tableAlias = null) {
+    function getColumnNames($tableAlias = null) {
         $cols = explode(' ', 'Status PaymentAmount PaymentNote UserId UpdatedById LastUpdated');
         if (!array_search($this->getPrimaryKeyColumn(), $cols)) {
             array_push($cols, $this->getPrimaryKeyColumn());
@@ -39,7 +199,7 @@ abstract class UpchargeItemManager {
 
     // gets a single upcharge row from the database by its primary key
     // (primary key column can vary from implementation to implementation)
-    protected function fetchRow($id) {
+    function fetchRow($id) {
         $sql =  "SELECT u.FirstName, u.LastName, upd.FirstName UpdaterFirstName, upd.LastName UpdaterLastName, ";
         $sql .= implode(", ", $this->getColumnNames("i"));
         $sql .= " FROM ".$this->getTableName().' i';
@@ -61,7 +221,7 @@ abstract class UpchargeItemManager {
     // optional parameters (passed as keys to the $options argument):
     //   "where" - specify additional conditions for the where clause
     //   "order" - specify an order clause
-    protected function fetchRows($options = array()) {
+    function fetchRows($options = array()) {
         $sql =  'SELECT u.FirstName, u.LastName, upd.FirstName UpdaterFirstName, upd.LastName UpdaterLastName, ';
         $sql .= implode(", ", $this->getColumnNames("i"));
         $sql .= ' FROM '.$this->getTableName().' i';
@@ -87,7 +247,7 @@ abstract class UpchargeItemManager {
         return $rows;
     }
     
-    public function fetchRowsForUser($userId, $options = array()) {
+    function fetchRowsForUser($userId, $options = array()) {
         if (array_key_exists("where", $options)) {
             $options["where"] = " AND (".$options["where"].")";
         } else {
@@ -97,7 +257,7 @@ abstract class UpchargeItemManager {
         return $this->fetchRows($options);
     }
     
-    public function fetchRowsForLoggedInUser($options = array()) {
+    function fetchRowsForLoggedInUser($options = array()) {
         if (is_logged_in()) {
             return $this->fetchRowsForUser($_SESSION[SESSION_LOGIN_USER_ID], $options);
         } else {
@@ -105,17 +265,19 @@ abstract class UpchargeItemManager {
         }
     }
     
-    public function getStatusColor($status) {
-        switch ($status)
-        {
-          case 'Paid':      return get_bgcolor_hex('Confirmed');  // Green
-          case 'Unpaid':    return get_bgcolor_hex('Waitlisted'); // Yellow
-          case 'Cancelled': return get_bgcolor_hex('Away');       // Gray
-          default:          return get_bgcolor_hex('Full');       // Red
-        }
+    function getReportTable($rows) {
+        return new UpchargeReportTable($rows);
     }
     
-    public function displayReport() {
+    function getReportView($table) {
+        return new UpchargeReportView($this, $table);
+    }
+    
+    function getIndexView($table) {
+        return new UpchargeIndexView($this, $table);
+    }
+        
+    function displayReport() {
         $rows = $this->fetchRows(array("order" => "i.Status, LastName, FirstName"));
 
         $statusCount = array("Paid" => 0, "Unpaid" => 0, "Cancelled" => 0);
@@ -133,45 +295,22 @@ abstract class UpchargeItemManager {
         }
         display_header ($this->getCollectionName() . " Report: " . implode(", ", $headerCounts));
 
-        echo "<table border=1>\n";
-        echo "<tr><th>Last Name</th><th>First Name</th><th>Status</th><th>Paid</th><th>Note</th></tr>\n";
-        foreach ($rows as $row) {
-            echo "<tr bgcolor=\"".$this->getStatusColor($row->$status)."\">";
-            echo "<td>" . $row->LastName . "</td><td>" . $row->FirstName . "</td>";
-            echo "<td>".$row->Status."</td>";
-            echo "<td>".($row->PaymentAmount/100)."</td><td>".$row->PaymentNote."</td></tr>\n";
-        }
-        echo "</table>\n";
+        $this->getReportView($this->getReportTable($rows))->display();
     }
     
-    public function displayUpchargeIndex() {
+    function displayUpchargeIndex() {
         $rows = $this->fetchRows(array("order" => "i.Status, LastName, FirstName"));
 
         display_header($this->getCollectionName() . " Payment Records");
 
-        echo "<table border=1>\n";
-        echo "<tr><th>Name</th><th>Status</th><th>Paid</th><th>Note</th></tr>\n";
-        foreach ($rows as $row) {
-            echo "<tr bgcolor=\"".$this->getStatusColor($row->Status)."\">";
-            echo "<td>";
-            if ($this->userCanEdit()) {
-                echo "<a href=\"".$_SERVER["PHP_SELF"]."?action=".$this->getEditUpchargeAction()."&id=";
-                $pkey = $this->getPrimaryKeyColumn();
-                echo $row->$pkey."\">".$row->LastName.", ".$row->FirstName."</a>";
-            } else {
-                echo $row->LastName.", ".$row->FirstName;
-            }
-            echo "</td><td>".$row->Status."</td>";
-            echo "<td>".($row->PaymentAmount/100)."</td><td>".$row->PaymentNote."</td></tr>\n";
-        }
-        echo "</table>\n";
+        $this->getIndexView($this->getReportTable($rows))->display();
         
         echo "<a href=\"".$_SERVER["PHP_SELF"]."?action=".$this->getNewUpchargeAction()."\">";
         echo "Create new record";
         echo "</a>\n";
     }
     
-    protected function status_radio($value)
+    function status_radio($value)
     {
       $checked = '';
       if (array_key_exists("Status", $_POST) && $value == $_POST['Status'])
@@ -181,7 +320,7 @@ abstract class UpchargeItemManager {
     	  $value, $value, $checked, $value, $value);
     }
     
-    protected function displayFormFields($row=null) {
+    function displayFormFields($row=null) {
     	$pkeyColumn = $this->getPrimaryKeyColumn();
     	if (is_null($row)) {
     	    printf ("<input type=\"hidden\" name=\"UserId\" value=%d>\n", $_REQUEST["UserId"]);
@@ -204,7 +343,7 @@ abstract class UpchargeItemManager {
         form_text (64, 'Payment Note', 'PaymentNote');
     }
     
-    public function displayUserSelector($caption, $action) {
+    function displayUserSelector($caption, $action) {
         $upcharges = array();
         foreach ($this->fetchRows() as $row) {
             $upcharges[$row->UserId] = $row;
@@ -309,7 +448,7 @@ abstract class UpchargeItemManager {
         echo "</table>\n";
     }
     
-    public function displayNewUpchargeForm() {
+    function displayNewUpchargeForm() {
         if (array_key_exists("UserId", $_REQUEST)) {
             $userId = intval(trim($_REQUEST["UserId"]));
             
@@ -340,7 +479,7 @@ abstract class UpchargeItemManager {
         }
     }
     
-    public function displayUpchargeEditor() {
+    function displayUpchargeEditor() {
         $id = intval(trim($_REQUEST["id"]));
         if (0 == $id)
             return display_error ('Invalid id');
@@ -397,21 +536,32 @@ abstract class UpchargeItemManager {
           $_SERVER['PHP_SELF'], $this->getSelectUpchargeAction());
     }
     
-    protected function saveRecordFromPost($row=null) {
+    function getSqlSaveFieldsFromPost() {
         $PaymentAmount = intval(floatval ($_POST['PaymentAmount']) * 100);
 
+        return array(
+            "Status" => $_POST['Status'],
+            "PaymentAmount" => $PaymentAmount,
+            "PaymentNote" => $_POST['PaymentNote'],
+            "UpdatedById" => $_SESSION[SESSION_LOGIN_USER_ID],
+            "UserId" => $_POST['UserId']
+        );
+    }
+    
+    function saveRecordFromPost($row=null) {
         $newRecord = is_null($row);
         if ($newRecord) {
             $sql = 'INSERT INTO '.$this->getTableName().' SET ';
         } else {
             $sql = 'UPDATE '.$this->getTableName().' SET ';
         }
-        $sql .= build_sql_string ('Status', $_POST['Status'], false);
-        $sql .= build_sql_string ('PaymentAmount', $PaymentAmount);
-        $sql .= build_sql_string ('PaymentNote');
-        $sql .= ', UpdatedById=' . $_SESSION[SESSION_LOGIN_USER_ID];
-        $sql .= ', LastUpdated=NULL';
-        $sql .= build_sql_string ('UserId', $_POST['UserId']);
+        
+        $fields = $this->getSqlSaveFieldsFromPost();
+        $setClauses = array();
+        foreach (array_keys($fields) as $fieldName) {
+            array_push($setClauses, build_sql_string($fieldName, $fields[$fieldName], false));
+        }
+        $sql .= implode(', ', $setClauses);
         if (!$newRecord) {
             $pkey = $this->getPrimaryKeyColumn();
             $sql .= ' WHERE '.$pkey." = ".$row->$pkey;
@@ -424,7 +574,7 @@ abstract class UpchargeItemManager {
           return true;
     }
     
-    public function processUpchargeEdit() {
+    function processUpchargeEdit() {
         // Fetch the UserId
 
         $id = intval (trim ($_REQUEST['id']));
@@ -441,14 +591,14 @@ abstract class UpchargeItemManager {
         
     }
     
-    public function processUpchargeCreate() {
+    function processUpchargeCreate() {
         if (out_of_sequence ())
           return display_sequence_error (false);
 
         return $this->saveRecordFromPost();
     }
     
-    public function userHasPermission($type) {
+    function userHasPermission($type) {
         switch ($type) {
             case "view":
                 return $this->userCanView();
@@ -459,7 +609,7 @@ abstract class UpchargeItemManager {
         }
     }
     
-    public function enforcePermission($type) {
+    function enforcePermission($type) {
         if (!$this->userHasPermission($type)) {
             display_error("Sorry, you don't have permissions to view this page.");
             return false;
@@ -468,47 +618,7 @@ abstract class UpchargeItemManager {
         }
     }
     
-    public function buildPaypalUrl($itemName, $cost) {
-        // Build the URL for the PayPal links.  If the user cancels, just return
-        // to index.php which will default to his homepage
-
-        $path_parts = pathinfo($_SERVER['PHP_SELF']);
-        $dirname = '';
-        if ("/" != $path_parts['dirname'])
-          $dirname = $path_parts['dirname'];
-
-        $return_url = sprintf ('http://%s%s/index.php',
-    			   $_SERVER['SERVER_NAME'],
-    			   $dirname);
-        //  echo "dirname: $dirname<br>\n";
-        //  echo "return_url: $return_url<br>\n";
-        $cancel_url = $return_url;
-
-        $url = 'https://www.paypal.com/cgi-bin/webscr?';
-        $url .= build_url_string ('cmd', '_xclick');
-        $url .= build_url_string ('business', 'InteractiveLit@yahoo.com');
-        $url .= build_url_string ('item_name', $itemName);
-        $url .= build_url_string ('no_note', '0');
-        $url .= build_url_string ('cn', 'Any notes about your payment?');
-        $url .= build_url_string ('no_shipping', '1');
-        $url .= build_url_string ('custom', $_SESSION[SESSION_LOGIN_USER_ID]);
-        $url .= build_url_string ('currency_code', 'USD');
-        $url .= build_url_string ('amount', $cost);
-        $url .= build_url_string ('rm', '2');
-        $url .= build_url_string ('cancel_return', $cancel_url);
-        $url .= build_url_string ('return', $return_url, FALSE);
-        
-        return $url;
-    }
-    
-    public function displayPaypalButton($itemName, $cost) {
-        echo "<a href=\"".$this->buildPaypalUrl($itemName, $cost)."\"><img\n";
-        echo "src=\"http://images.paypal.com/images/x-click-but3.gif\"\n";
-        echo "border=\"0\"\n";
-        printf ('alt=\"Click to pay for the %s.\"></a>', $itemName);
-    }
-    
-    public function processAction($action) {
+    function processAction($action) {
         switch ($action) {
             case $this->getReportAction():
                 if ($this->enforcePermission("view")) {
