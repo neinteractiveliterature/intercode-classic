@@ -684,6 +684,43 @@ function build_order_string ($n, $size, &$s, &$count, $type)
 }
 
 /*
+ * show_user_homepage_dead_dog
+ *
+ * Show whether the user has signed up for the Dead Dog
+ */
+
+function show_user_homepage_dead_dog ($UserId)
+{
+  // Display the header for the Pre-Convention
+
+  display_header (CON_NAME . ' Dead Dog');
+
+  // Check whether the user has registered for the PreCon
+
+  $sql = 'SELECT SUM(Quantity) FROM DeadDog';
+  $sql .= " WHERE UserId=$UserId";
+  $sql .= '   AND Status="Paid"';
+
+  $result = mysql_query ($sql);
+  if (! $result)
+    return display_mysql_error ('Thursday query failed', $sql);
+    
+  $row = mysql_fetch_row($result);
+  $tickets = $row[0];
+
+  if (0 == $tickets)
+  {
+    printf ("<p>You're not signed up for the %s Dead Dog.\n", CON_NAME);
+    echo "Click <a href=\"DeadDog.php\">here</a>";
+    echo " to buy tickets.</p>\n";
+    return;
+  }
+
+  printf ("<p>You have purchased %d tickets for the %s Dead Dog.</p>\n",
+	  $tickets, CON_NAME);
+}
+
+/*
  * show_user_homepage_thursday
  *
  * Show whether the user has signed up for the Thursday Thing
@@ -1666,6 +1703,11 @@ function show_user_homepage ()
 
   if (SHOW_TSHIRTS)
     show_user_homepage_shirts ($_SESSION[SESSION_LOGIN_USER_ID]);
+    
+  // Show whether the user has signed up for the Dead Dog
+
+  if (DEAD_DOG_ENABLED)
+    show_user_homepage_dead_dog($_SESSION[SESSION_LOGIN_USER_ID]);
 
   // Fetch whether the user is expected to submit a bio, and the text of that
   // bio, if one is available
