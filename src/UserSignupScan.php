@@ -226,7 +226,7 @@ function display_all_signups ()
       }
     }
 
-    $game = sprintf ('<a href=\"Schedule.php?action=%d&EventId=%d&RunId=%d target=_blank\">%s</a>',
+    $game = sprintf ('<a href="Schedule.php?action=%d&EventId=%d&RunId=%d" target="_blank">%s</a>',
 		     SCHEDULE_SHOW_SIGNUPS,
 		     $row->EventId,
 		     $row->RunId,
