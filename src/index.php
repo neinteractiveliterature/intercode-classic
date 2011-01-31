@@ -12,6 +12,7 @@ if (! intercon_db_connect ())
 // Note that unlike all other scripts, we delay displaying the boilerplate
 // so we can update it when the user successfully logs in
 
+/*
 // If this appears to be a PayPal message, log a copy of it
 
 if (array_key_exists ('txn_type', $_POST))
@@ -28,6 +29,7 @@ if (array_key_exists ('txn_type', $_POST))
       mark_user_paid ();
   }
 }
+*/
 
 // Figure out what we're supposed to do
 
@@ -1113,6 +1115,8 @@ function show_user_homepage_plugs ($UserId)
 
 function mark_user_paid ()
 {
+    
+/*
   //  dump_array ('POST - mark_user_paid', $_POST);
   
   // Flip the "Paid" bit in the user's record
@@ -1139,18 +1143,18 @@ function mark_user_paid ()
 
   $user_id = 0;
 
+
   $bConPayment = $_POST['item_name'] == PAYPAL_ITEM_CON;
   $bShirtPayment = $_POST['item_name'] == PAYPAL_ITEM_SHIRT;
   $bThursdayPayment = $_POST['item_name'] == PAYPAL_ITEM_THURSDAY;
 
-  /*
-  if ($bConPayment)
-    echo "<!-- Con payment -->\n";
-  if ($bShirtPayment)
-    echo "<!-- Shirt payment -->\n";
-  if ($bThursdayPayment)
-    echo "<!-- Thursday payment -->\n";
-  */
+//  if ($bConPayment)
+//    echo "<!-- Con payment -->\n";
+//  if ($bShirtPayment)
+//    echo "<!-- Shirt payment -->\n";
+//  if ($bThursdayPayment)
+//    echo "<!-- Thursday payment -->\n";
+
 
   if ($bConPayment)
   {
@@ -1242,6 +1246,8 @@ function mark_user_paid ()
     printf ("<!-- Unknown payment type! \"%s\" -->\n",
 	    $_POST['item_name']);
   }
+
+*/
 
   // Refetch the user info & log them in again, since it's probably lost
 
