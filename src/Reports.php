@@ -1192,7 +1192,10 @@ function report_users_csv ()
 {
   // Fetch the list of users
 
-  $sql = 'SELECT UserId, FirstName, Nickname, LastName, EMail, CanSignup, LastLogin FROM Users';
+  $sql = 'SELECT Users.UserId UserId, FirstName, Nickname, LastName, EMail, CanSignup, LastLogin, ';
+  $sql .= ' (SELECT Status FROM Thursday WHERE Thursday.UserId = Users.UserId AND Status = "Paid") ThursdayStatus,';
+  $sql .= ' (SELECT SUM(Quantity) FROM DeadDog WHERE DeadDog.UserId = Users.UserId AND Status = "Paid") DeadDogTickets';
+  $sql .= ' FROM Users';
 //  $sql .= ' WHERE CanSignup<>"Alumni"';
 //  $sql .= '   AND LastName<>"Admin"';
   $sql .= ' ORDER BY LastName, FirstName';
@@ -1201,7 +1204,7 @@ function report_users_csv ()
   if (! $result)
     return display_mysql_error ('Query for users failed');
 
-  echo "\"LastName\",\"FirstName\",\"Nickname\",\"EMail\",\"Status\",\"LastLogin\",\"ShirtOrder\"\n";
+  echo "\"LastName\",\"FirstName\",\"Nickname\",\"EMail\",\"Status\",\"LastLogin\",\"ShirtOrder\",\"PreCon\",\"DeadDogTickets\"\n";
 
   while ($row = mysql_fetch_object ($result))
   {
@@ -1213,6 +1216,9 @@ function report_users_csv ()
     echo "\"$row->LastLogin\",";
     
     report_users_csv_tshirts ($row->UserId);
+    echo ",\"$row->ThursdayStatus\",";
+    echo "\"$row->DeadDogTickets\"";
+    echo "\n";
   }
 }
 
@@ -1257,7 +1263,7 @@ function report_users_csv_tshirts ($user_id)
 
   mysql_free_result ($result);
 
-  echo "\"$order\"\n";
+  echo "\"$order\"";
 }
 
 /*
