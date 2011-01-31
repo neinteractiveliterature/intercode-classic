@@ -11,7 +11,6 @@ if (! intercon_db_connect ())
 
 // Note that unlike all other scripts, we delay displaying the boilerplate
 // so we can update it when the user successfully logs in
-
 /*
 // If this appears to be a PayPal message, log a copy of it
 
@@ -1116,7 +1115,6 @@ function show_user_homepage_plugs ($UserId)
 function mark_user_paid ()
 {
     
-/*
   //  dump_array ('POST - mark_user_paid', $_POST);
   
   // Flip the "Paid" bit in the user's record
@@ -1246,8 +1244,6 @@ function mark_user_paid ()
     printf ("<!-- Unknown payment type! \"%s\" -->\n",
 	    $_POST['item_name']);
   }
-
-*/
 
   // Refetch the user info & log them in again, since it's probably lost
 
