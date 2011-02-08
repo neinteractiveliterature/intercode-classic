@@ -6,7 +6,7 @@ body
 {
 	margin: 135px 0 0 0;
 	padding: 0 7% 0 180px;
-	background-image: url("PageBanner.png");
+	background-image: url("PageBanner.jpg");
 	background-repeat: no-repeat;
 	background-color: #ffffff;
 	background-position: 9px 5px;

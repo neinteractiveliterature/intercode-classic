@@ -588,7 +588,7 @@ function html_begin ($bShowLogo=true)
   // Show the con logo.  Some pages may want to handle this themselves
 
   if ($bShowLogo)
-    echo "<div class=print_logo><img src=PageBanner.png></div>\n";
+    echo "<div class=print_logo><img src=PageBanner.jpg></div>\n";
 }
 
 /*
