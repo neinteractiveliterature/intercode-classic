@@ -208,6 +208,10 @@ ul.menu.links li.title
 	background-color: #555 !important;
 }
 
+ul.menu.links li {
+    border-color: #555;
+}
+
 ul.menu li.expandable a {
   background-image: url(bullet_toggle_plus.png);
   background-repeat: no-repeat;
