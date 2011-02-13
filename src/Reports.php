@@ -182,7 +182,7 @@ function report_per_user ()
     if ('Admin' == $row->LastName)
       continue;
 
-    echo "<div class=print_logo_break_before><img src=PageBanner.jpg></div>\n";
+    echo "<div class=print_logo_break_before><img src=PageBanner.png></div>\n";
 
     write_user_report (trim ("$row->LastName, $row->FirstName"),
 		       $row->UserId);
@@ -321,7 +321,7 @@ function report_per_room ()
     if (0 == mysql_num_rows($room_result))
       continue;
 
-    echo "<div class=print_logo_break_before><img src=PageBanner.jpg></div>\n";
+    echo "<div class=print_logo_break_before><img src=PageBanner.png></div>\n";
 
     echo "<font size=\"+3\"><b>$room_name</b></font><p>\n";
 
@@ -500,7 +500,7 @@ function report_per_game ()
 
   while ($row = mysql_fetch_object ($result))
   {
-    echo "<div class=print_logo_break_before><img src=PageBanner.jpg></div>\n";
+    echo "<div class=print_logo_break_before><img src=PageBanner.png></div>\n";
 
     write_game_report ($row->RunId,
 		       $row->Title,
@@ -1130,7 +1130,7 @@ function whos_not_playing_when ()
 
 function report_games_by_time ($day)
 {
-  echo "<div class=print_logo_break_before><img src=PageBanner.jpg></div>\n";
+  echo "<div class=print_logo_break_before><img src=PageBanner.png></div>\n";
   printf ("<font size=\"+3\"><b>%s Schedule for %s</b></font><p>\n",
 	  CON_NAME,
 	  $day);
