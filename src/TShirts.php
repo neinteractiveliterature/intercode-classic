@@ -370,7 +370,7 @@ function show_tshirt_form ()
 	    TSHIRT_DOLLARS);
 
     $email = mailto_or_obfuscated_email_address (EMAIL_OPS);
-    echo "This year there are TWO shirts for you to choose from!";
+    echo "This year there are TWO shirts for you to choose from! ";
     /*
     echo "The\n";
     echo "first is a burgundy men's polo shirt.\n";
