@@ -370,10 +370,17 @@ function show_tshirt_form ()
 	    TSHIRT_DOLLARS);
 
     $email = mailto_or_obfuscated_email_address (EMAIL_OPS);
-    echo "This year there are TWO shirts for you to choose from!  The\n";
+    echo "This year there are TWO shirts for you to choose from!";
+    /*
+    echo "The\n";
     echo "first is a burgundy men's polo shirt.\n";
     echo "The second is a baby blue babydoll-style shirt.\n";
     echo "Both shirts are 100% cotton.\n";
+    */
+    
+    echo "We'll have information about these shirts for you soon, once we finalize ";
+    echo "the designs.\n";
+    
     echo "If you want a size that's not listed on the website,\n";
     echo 'please contact ' . NAME_OPS . " at $email.<p>\n";
     echo "We will be ordering fewer shirts this year, so if you want\n";
