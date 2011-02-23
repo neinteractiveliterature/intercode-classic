@@ -1,3 +1,4 @@
+#test commit
 require 'hoe'
 
 begin
