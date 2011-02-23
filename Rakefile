@@ -1,4 +1,3 @@
-# should't be able to commit this
 require 'hoe'
 
 begin
