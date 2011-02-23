@@ -139,7 +139,7 @@ class UpchargePaypalLink {
 
         $url = 'https://www.paypal.com/cgi-bin/webscr?';
         $url .= build_url_string ('cmd', '_xclick');
-        $url .= build_url_string ('business', 'InteractiveLit@yahoo.com');
+        $url .= build_url_string ('business', PAYPAL_ACCOUNT_EMAIL);
         $url .= build_url_string ('item_name', $this->itemName);
         $url .= build_url_string ('no_note', '0');
         $url .= build_url_string ('cn', 'Any notes about your payment?');

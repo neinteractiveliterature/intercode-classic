@@ -70,7 +70,7 @@ if (!is_logged_in()) {
     
       $url = 'https://www.paypal.com/cgi-bin/webscr?';
       $url .= build_url_string ('cmd', '_xclick');
-      $url .= build_url_string ('business', 'InteractiveLit@yahoo.com');
+      $url .= build_url_string ('business', PAYPAL_ACCOUNT_EMAIL);
       $url .= build_url_string ('item_name', PAYPAL_ITEM_CON);
       $url .= build_url_string ('no_note', '0');
       $url .= build_url_string ('cn', 'Any notes about your payment?');
@@ -101,7 +101,7 @@ if (!is_logged_in()) {
       echo "<div style=\"margin-right: 100px;\">\n";
       echo "You can <A HREF=$url>pay now</A> through\n";
       echo "PayPal.  If you sign up for PayPal, please be sure to say that\n";
-      echo "you were referred by <A HREF=mailto:InteractiveLit@yahoo.com>InteractiveLit@yahoo.com</A>\n";
+      echo "you were referred by <A HREF=mailto:".PAYPAL_ACCOUNT_EMAIL.">".PAYPAL_ACCOUNT_EMAIL."</A>\n";
       echo "and PayPal will give an extra $5 to the con!<P>\n";
       echo "If you pay for multiple people using PayPal, please tell us what\n";
       echo "you're doing in the Note field on the PayPal site so we can\n";

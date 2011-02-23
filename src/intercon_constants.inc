@@ -72,6 +72,7 @@ define (CON_NUMBER, 'thirteenth');
 define (CON_DOMAIN, 'intercon-j.org');
 define (CON_MAX, 310);
 
+define (PAYPAL_ACCOUNT_EMAIL, 'InteractiveLit@yahoo.com');
 define (PAYPAL_ITEM_SHIRT, CON_NAME . ' Shirt Payment');
 define (PAYPAL_ITEM_CON, CON_NAME . ' Registration');
 define (PAYPAL_ITEM_THURSDAY, CON_NAME . ' Thursday');
