@@ -1,0 +1,58 @@
+Intercode PayPal Integration
+============================
+
+Intercode uses PayPal to process convention payments such as:
+
+* Registration fee
+* T-shirt pre-orders
+* Dead dog ticket pre-orders
+* Pre-convention tickets
+
+As of the 2011 release, we've implemented PayPal Instant Payment Notification
+(IPN) support.  This has the advantage of much greater reliability than the
+old link-back method, and is easier to debug issues with using PayPal's
+IPN integration console.  However, it does come with increased complexity of
+setup.
+
+The main reason for this complexity is that Intercode must be deployed 
+separately for each convention you run, but PayPal only allows one IPN
+listener URL per account.  Thus, the IPN listener must be able to handle
+payments for all the conventions at once.  This means figuring out which 
+con database to write payment records into based on the name of the item being
+purchased.
+
+The code for PayPal integration is located in the Subversion repository at:
+http://interactiveliterature.org/svn/intercon/paypal-integration
+
+It consists of a single PHP file called "ipn-listener.php".  This should be
+deployed somewhere separate from your convention site installations.  We
+deploy ours to http://interactiveliterature.org/paypal-integration.
+
+In order to use this file, you'll need to change several things in it:
+
+1) The HOME_DIR should be set to the root directory of all your convention
+   site installations on the web server.
+   
+2) Change the "Phone home" email address at the end of the log_paypal_msgs
+   function so it's not emailing Nat Budin.
+   
+3) There's a section late in the file that begins with the line:
+   $item_name = $_POST['item_name'];
+   
+   This is where we figure out which convention is being paid for using the
+   PayPal item name.  You'll need to change the regular expression as well
+   as the logic below to figure out which convention is being paid for and
+   set $con_dir to the appropriate directory.  This should be a directory
+   in which a copy of Intercode is deployed, because the next thing the
+   script is going to do is try to require('intercon_db.inc') from that
+   directory to connect to the appropriate database.
+
+Once that's all done, you'll need to tell PayPal to send IPN requests to
+the URL of the ipn-listener.php script.  This can be done from your PayPal
+account's control panel.
+
+To test it, set the DEVELOPMENT_MODE flag to 1 in intercon_constants.inc.
+This will make the price of everything 5 cents so you can try it out
+without having to spend too much money.  (It will also put a red banner on
+each page of the site saying that it's in development mode, and direct all
+convention email to you rather than the user it was supposed to go to.)
