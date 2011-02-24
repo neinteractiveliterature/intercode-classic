@@ -1166,7 +1166,7 @@ function report_games_by_time ($day)
       $hour = $row->StartHour;
     }
 
-    $rooms = pretty_rooms($row->$Rooms);
+    $rooms = pretty_rooms($row->Rooms);
     echo "    $row->Title $row->TitleSuffix $rooms<br>\n";
   }
   echo "    </td>\n";
