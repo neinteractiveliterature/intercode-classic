@@ -286,6 +286,7 @@ function report_per_room ()
   // Fetch the set of rooms
   $sql = 'SELECT COLUMN_TYPE FROM Information_Schema.Columns';
   $sql .= ' WHERE Table_Name="Runs" AND Column_Name="Rooms"';
+  $sql .= ' AND Table_Schema="'.DB_NAME.'"';
 
   $result = mysql_query ($sql);
   if (! $result)
