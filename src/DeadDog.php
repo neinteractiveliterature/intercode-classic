@@ -120,6 +120,10 @@ class DeadDogManager extends UpchargeItemManager {
         return (DEAD_DOG_MAX - $row[0]);
     }
     
+    public function ticketsFrozen() {
+        return con_signups_frozen();
+    }
+    
     function displayFormFields($row=null) {
         parent::displayFormFields($row);
         form_text(2, 'Number of Tickets', 'Quantity');
@@ -199,7 +203,13 @@ function dead_dog($manager) {
         }
         
         $availableSlots = $manager->availableSlots();
-        if ($availableSlots > 0) {
+        if ($manager->ticketsFrozen()) {
+            echo "<h3>Pre-orders for tickets have ended</h3>";
+            
+            echo "<p>There are up to $availableSlots tickets available at ";
+            echo "the convention; please see Ops if you want to purchase ";
+            echo "one.</p>";
+        } elseif ($availableSlots > 0) {
             if ($ticketCount == 0) {
                 echo "<h3>Sign up for the Dead Dog!</h3>";
             } else {
