@@ -384,6 +384,7 @@ function build_about_subnavbar() {
   $aboutSection->push(NavBarItem::newAction("What Does It Cost?", "cost.php"));
   $aboutSection->push(NavBarItem::newAction("Contacts", "Contacts.php"));
   $aboutSection->push(NavBarItem::newAction("Hotel Info", "hotel.php"));
+  $aboutSection->push(NavBarItem::newStatic("Local Guide", "LocalGuide"));
   $aboutSection->push(NavBarItem::newAction("Who's Who", "index.php", WHO_IS_WHO));
   $aboutSection->push(NavBarItem::newStatic("Volunteering", "volunteering"));
   $aboutSection->push(NavBarItem::newAction("ConCom Schedule", "ConComSchedule.php"));
