@@ -669,6 +669,22 @@ function calculate_con_signups_allowed ()
   return 0;
 }
 
+// Only use this if you need to make the distinction between signups not being
+// allowed _yet_ and signups being _frozen_.
+function con_signups_frozen () {
+  $result = mysql_query ("SELECT SignupsAllowed FROM Con");
+  if (!$result) {
+      return 0;
+  }
+  
+  $row = mysql_fetch_object ($result);
+  if (!$row) {
+    return 0;
+  }
+  
+  return ($row->SignupsAllowed == "NotNow");
+}
+
 function attendees_at_max() {
   $sql = 'SELECT CanSignup, COUNT(*) AS Count FROM Users';
   $sql .= ' WHERE CanSignup<>"Alumni"';

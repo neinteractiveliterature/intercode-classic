@@ -1026,7 +1026,7 @@ function schedule_day ($day, $away_all_day, $away_hours,
 
   if ($show_away_column)
   {
-    echo "<div style=\"text-align: center;\"\n";
+    echo "<div style=\"text-align: center;\">\n";
     echo "<INPUT TYPE=SUBMIT VALUE=\"Update Away Settings\"/>\n";
     echo "</div>\n";
   }
