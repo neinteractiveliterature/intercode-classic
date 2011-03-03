@@ -36,3 +36,7 @@ p.dev_warning
 	font-weight: bold;
 	text-align: center;
 }
+
+.print_logo_break_before {
+    page-break-before: always;
+}
