@@ -942,8 +942,8 @@ function display_bid_form ($first_try)
   $text = "A short sentence for the game to be used to sell the game to the\n";
   $text .= "general public.  Include information about the genre.  For\n";
   $text .= "example, &quot;Members of a Vampire Cabal battle for control of\n";
-  $text .= "Waltham&quot; is better than &quot;The Prince of\n";
-  $text .= "Waltham is dead.  Who will take his place?&quot;";
+  $text .= "Chelmsford&quot; is better than &quot;The Prince of\n";
+  $text .= "Chelmsford is dead.  Who will take his place?&quot;";
   form_textarea ($text, 'ShortSentence', 2, TRUE, TRUE);
 
   $text = "Without giving away any secrets for the game (because we want to\n";
