@@ -38,7 +38,7 @@ echo "      The Radisson is \n";
 echo "      <a href=\"http://www.mapquest.com/maps/map.adp?country=US&addtohistory=&address=10+Independence+Drive&city=Chelmsford&state=MA&zipcode=01824&homesubmit=Get+Map\" target=\"_blank\">conveniently located</a> \n";
 echo "      just off exit 34 (Route 110) on Interstate 495 in Chelmsford. \n";
 echo "      Follow the signs on the highway ramp to the hotel.\n";
-echo "      <p>A map is available <a href=\"http://www.mapquest.com/maps/map.adp?latlongtype=internal&addtohistory=&latitude=JxeSZBN%2fJn0%3d&longitude=eP8pzdrdLfg%3d&name=Radisson%20Hotel&countryid=250&country=US&address=10%20Independence%20Dr&city=Chelmsford&state=MA&zipcode=01824&phone=978%2d256%2d0800&cat=Radisson%20Hotel&spurl=0&searchtype=search\" target=_blank>here</a>.\n";
+echo "      <p>A map is available <a href=\"http://maps.google.com/maps?ie=UTF8&q=radisson+hotel+and+suites+chelmsford+lowell&fb=1&gl=us&hq=radisson+hotel+and+suites+chelmsford+lowell&hnear=radisson+hotel+and+suites+chelmsford+lowell&cid=0,0,7149764001485294323&ll=42.604352,-71.346352&spn=0.007771,0.018411&t=h&z=16&iwloc=A\" target=_blank>here</a>.\n";
 echo "    </td>\n";
 echo "    <td valign=\"top\" rowspan=\"3\">\n";
 echo "      <table class=\"reserve\" width=\"100%\" border=\"0\"  cellspacing=\"2\" cellpadding=\"2\">\n";
