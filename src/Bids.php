@@ -13,7 +13,7 @@ if (! intercon_db_connect ())
 
 html_begin ();
 
-// Figure out what we''re supposed to do
+// Figure out what we're supposed to do
 
 if (array_key_exists ('action', $_REQUEST))
   $action=$_REQUEST['action'];
@@ -240,7 +240,7 @@ function form_bid_consensus ($key, $display='')
 /*
  * schedule_table_entry
  *
- * Display a drop-down list to allow the user to select whether he''s
+ * Display a drop-down list to allow the user to select whether he's
  * willing to run his game in this time slot
  */
 
@@ -248,13 +248,11 @@ function schedule_table_entry ($key)
 {
   //  echo "          <TD><INPUT TYPE=TEXT NAME=$key SIZE=1 MAXLENGTH=1 VALUE=\"$_POST[$key]\"></TD>\n";
 
-  $mykey = str_replace ( ' ' , '_' , $key );
-
-  if (! isset ($_POST[$mykey]))
+  if (! isset ($_POST[$key]))
     $value = '';
   else
   {
-    $value = trim ($_POST[$mykey]);
+    $value = trim ($_POST[$key]);
     if (1 == get_magic_quotes_gpc())
       $value = stripslashes ($value);
   }
@@ -275,7 +273,7 @@ function schedule_table_entry ($key)
   }
 
   echo "          <TD>\n";
-  echo "            <SELECT NAME=$mykey SIZE=1>\n";
+  echo "            <SELECT NAME=$key SIZE=1>\n";
   echo "              <option value=\"\" $dont_care>Don't Care&nbsp;</option>\n";
   echo "              <option value=1 $one>1st Choice&nbsp;</option>\n";
   echo "              <option value=2 $two>2nd Choice&nbsp;</option>\n";
@@ -287,7 +285,6 @@ function schedule_table_entry ($key)
 
 function validate_schedule_table_entry ($key, $display)
 {
-  $key = str_replace ( ' ' , '_' , $key );
   $value = trim ($_POST[$key]);
 
   switch ($value)
@@ -457,17 +454,6 @@ function show_bid ()
       $bid_row[$key] = $value;
   }
 
-  //Get the Bid Preferred Slot Info
-  $sql = 'SELECT * FROM BidTimes WHERE BidId=' . $BidId;
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ("Query for BidId $BidId failed");
-
-  $bid_pref_slots = array();
-  while ($row = mysql_fetch_assoc($result)) {
-    $bid_pref_slots[$row['Day'].$row['Slot']] = $row['Pref'];
-	}
-
   echo "<TABLE BORDER=0 WIDTH=\"100%\">\n";
   echo "  <TR VALIGN=TOP>\n";
   echo "    <TD>\n";
@@ -486,7 +472,7 @@ function show_bid ()
   }
   echo "  </tr>\n";
   echo "</TABLE>\n";
-
+  
   echo "<TABLE BORDER=0>\n";
 
   show_section ('Submitter Information');
@@ -535,30 +521,34 @@ function show_bid ()
 
   show_section ('Scheduling Information');
 
-  global $CON_DAYS;
-  global $BID_SLOTS;
-  global $BID_SLOT_ABBREV;
-
   echo "  <TR VALIGN=TOP>\n";
   echo "    <TD ALIGN=RIGHT><B>Preferred Slots:</B></TD>\n";
   echo "    <TD>\n";
   echo "      <TABLE BORDER=1>\n";
   echo "        <TR ALIGN=CENTER>\n";
-  foreach ($CON_DAYS as $day)
-  	echo "          <TD COLSPAN=".count($BID_SLOTS[$day]).">{$day}</TD>\n";
+  echo "          <TD COLSPAN=3>Friday</TD>\n";
+  echo "          <TD COLSPAN=4>Saturday</TD>\n";
+  echo "          <TD COLSPAN=1>Sunday</TD>\n";
   echo "        </tr>\n";
   echo "        <TR ALIGN=CENTER>\n";
-  foreach ($CON_DAYS as $day)
-  	foreach ($BID_SLOTS[$day] as $slot)
-  		echo "          <TD>".$BID_SLOT_ABBREV[$slot]."</TD>\n";
+  echo "          <TD>PM</TD>\n";
+  echo "          <TD>Eve</TD>\n";
+  echo "          <TD>Late</TD>\n";
+  echo "          <TD>AM</TD>\n";
+  echo "          <TD>PM</TD>\n";
+  echo "          <TD>Eve</TD>\n";
+  echo "          <TD>Late</TD>\n";
+  echo "          <TD>AM</TD>\n";
   echo "        </tr>\n";
   echo "        <TR ALIGN=CENTER>\n";
-  foreach ($CON_DAYS as $day)
-  	foreach ($BID_SLOTS[$day] as $slot)
-  		if (isset($bid_pref_slots[$day.$slot]))
-  			show_table_entry ($bid_pref_slots[$day.$slot]);
-  		else
-  			show_table_entry ('&nbsp;');
+  show_table_entry ($bid_row['FriPM']);
+  show_table_entry ($bid_row['FriEve']);
+  show_table_entry ($bid_row['FriLate']);
+  show_table_entry ($bid_row['SatAM']);
+  show_table_entry ($bid_row['SatPM']);
+  show_table_entry ($bid_row['SatEve']);
+  show_table_entry ($bid_row['SatLate']);
+  show_table_entry ($bid_row['SunAM']);
   echo "        </tr>\n";
   echo "      </TABLE>\n";
   echo "    </TD>\n";
@@ -687,13 +677,13 @@ function display_bid_form ($first_try)
       $sql = "SELECT * FROM Bids WHERE BidId=$BidId";
       $result = mysql_query ($sql);
       if (! $result)
-		return display_mysql_error ("Query failed for BidId $BidId");
+	return display_mysql_error ("Query failed for BidId $BidId");
 
       if (0 == mysql_num_rows ($result))
-		return display_error ("Failed to find BidId $BidId");
+	return display_error ("Failed to find BidId $BidId");
 
       if (1 != mysql_num_rows ($result))
-		return display_error ("Found multiple entries for BidId $BidId");
+	return display_error ("Found multiple entries for BidId $BidId");
 
       $row = mysql_fetch_array ($result, MYSQL_ASSOC);
 
@@ -704,20 +694,6 @@ function display_bid_form ($first_try)
         else
           $_POST[$key] = $value;
       }
-
-      //Also get the bid slot data.
-      $sql = "SELECT * FROM BidTimes WHERE BidId=$BidId;";
-      $result = mysql_query ($sql);
-      if (! $result)
-		return display_mysql_error ("BidTimes query failed for BidId $BidId");
-
-	  while ($row = mysql_fetch_array ($result, MYSQL_ASSOC))
-	  {
-	  	 $key = $row['Day'].'_'.$row['Slot'];
-  		 $key = str_replace ( ' ' , '_' , $key );
-		 $_POST[$key] = mysql_real_escape_string ($row['Pref']);
-	  }
-	  mysql_free_result ($result);
 
       // If the user or game IDs are in the record, then have the user
       // modify them using the Edit User or Edit Game links
@@ -910,29 +886,41 @@ function display_bid_form ($first_try)
   echo "      Please pick your top three preferences for when you'd like to\n";
   echo "      run your game.\n";
   echo "    </TD>\n";
-  echo "  </TR>\n";
-
-  global $CON_DAYS;
-  global $BID_SLOTS;
+  echo "  </tr>\n";
 
   echo "  <TR>\n";
   echo "    <TD COLSPAN=2>\n";
   echo "      <TABLE BORDER=1>\n";
   echo "        <TR VALIGN=BOTTOM>\n";
   echo "          <TH></TH>\n";
-  foreach ($CON_DAYS as $day)
-  	echo "          <TH>{$day}</TH>\n";
+  echo "          <TH>Friday</TH>\n";
+  echo "          <TH>Saturday</TH>\n";
+  echo "          <TH>Sunday</TH>\n";
   echo "        </tr>\n";
-  foreach ($BID_SLOTS['All'] as $main_slot) {
-	  echo "        <TR ALIGN=CENTER>\n";
-	  echo "          <TH>{$main_slot}</TH>\n";
-	  foreach ($CON_DAYS as $day)
-	  	if (in_array($main_slot,$BID_SLOTS[$day]))
-	  		schedule_table_entry ("{$day}_{$main_slot}");
-		else
-	  		echo "          <TD>&nbsp;</TD>\n";
-	  echo "        </tr>\n";
-  }
+  echo "        <TR ALIGN=CENTER>\n";
+  echo "          <TH>Morning</TH>\n";
+  echo "          <TD>&nbsp;</TD>\n";
+  schedule_table_entry ('SatAM');
+  schedule_table_entry ('SunAM');
+  echo "        </tr>\n";
+  echo "        <TR ALIGN=CENTER>\n";
+  echo "          <TH>Afternoon</TH>\n";
+  schedule_table_entry ('FriPM');
+  schedule_table_entry ('SatPM');
+  echo "          <TD>&nbsp;</TD>\n";
+  echo "        </tr>\n";
+  echo "        <TR ALIGN=CENTER>\n";
+  echo "          <TH>Evening</TH>\n";
+  schedule_table_entry ('FriEve');
+  schedule_table_entry ('SatEve');
+  echo "          <TD>&nbsp;</TD>\n";
+  echo "        </tr>\n";
+  echo "        <TR ALIGN=CENTER>\n";
+  echo "          <TH>After Midnight</TH>\n";
+  schedule_table_entry ('FriLate');
+  schedule_table_entry ('SatLate');
+  echo "          <TD>&nbsp;</TD>\n";
+  echo "        </tr>\n";
   echo "      </TABLE>\n";
   echo "    </TD>\n";
   echo "  </tr>\n";
@@ -1047,9 +1035,9 @@ function process_bid_form ()
   $BidId = intval (trim ($_REQUEST['BidId']));
   $EditGameInfo = intval (trim ($_REQUEST['EditGameInfo']));
 
-  //echo "EditGameInfo: $EditGameInfo<br>\n";
+  //  echo "EditGameInfo: $EditGameInfo<br>\n";
 
-  //echo "BidId: $BidId<p>\n";
+  //  echo "BidId: $BidId<p>\n";
 
   // Always hopeful...
 
@@ -1079,11 +1067,15 @@ function process_bid_form ()
   $form_ok &= validate_string ('Premise');
 
   // Scheduling Information
-  global $CON_DAYS;
-  global $BID_SLOTS;
-  foreach ($CON_DAYS as $day)
-  	foreach ($BID_SLOTS[$day] as $slot)
-  		$form_ok &= validate_schedule_table_entry ("{$day}_{$slot}", "{$day} {$slot}");
+  
+  $form_ok &= validate_schedule_table_entry ('FriPM', 'Friday Afternoon');
+  $form_ok &= validate_schedule_table_entry ('FriEve', 'Friday Evening');
+  $form_ok &= validate_schedule_table_entry ('FriLate', 'Friday After Midnight');
+  $form_ok &= validate_schedule_table_entry ('SatAM', 'Saturday Morning');
+  $form_ok &= validate_schedule_table_entry ('SatPM', 'Saturday Afternoon');
+  $form_ok &= validate_schedule_table_entry ('SatEve', 'Saturday Evening');
+  $form_ok &= validate_schedule_table_entry ('SatLate', 'Saturday After Midnight');
+  $form_ok &= validate_schedule_table_entry ('SunAM', 'Sunday Morning');
 
   // Advertising Information
 
@@ -1095,11 +1087,12 @@ function process_bid_form ()
     return FALSE;
 
   // Make sure that we don't already have a game with this title
-  $Title = trim ($_POST['Title']);
 
-  if (!$EditGameInfo)
+  if ($EditGameInfo)
   {
-    if (!title_not_in_events_table ($Title))
+    $Title = trim ($_POST['Title']);
+
+    if (! title_not_in_events_table ($Title))
       return false;
   }
 
@@ -1194,6 +1187,14 @@ function process_bid_form ()
   $sql .= build_sql_string ('Offensive', '', FALSE, TRUE);
   $sql .= build_sql_string ('PhysicalRestrictions', '', TRUE, TRUE);
   $sql .= build_sql_string ('AgeRestrictions', '', TRUE, TRUE);
+  $sql .= build_sql_string ('FriPM');
+  $sql .= build_sql_string ('FriEve');
+  $sql .= build_sql_string ('FriLate');
+  $sql .= build_sql_string ('SatAM');
+  $sql .= build_sql_string ('SatPM');
+  $sql .= build_sql_string ('SatEve');
+  $sql .= build_sql_string ('SatLate');
+  $sql .= build_sql_string ('SunAM');
   $sql .= build_sql_string ('SchedulingConstraints', '', TRUE, TRUE);
   $sql .= build_sql_string ('SpaceRequirements', '', TRUE, TRUE);
   $sql .= build_sql_string ('MultipleRuns');
@@ -1204,28 +1205,6 @@ function process_bid_form ()
   $result = mysql_query ($sql);
   if (! $result)
     return display_mysql_error ("Insert into Bids failed");
-
-  $sql = "DELETE from BidTimes WHERE BidId=$BidId";
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ("Delete from BidTimes failed");
-
-  global $CON_DAYS;
-  global $BID_SLOTS;
-  foreach ($CON_DAYS as $day)
-  	foreach ($BID_SLOTS[$day] as $slot) {
-	  $sql = "INSERT into BidTimes (BidId, Day, Slot, Pref) values (";
-	  $sql .= "{$BidId}, ";
-	  $sql .= "'{$day}', ";
-	  $sql .= "'{$slot}', ";
-	  $sql .= "'";
-	  $sql .= $_POST[str_replace(' ','_',"${day}_{$slot}")];
-	  $sql .= "');";
-	  $result = mysql_query ($sql);
-	  if (! $result)
-		return display_mysql_error ("Add {$day} {$slot} to BidTimes failed");
-
-  	}
 
   // Advertising Information
 
@@ -1359,6 +1338,8 @@ function display_bids_for_review ()
 
   $sql = 'SELECT Bids.BidId, Bids.Title, Bids.Hours, Bids.Status,';
   $sql .= ' Users.EMail, Users.FirstName, Users.LastName,';
+  $sql .= ' Bids.FriPM, Bids.FriEve, Bids.FriLate,';
+  $sql .= ' Bids.SatAM, Bids.SatPM, Bids.SatEve, Bids.SatLate, Bids.SunAM,';
   $sql .= ' Bids.Organization, Bids.EventId, Bids.UserId,';
   $sql .= ' DATE_FORMAT(Bids.LastUpdated, "%H:%i <NOBR>%d-%b-%y</NOBR>") AS LastUpdatedFMT,';
   $sql .= ' DATE_FORMAT(Bids.Created, "%H:%i <NOBR>%d-%b-%y</NOBR>") AS CreatedFMT,';
@@ -1386,14 +1367,6 @@ function display_bids_for_review ()
     echo "<br>Click on the status to change the status\n";
   echo "<p>\n";
 
-  global $CON_DAYS;
-  global $BID_SLOTS;
-  global $BID_SLOT_ABBREV;
-
-  $numslots = 0;
-  foreach ($CON_DAYS as $day)
-	$numslots += count($BID_SLOTS[$day]);
-
   echo "<table border=\"1\">\n";
   echo "  <tr valign=\"bottom\">\n";
   printf ("    <th rowspan=\"3\" align=\"left\">" .
@@ -1404,7 +1377,7 @@ function display_bids_for_review ()
 	  BID_REVIEW_BIDS);
   echo "    <TH COLSPAN=3>Size</TH>\n";
   echo "    <TH ROWSPAN=3>Hours</TH>\n";
-  echo "    <TH COLSPAN={$numslots}>Preferred Slots</TH>\n";
+  echo "    <TH COLSPAN=8>Preferred Slots</TH>\n";
   printf ("    <th rowspan=\"3\" align=\"left\">" .
 	  "<a href=\"Bids.php?action=%d&order=Status\">Status</th>\n",
 	  BID_REVIEW_BIDS);
@@ -1420,16 +1393,21 @@ function display_bids_for_review ()
   echo "    <TH ROWSPAN=2>Min</TH>\n";
   echo "    <TH ROWSPAN=2>Pref</TH>\n";
   echo "    <TH ROWSPAN=2>Max</TH>\n";
-
-  foreach ($CON_DAYS as $day)
-	echo "    <TH COLSPAN='".count($BID_SLOTS[$day])."'>".substr($day,0,3)."</TH>\n";
+  echo "    <TH COLSPAN=3>Fri</TH>\n";
+  echo "    <TH COLSPAN=4>Sat</TH>\n";
+  echo "    <TH>Sun</TH>\n";
   echo "  </tr>\n";
 
   echo "  <TR VALIGN=BOTTOM>\n";
-  foreach ($CON_DAYS as $day)
-  	foreach ($BID_SLOTS[$day] as $slot)
-  		echo "          <TH>".$BID_SLOT_ABBREV[$slot]."</TH>\n";
-  echo "  </TR>\n";
+  echo "    <TH>PM</TH>\n";
+  echo "    <TH>Eve</TH>\n";
+  echo "    <TH>Late</TH>\n";
+  echo "    <TH>AM</TH>\n";
+  echo "    <TH>PM</TH>\n";
+  echo "    <TH>Eve</TH>\n";
+  echo "    <TH>Late</TH>\n";
+  echo "    <TH>AM</TH>\n";
+  echo "  </tr>\n";
 
   while ($row = mysql_fetch_object ($result))
   {
@@ -1501,19 +1479,6 @@ function display_bids_for_review ()
       }
     }
 
-	$sql = "SELECT * FROM BidTimes WHERE BidId=".$row->BidId.";";
-	$btresult = mysql_query ($sql);
-	if (! $btresult)
-		return display_mysql_error ("BidTimes query failed for BidId ".$row->BidId);
-
-	$bidtimes = array();
-	while ($btrow = mysql_fetch_array ($btresult, MYSQL_ASSOC))
-	{
-		$key = $btrow['Day'].'_'.$btrow['Slot'];
-		$bidtimes[$key] = mysql_real_escape_string ($btrow['Pref']);
-	}
-	mysql_free_result ($btresult);
-
     $name = $row->FirstName;
     if ('' != $name)
       $name .= ' ';
@@ -1545,14 +1510,14 @@ function display_bids_for_review ()
     echo "    <TD>$row->Max</TD>\n";
     echo "    <TD>$row->Hours</TD>\n";
 
-	global $CON_DAYS;
-	global $BID_SLOTS;
-
-  	foreach ($CON_DAYS as $day)
-  		foreach ($BID_SLOTS[$day] as $slot) {
-  			$key = $day.'_'.$slot;
-  			echo "    <TD>" . table_value ($bidtimes[$key]) . "</TD>\n";
-  	    }
+    echo "    <TD>" . table_value ($row->FriPM) . "</TD>\n";
+    echo "    <TD>" . table_value ($row->FriEve) . "</TD>\n";
+    echo "    <TD>" . table_value ($row->FriLate) . "</TD>\n";
+    echo "    <TD>" . table_value ($row->SatAM) . "</TD>\n";
+    echo "    <TD>" . table_value ($row->SatPM) . "</TD>\n";
+    echo "    <TD>" . table_value ($row->SatEve) . "</TD>\n";
+    echo "    <TD>" . table_value ($row->SatLate) . "</TD>\n";
+    echo "    <TD>" . table_value ($row->SunAM) . "</TD>\n";
 
     if (user_has_priv (PRIV_BID_CHAIR))
       printf ("    <TD><A HREF=Bids.php?action=%d&BidId=%d>$row->Status</A></TD>\n",
@@ -1692,7 +1657,7 @@ function change_bid_status ()
   }
 
   echo "</SELECT>\n";
-
+      
   echo "<P>\n";
   echo "<INPUT TYPE=SUBMIT VALUE=\"Update Status\">\n";
   echo "</FORM>\n";
@@ -1936,7 +1901,7 @@ function show_bid_feedback_summary()
     $suffix = '';
     if (user_has_priv (PRIV_BID_CHAIR))
       $suffix = '</a>';
-
+ 
     foreach ($committee as $key => $value)
     {
       if (user_has_priv (PRIV_BID_CHAIR))
@@ -2730,7 +2695,7 @@ function process_feedback_for_entry()
 
   $sql .= build_sql_string ('Vote', $_POST['Vote'], false);
   $sql .= build_sql_string ('Issues');
-
+  
   if (0 == $FeedbackId)
   {
     $sql .= build_sql_string ('UserId');
@@ -2798,7 +2763,7 @@ function show_bid_feedback_by_user_form()
     if (! $result)
       return display_mysql_error ('Query failed for bids under discussion',
 				  $sql);
-
+  
     $_POST['BidCount'] = mysql_num_rows($result);
     if (0 == $_POST['BidCount'])
       return display_error ('There are no bids under discussion');
@@ -2934,7 +2899,7 @@ function process_feedback_for_user()
     }
     else
       $sql .= " WHERE FeedbackId=$FeedbackId";
-
+  
     //    echo "$sql<br>\n";
     $result = mysql_query($sql);
     if (! $result)
