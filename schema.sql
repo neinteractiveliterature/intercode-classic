@@ -237,14 +237,6 @@ CREATE TABLE `Bids` (
   `Offensive` text,
   `PhysicalRestrictions` text,
   `AgeRestrictions` text,
-  `FriPM` char(1) NOT NULL DEFAULT '',
-  `FriEve` char(1) NOT NULL DEFAULT '',
-  `FriLate` char(1) NOT NULL DEFAULT '',
-  `SatAM` char(1) NOT NULL DEFAULT '',
-  `SatPM` char(1) NOT NULL DEFAULT '',
-  `SatEve` char(1) NOT NULL DEFAULT '',
-  `SatLate` char(1) NOT NULL DEFAULT '',
-  `SunAM` char(1) NOT NULL DEFAULT '',
   `SchedulingConstraints` text,
   `SpaceRequirements` text NOT NULL,
   `MultipleRuns` enum('Y','N') DEFAULT NULL,
@@ -269,6 +261,28 @@ CREATE TABLE `Bids` (
 LOCK TABLES `Bids` WRITE;
 /*!40000 ALTER TABLE `Bids` DISABLE KEYS */;
 /*!40000 ALTER TABLE `Bids` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `BidTimes`
+--
+
+CREATE TABLE `BidTimes` (
+  `BidTimeId` int(10) unsigned NOT NULL auto_increment,
+  `BidId` int(10) unsigned NOT NULL,
+  `Day` enum('Monday','Tuesday','Wednesday','Thursday','Friday', 'Saturday', 'Sunday') NOT NULL,
+  `Slot` enum('Morning', 'Lunch', 'Afternoon', 'Dinner', 'Evening', 'After Midnight' ) NOT NULL,
+  `Pref` char(1) NOT NULL default '',
+  PRIMARY KEY  (`BidTimeId`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+--
+-- Dumping data for table `BidTimes`
+--
+
+LOCK TABLES `BidTimes` WRITE;
+/*!40000 ALTER TABLE `BidTimes` DISABLE KEYS */;
+/*!40000 ALTER TABLE `BidTimes` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
