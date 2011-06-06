@@ -40,6 +40,12 @@ define (DB_USER_PWD, '');
 
 define (DEVELOPMENT_MAIL_ADDR, 'natbudin@gmail.com');
 
+//Set this to the name of the directory that contains your con specific text.
+//Copy the intercontext directory to yours and then edit the files there
+//For your con specific text.  NEIL Intercons can skip this step.
+
+define (TEXT_DIR, 'steamtext');
+
 // Set to 0 to disable the poll
 
 define (POLL_ENABLED, 0);
@@ -71,6 +77,9 @@ define (CON_NAME, 'Intercon ' . CON_ID);
 define (CON_NUMBER, 'thirteenth');
 define (CON_DOMAIN, 'intercon-j.org');
 define (CON_MAX, 310);
+//set USE_CON_SHORT_NAME for long convention names.
+define (CON_SHORT_NAME, 'Intercon');
+define (USE_CON_SHORT_NAME, 0);
 
 define (PAYPAL_ACCOUNT_EMAIL, 'InteractiveLit@yahoo.com');
 define (PAYPAL_ITEM_SHIRT, CON_NAME . ' Shirt Payment');
@@ -83,7 +92,7 @@ define (NAME_CON_CHAIR, 'Tim Lasko');
 define (EMAIL_CON_CHAIR, 'conchair@' . CON_DOMAIN);
 define (ADDR_CON_CHAIR, '88 Perry Street, Unit 281<br>Putnam, CT 06260');
 
-define (NAME_SEND_CHECKS, 'Chad Bergeron');
+define (NAME_SEND_CHECKS, 'Fake Name');
 define (ADDR_SEND_CHECKS, '123 Fake St<br>Fake, MA 90210');
 
 // EMail Addresses
@@ -165,6 +174,11 @@ define (COLOR_MENU_PUBLIC_BG, "#b9d1ec");
 define (COLOR_MENU_PRIV_FG, "#ca9a00");
 define (COLOR_MENU_PRIV_BG, "#FADB5E");
 
+//These are for the NavMenu
+define (NAV_SHOW_COST, 0);
+define (NAV_SHOW_FLYER, 0);
+define (NAV_SHOW_LINKS, 0);
+
 // 1 (true) if we're accepting bids, 0 if we're not
 
 define (ACCEPTING_BIDS, 1);
@@ -178,9 +192,33 @@ define(MAIL_BACKEND, "sendmail");
 // Define these if you specified "smtp" above.
 // Must be an SSL-enabled SMTP server listening on port 485
 define(SMTP_HOST, "smtp.gmail.com");
-define(SMTP_USERNAME, "web@intercon-k.org");
+define(SMTP_USERNAME, "web@" . CON_DOMAIN);
 define(SMTP_PASSWORD, "");
 
+//Look and feel items
+define (PAGE_BANNER, 'PageBanner.png');
+  
+//Items for Bids/Schedule
+global $CON_DAYS;
+$CON_DAYS = array('Friday', 'Saturday', 'Sunday', 'Monday');
+
+//These must match the text values in the BidTimes table slot field.
+global $BID_SLOTS;
+$BID_SLOTS = array();
+$BID_SLOTS['Friday'] = array('Afternoon', 'Evening', 'After Midnight');
+$BID_SLOTS['Saturday'] = array('Morning', 'Afternoon', 'Evening', 'After Midnight');
+$BID_SLOTS['Sunday'] = array('Morning', 'Afternoon', 'Evening', 'After Midnight');
+$BID_SLOTS['Monday'] = array('Morning', 'Afternoon');
+$BID_SLOTS['All'] = array('Morning', 'Afternoon', 'Evening', 'After Midnight'); //all possible bid slots.
+
+global $BID_SLOT_ABBREV;
+$BID_SLOT_ABBREV = array();
+$BID_SLOT_ABBREV['Morning'] = 'AM';
+$BID_SLOT_ABBREV['Afternoon'] = 'PM';
+$BID_SLOT_ABBREV['Evening'] = 'Eve';
+$BID_SLOT_ABBREV['After Midnight'] = 'Late';
+$BID_SLOT_ABBREV['Lunch'] = 'Lunch';
+$BID_SLOT_ABBREV['Dinner'] = 'Din';
 
 function parse_date ($d)
 {
