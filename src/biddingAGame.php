@@ -72,19 +72,9 @@ function display_bid_intro ()
   echo "<table cellspacing=\"2\" cellPadding=\"2\" width=\"100%\" border=\"0\">\n";
   echo "  <tr>\n";
   echo "    <td width=\"60%\" valign=\"top\">\n";
-  echo "      <h3>Bidding an Event for Intercon</h3>\n";
-  echo "      <p>\n";
-  echo "Intercon is the premiere Live Action Role Playing convention in the\n";
-  echo "world. We've gotten this way by seeking out a diverse selection of\n";
-  echo "LARPs, in as many different styles and genres as we can find. Ask\n";
-  echo "ten LARPers what LARP is about and you'll get thirteen different\n";
-  echo "answers. We're trying to find interesting games that satisfy as\n";
-  echo "many of those possibilities as we can. We encourage new authors to\n";
-  echo "bid games as much as we recruit experienced authors. We also\n";
-  echo "encourage authors who've never run at an Intercon before to bid.\n";
-  echo "Whether it's a new game or one that's been run before, we're\n";
-  echo "interested in what you have to propose.</p>\n";
-
+  echo "      <h3>Bidding an Event for ".(USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME)."</h3>\n";
+    if (file_exists(TEXT_DIR.'/bidding1.html'))
+	include(TEXT_DIR.'/bidding1.html');	
   echo "      <h3><a name=\"deadlines\">Bid Deadlines</a></h3>\n";
   if (user_has_priv (PRIV_SCHEDULING))
   {
@@ -128,7 +118,7 @@ function display_bid_intro ()
     if (('' != $row->ThirdBid) && ('' != $row->ThirdDecision))
     {
       echo "<p>\n";
-      echo "Intercon actively solicits bids in the months leading up to the\n";
+      echo CON_NAME . "actively solicits bids in the months leading up to the\n";
       echo "convention. As the convention attendance grows, based on\n";
       echo "registration numbers, we may need a third round of bids to fill\n";
       echo "in the slate of games already accepted for the convention.\n";
@@ -162,8 +152,8 @@ function display_bid_intro ()
   echo "<tr>\n";
   echo "<td bgcolor=\"white\">\n";
   echo "<h3>Questions?</h3>\n";
-  bidfaq_link ('gamekind', 'What kind of games are you looking for?');
-  bidfaq_link ('audience', 'What kind of players come to Intercon?');
+  bidfaq_link ('gamekind', 'What kind of events are you looking for?');
+  bidfaq_link ('audience', "What kind of players come to ".CON_NAME."?");
   echo "<p><A href=\"#deadlines\">When do I have to get my bid in?</a></p>\n";
   static_link ('bidFollowup', 'What happens when I submit my bid?');
   bidfaq_link ('', 'Other Frequently Asked Questions About Bidding');
@@ -175,18 +165,8 @@ function display_bid_intro ()
   echo "<table cellspacing=\"2\" cellpadding=\"2\" bgcolor=\"#4B067A\">\n";
   echo "<tr bgcolor=\"white\">\n";
   echo "<td>\n";
-  echo "<h3>Why Bid Early?</h3>\n";
-  echo "<p>There are several great reasons to get your game bid in early:\n";
-  echo "<ul>\n";
-  echo "<li>You're likelier to get the time slot you desire. As the\n";
-  echo "schedule fills, the prime time slots fill up.\n";
-  echo "<li>Your game gets more publicity and advertising. It's likelier\n";
-  echo "to fill earlier, which will give you more time to cast and plan.\n";
-  echo "<li>You get a better chance at attracting the players who know that\n";
-  echo "it's smart to sign up early for games.\n";
-  echo "<li>You might miss your chance to bid at all if you wait.There are\n";
-  echo "many GMs who know how much fun it is to run a game at Intercon!\n";
-  echo "</ul>\n";
+    if (file_exists(TEXT_DIR.'/bidearly.html'))
+	include(TEXT_DIR.'/bidearly.html');	
   echo "</td></tr></table>\n";
   echo "</td></tr></table>\n";
 }
@@ -227,7 +207,7 @@ function show_bidinfo_form()
     $_POST['ThirdDecision'] = '';
     $_POST['BidInfo'] =
       "<p>\n" .
-      "Intercon solicits bids for games in rounds, as needed, based on the\n" .
+      CON_NAME . "solicits bids for games in rounds, as needed, based on the\n" .
       "number of registrants we get. It's our goal to have a great schedule\n".
       "of games up as  early as possible!</p>\n" .
       "<p>\n" .

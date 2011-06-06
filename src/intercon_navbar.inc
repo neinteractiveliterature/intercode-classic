@@ -230,7 +230,7 @@ function navbar_end() {
 }
 
 function build_larps_subnavbar() {
-  $larpSection = new SubNavBar("LARPs at <NOBR>".CON_NAME."</NOBR>");
+  $larpSection = new SubNavBar("Events at <NOBR>".(USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME)."</NOBR>");
   if (can_show_schedule()) {
     $larpSection->push(NavBarItem::newAction("Con Schedule", "Schedule.php"));    
     if (user_has_priv(PRIV_CON_COM))
@@ -274,7 +274,7 @@ function build_gm_subnavbar() {
 }
 
 function build_shirts_subnavbar() {
-  $shirtsSection = new SubNavBar(CON_NAME . " <NOBR>Shirts</NOBR>");
+  $shirtsSection = new SubNavBar((USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME) . " <NOBR>Shirts</NOBR>");
   $shirtsSection->push(NavBarItem::newAction("Order Shirts", "TShirts.php"));
   if (user_has_priv(PRIV_CON_COM)) {
     $shirtsSection->push(NavBarItem::newAction('Shirt Order Summary', 'TShirts.php', SHOW_TSHIRT_SUMMARY));
@@ -297,7 +297,7 @@ function build_bids_subnavbar() {
   if (user_has_priv (PRIV_SCHEDULING))
     $bidsSection->push(NavBarItem::newAction('Manage Bid Page Info', 'biddingAGame.php', BAG_SHOW_FORM));
 
-  $bidsSection->push(NavBarItem::newAction("Bid a Game!", "biddingAGame.php"));
+  $bidsSection->push(NavBarItem::newAction("Bid an Event!", "biddingAGame.php"));
     
   return $bidsSection;
 }
@@ -328,7 +328,8 @@ function build_mail_subnavbar() {
   $mailSection = new SubNavBar('Mail');
   $mailSection->push(NavBarItem::newAction('Show Lists', 'MailTo.php', MAIL_LISTS));
   $mailSection->push(NavBarItem::newAction('GM Lists', 'MailTo.php', MAIL_GM_LISTS));
-  $mailSection->push(NavBarItem::newAction('Iron GM List', 'MailTo.php', MAIL_IRON_GM_LIST));
+  if (IRONGM_ENABLED)
+    $mailSection->push(NavBarItem::newAction('Iron GM List', 'MailTo.php', MAIL_IRON_GM_LIST));
   $mailSection->push(NavBarItem::newAction('Bid Submitters', 'MailTo.php', MAIL_BID_SUBMITTERS));
   $mailSection->push(NavBarItem::newAction('Bio Lists', 'MailTo.php', MAIL_BIO_LISTS));
   $mailSection->push(NavBarItem::newAction('Waitlisted Players', 'MailTo.php', MAIL_WAITLISTED));
@@ -378,16 +379,18 @@ function build_schedule_subnavbar() {
 }
 
 function build_about_subnavbar() {
-  $aboutSection = new SubNavBar("About <NOBR>".CON_NAME."</NOBR>");
+  $aboutSection = new SubNavBar("About <NOBR>".(USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME)."</NOBR>");
   $aboutSection->push(NavBarItem::newStatic("Frequently Asked Questions", "faq"));
   $aboutSection->push(NavBarItem::newStatic("Convention Rules", "ConRules"));
-  $aboutSection->push(NavBarItem::newAction("What Does It Cost?", "cost.php"));
+  if (NAV_SHOW_COST)
+    $aboutSection->push(NavBarItem::newAction("What Does It Cost?", "cost.php"));
   $aboutSection->push(NavBarItem::newAction("Contacts", "Contacts.php"));
-  $aboutSection->push(NavBarItem::newAction("Hotel Info", "hotel.php"));
+  $aboutSection->push(NavBarItem::newStatic("Hotel Info", "hotel"));
   $aboutSection->push(NavBarItem::newAction("Who's Who", "index.php", WHO_IS_WHO));
   $aboutSection->push(NavBarItem::newStatic("Volunteering", "volunteering"));
   $aboutSection->push(NavBarItem::newAction("ConCom Schedule", "ConComSchedule.php"));
-  $aboutSection->push(NavBarItem::newAction(CON_NAME.' Flyer', 'InterconFlyer.pdf'));
+  if (NAV_SHOW_FLYER)
+    $aboutSection->push(NavBarItem::newAction((USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME).' Flyer', 'InterconFlyer.pdf'));
   
   return $aboutSection;
 }
@@ -414,7 +417,7 @@ function display_account_control_navbar() {
       $accountControl->push(NavBarItem::newAction("Edit My Bio", "index.php", EDIT_BIO, "bio"));
   } else {
     $accountControl->push(NavBarItem::newAction('Login', 'index.php', NULL, "login"));
-    $accountControl->push(NavBarItem::newAction('Register for <NOBR>'.CON_NAME.'</NOBR>', 'index.php', NEW_USER, "register"));
+    $accountControl->push(NavBarItem::newAction('Register for <NOBR>'.(USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME).'</NOBR>', 'index.php', NEW_USER, "register"));
   }
   echo $accountControl->render("menu accountControl priv");
 }
@@ -435,7 +438,8 @@ function display_main_navbar() {
     $navbar->push(build_precon_subnavbar());
   if (DEAD_DOG_ENABLED)
     $navbar->push(build_dead_dog_subnavbar());
-  if ((SHOW_TSHIRTS && is_logged_in()) || user_has_priv(PRIV_CON_COM))
+  if (SHOW_TSHIRTS)
+  if (is_logged_in() || user_has_priv(PRIV_CON_COM))
     $navbar->push(build_shirts_subnavbar());
   if (user_has_priv(PRIV_CON_COM))
     $navbar->push(build_attendees_subnavbar());
@@ -459,7 +463,7 @@ function display_links_navbar() {
 			  'http://www.interactiveliterature.org'));
 	if (user_has_priv(PRIV_CON_COM)) {
 	  $links->push(NavBarItem::newExternal("Intercon Wiki", "http://www.interactiveliterature.org/Wiki"));
-    $links->push(NavBarItem::newExternal(CON_NAME . " Google Login", "http://www.google.com/a/" . CON_DOMAIN));
+    $links->push(NavBarItem::newExternal((USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME) . " Google Login", "http://www.google.com/a/" . CON_DOMAIN));
 	}
 	
   // Shameless Plugs section
@@ -479,7 +483,8 @@ function display_navbar() {
   
   display_account_control_navbar();
   display_main_navbar();
-  display_links_navbar();
+  if (NAV_SHOW_LINKS)
+    display_links_navbar();
   
   echo "</div> <!-- navbar -->\n\n";
 }

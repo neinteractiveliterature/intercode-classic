@@ -3257,14 +3257,8 @@ function list_games_alphabetically ()
 
   if (accepting_bids())
   {
-    echo "<p>\n";
-    echo "We're looking for a wide and varied slate of games to fill\n";
-    echo "this page. Do <em>you</em> have a game for us?  If so,\n";
-    echo "please <a href=\"biddingAGame.php\">bid your game</a>!\n";
-    echo "If you're not sure, then take a look at our ";
-    echo "<a href=\"Static.php?page=bidFAQ\">bidding FAQ</a>, or contact\n";
-    printf ("the <a href=%s>Bid Committee Chair</a>.<p>\n",
-	    mailto_url (EMAIL_BID_CHAIR, 'Bid question'));
+     if (file_exists(TEXT_DIR.'/acceptingbids.html'))
+	include(TEXT_DIR.'/acceptingbids.html');	
   }
 
   $sql = 'SELECT EventId, Title, Author, ShortBlurb, SpecialEvent,';

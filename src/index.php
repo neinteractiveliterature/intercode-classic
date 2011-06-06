@@ -1459,7 +1459,7 @@ function show_user_homepage_status ()
 
   if ('' != $_SESSION[SESSION_CON_NEWS])
   {
-    display_header ('Intercon News - Last updated ' .
+    display_header (CON_NAME.' News - Last updated ' .
 		    $_SESSION[SESSION_CON_LAST_UPDATED]);
     echo $_SESSION[SESSION_CON_NEWS] . "<P>\n";
   }
@@ -1601,7 +1601,7 @@ function status_unpaid ()
   // Give the user the news, if any
   if ('' != $_SESSION[SESSION_CON_NEWS])
   {
-    display_header ('Intercon News');
+    display_header (CON_NAME.' News');
     echo '<p>' . $_SESSION[SESSION_CON_NEWS] . "</p>\n";
   }
 
@@ -2667,8 +2667,8 @@ function display_user_information ($user_id)
 
 function display_password_form ()
 {
-  echo "To reset the password for your Intercon account, enter the\n";
-  echo "EMail address you registered with.  A new password will be\n";
+  echo "To reset the password for your account with ".CON_NAME.", enter the\n";
+  echo "e-mail address you registered with.  A new password will be\n";
   echo "randomly generated and the new password will be mailled to\n";
   echo "that account.<br>&nbsp;\n";
 
@@ -2676,16 +2676,16 @@ function display_password_form ()
   form_add_sequence ();
   printf ("<INPUT TYPE=HIDDEN NAME=action VALUE=%s>\n", SEND_PASSWORD);
   echo "<TABLE BORDER=0>\n";
-  form_text (30, 'EMail');
+  form_text (30, 'e-mail', 'EMail');
   form_submit ('Send Password');
   echo "</TABLE>\n";
   echo "</FORM>\n";
 
-  echo "<P>If you cannot access that EMail account or do not receive your\n";
+  echo "<P>If you cannot access that e-mail account or do not receive your\n";
   echo "new password shortly after you request it, contact the\n";
   printf ("<a href=%s>webmaster</a>.\n", mailto_url(EMAIL_WEBMASTER, ''));
 
-  echo "<P><B>AOL Users:</B> We are experiencing difficulties sending\n";
+  /*echo "<P><B>AOL Users:</B> We are experiencing difficulties sending\n";
   echo "mail to AOL accounts.  We expect to have this fixed soon, but if\n";
   echo "you do not receive your password shortly after requesting it, send\n";
   echo "mail to the\n";
@@ -2694,7 +2694,7 @@ function display_password_form ()
 	  mailto_url(EMAIL_REGISTRAR, 'Password reset problem'));
   printf ("<a href=%s>Webmaster</a>\n",
 	  mailto_url(EMAIL_WEBMASTER, 'Password reset problem'));
-  echo "for assistance.\n";
+  echo "for assistance.\n";*/
 }
 
 /*

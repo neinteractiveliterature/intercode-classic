@@ -24,9 +24,16 @@ html_begin ();
 $page = $_REQUEST['page'] . '.html';
 
 if (! is_readable ($page))
-  display_error ("Unable to read $page");
+{
+    if (! is_readable (TEXT_DIR."/$page"))
+    {
+      display_error ("Unable to read $page");
+    }
+    else
+      include (TEXT_DIR."/$page");
+}
 else
-  readfile ($page);
+  include ($page);
 
 html_end ();
 ?>

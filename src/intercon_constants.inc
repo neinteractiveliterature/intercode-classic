@@ -154,6 +154,8 @@ define (BIO_CLOSE, '2010-12-25');
 define (NEXT_CON_INFO, "Registration for Intercon L will open in March 2011.");
 
 // Shirt stuff
+define (SHOW_TSHIRTS, 0);
+define (TSHIRT_DOLLARS, 20);
 
 define (SHIRT_IMG_AVAILABLE, 1);
 define (SHIRT_TWO_SHIRTS, 1);

@@ -588,7 +588,7 @@ function html_begin ($bShowLogo=true)
   // Show the con logo.  Some pages may want to handle this themselves
 
   if ($bShowLogo)
-    echo "<div class=print_logo><img src=PageBanner.png></div>\n";
+    echo "<div class=print_logo><img src=".PAGE_BANNER."></div>\n";
 }
 
 /*
@@ -601,15 +601,8 @@ function html_end ($bShowCopyright=true)
 {
   if ($bShowCopyright)
   {
-    echo "\n<div class=copyright>\n";
-
-    // Fetch the current year and display a copyright statement
-    
-    $y = date ('Y');
-    echo "<HR WIDTH=\"50%\" ALIGN=CENTER>\n";
-    echo "Copyright &copy; $y, New England Interactive Literature<BR>\n";
-    echo "All Rights Reserved\n";
-    echo "</div> <!-- copyright-->\n";
+     if (file_exists(TEXT_DIR.'/copyright.html'))
+	include(TEXT_DIR.'/copyright.html');	
   }
   echo"</BODY>\n</HTML>\n";
 }
@@ -2610,18 +2603,8 @@ function display_login_form ($error='', $dest='')
 
   if ('' == $dest)
   {
-    printf ("Welcome to the home of %s, the premiere multi-genre\n", CON_NAME);
-    echo "<A HREF=Static.php?page=faq>Live Action Role Playing</A> (LARP)\n";
-    printf ("convention in the world.  %s is the\n", CON_NAME);
-    printf ("<a href=\"http://www.interactiveliterature.org/NEIL/conventions.html\" target=\"_blank\">%s</a> Intercon in the Boston\n",
-	    CON_NUMBER);
-    echo "area, and we're planning on making it the best ever. If you love to\n";
-    printf ("LARP, then %s is the place you want to be. If you've always\n",
-	    CON_NAME);
-    echo "wanted to try LARPing, then come join us! You won't regret it!<P>\n";
-    printf ("If you're already signed up for %s, or have attended a previous\n",
-	    CON_NAME);
-    echo "New England Intercon you can login here.<BR>\n";
+  	if (file_exists(TEXT_DIR.'/logintop.html'))
+		include(TEXT_DIR.'/logintop.html');	
   }
 
   // If there's an error from a prior screen, display it now
@@ -2663,55 +2646,8 @@ function display_login_form ($error='', $dest='')
 
   display_available_games ();
 
-  echo "<table cellSpacing=2 cellPadding=2 border=0 width=600>\n";
-  echo "<tbody>\n";
-  echo "<tr valign=top>\n";
-  echo "  <td nowrap><i>Need the latest flyer?</i></td>\n";
-  echo "  <td>Download it <a href=\"InterconFlyer.pdf\">here</a>!</td>\n";
-  echo "</tr>\n";
-  echo "<tr valign=top>\n";
-  echo "  <td nowrap><i>Have questions?</i></td>\n";
-  echo "  <td>Check out our <a href=\"Static.php?page=faq\">FAQ</a>!</td>\n";
-  echo "</tr>\n";
-  echo "<tr valign=top>\n";
-  echo "  <td nowrap><i>Want to contact the con?</i></td>\n";
-  echo "  <td>Take a look at the <a href=\"Contacts.php\">contact list</a>,\n";
-  printf ("or drop a note to our <a href=%s>Con&nbsp;Chair</a> %s</td>\n",
-	  mailto_url (EMAIL_CON_CHAIR, 'I have a question'),
-	  NAME_CON_CHAIR);
-  echo "</tr>\n";
-  echo "<tr valign=top>\n";
-  echo "  <td nowrap><i>Want to volunteer?</i></td>\n";
-  printf ("<td>Fantastic! Just <a href=%s>tell us</a> what you're\n",
-	  mailto_url (EMAIL_CON_CHAIR, 'Volunteer!'));
-  printf ("interested in doing, or just <a href=%s>tell us</a>\n", 
-	  mailto_url (EMAIL_CON_CHAIR, 'Volunteer!'));
-  echo "that you want to <a href=\"Static.php?page=volunteering\">volunteer</a>!\n";
-  echo "NO EXPERIENCE IS NECESSARY!</td>\n";
-  echo "</tr>\n</tbody>\n</table>\n";
-  printf ("<p>%s is brought to you by\n", CON_NAME);
-  echo "<a href=\"http://www.interactiveliterature.org\">NEIL</a>,\n";
-  echo "New England Interactive Literature, as one of the semi-annual Live\n";
-  echo "Action Role-Playing conventions of the\n";
-  echo "<a href=\"http://www.larpaweb.net\" target=_blank>Live Action\n";
-  echo "RolePlayers Association</a>. It's a convention dedicated to LARPs,\n";
-  echo "LARPers and LARPing. It's also more than just games, though! There\n";
-  echo "will be vendors, parties, social get-togethers, and other\n";
-  echo "LARP-related events.</p>\n";
-  echo "<p>Our goal is to bring together the best LARPs we can find, of all\n";
-  echo "styles and genres, in one weekend, so that you can't help but find\n";
-  echo "a game or three (or five!) that you just have to play. We are\n";
-  echo "<a href=\"Bids.php\">always looking</a> for new and different\n";
-  echo "styles of games, for short games, long games, small games and\n";
-  echo "bigger games.  We always have a great crowd of wonderful LARPers\n";
-  echo "waiting to get into character and costume. It doesn't matter if\n";
-  echo "this is your first experience with a LARP convention or if you're\n";
-  echo "an old hand; there's something for everyone, and we try to help\n";
-  echo "newcomers fit right in.</p>\n";
-  echo "<p>Intercons are organized and run by a large group of volunteers,\n";
-  echo "all of whom are LARP enthusiasts. We\n";
-  echo "<a href=\"Static.php?page=volunteering\">welcome new people</a> to\n";
-  echo "the process.</p>\n";
+  if (file_exists(TEXT_DIR.'/loginbottom.html'))
+	include(TEXT_DIR.'/loginbottom.html');	
 }
 
 /*
@@ -3036,7 +2972,7 @@ function include_alumni ()
 
   echo "<INPUT TYPE=HIDDEN NAME=AlumniInitialized VALUE=1>\n";
   echo "<INPUT TYPE=CHECKBOX NAME=Alumni $alumni_checked>";
-  echo "&nbsp;Include Alumni from Previous Intercons&nbsp;&nbsp;\n";
+  echo "&nbsp;Include Alumni\n";
 
   return $alumni;
 }
@@ -3215,10 +3151,10 @@ function title_not_in_events_table ($title)
 	mysql_real_escape_string ($title));
   $result = mysql_query ($sql);
   if (! $result)
-    return display_mysql_error ("Query for title '$Title' failed");
+    return display_mysql_error ("Query for title '$title' failed");
 
   if (0 != mysql_num_rows ($result))
-    return display_error ("Title '$Title' is already in the database");
+    return display_error ("Title '$title' is already in the database");
 
   return true;
 }
