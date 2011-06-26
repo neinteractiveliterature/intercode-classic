@@ -63,6 +63,10 @@ define (DEAD_DOG_MAX, 100);
 
 define (IRONGM_ENABLED, 0);
 
+// Set to 0 to disable allowing players to select events.
+
+define (SELECTEVENTS_ENABLED, 1);
+
 // Defining the program file prefix enables the links on the ConCom menu
 // which allow users to download the program booklet sections.  The second
 // constant enables the entries on the Ops menu for the .PUB files
@@ -221,6 +225,15 @@ $BID_SLOT_ABBREV['Evening'] = 'Eve';
 $BID_SLOT_ABBREV['After Midnight'] = 'Late';
 $BID_SLOT_ABBREV['Lunch'] = 'Lunch';
 $BID_SLOT_ABBREV['Dinner'] = 'Din';
+
+define(BID_SHOW_COMPS, 1);
+define(ALLOW_EVENT_FEES, 0);  //set to 1 to allow additional fees for events.
+
+//Types of bids; only use the ones you will accept.
+global $BID_TYPES;
+//$BID_TYPES = array('LARP', 'Tabletop RPG', 'Board Game', 'Panel', 'Other');
+$BID_TYPES = array('LARP');
+
 
 function parse_date ($d)
 {

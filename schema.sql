@@ -189,6 +189,7 @@ DROP TABLE IF EXISTS `Bids`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Bids` (
   `BidId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `GameType` varchar(30) NOT NULL DEFAULT '',
   `Status` enum('Pending','Under Review','Accepted','Rejected','Dropped') NOT NULL DEFAULT 'Pending',
   `UserId` int(10) unsigned NOT NULL DEFAULT '0',
   `FirstName` varchar(30) NOT NULL DEFAULT '',
@@ -224,6 +225,7 @@ CREATE TABLE `Bids` (
   `PrefPlayersNeutral` int(10) unsigned NOT NULL DEFAULT '0',
   `Hours` int(10) unsigned NOT NULL DEFAULT '0',
   `CanPlayConcurrently` enum('Y','N') DEFAULT NULL,
+  `Fee` enum('Y','N') DEFAULT NULL,
   `Description` text,
   `Genre` varchar(64) NOT NULL DEFAULT '',
   `OngoingCampaign` enum('Y','N') DEFAULT NULL,
@@ -386,6 +388,7 @@ CREATE TABLE `Events` (
   `EventId` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Title` varchar(128) NOT NULL DEFAULT '',
   `Author` varchar(128) DEFAULT '',
+  `GameType` varchar(30) NOT NULL DEFAULT '',
   `GameEMail` varchar(64) NOT NULL DEFAULT '',
   `Organization` varchar(64) DEFAULT '',
   `Homepage` text,
@@ -401,6 +404,7 @@ CREATE TABLE `Events` (
   `MinPlayersNeutral` int(10) unsigned NOT NULL DEFAULT '0',
   `MaxPlayersNeutral` int(10) unsigned NOT NULL DEFAULT '0',
   `PrefPlayersNeutral` int(10) unsigned NOT NULL DEFAULT '0',
+  `Fee` varchar(30) DEFAULT '',
   `Hours` int(10) unsigned NOT NULL DEFAULT '0',
   `SpecialEvent` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `CanPlayConcurrently` enum('Y','N') NOT NULL DEFAULT 'N',

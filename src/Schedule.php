@@ -3262,7 +3262,7 @@ function list_games_alphabetically ()
   }
 
   $sql = 'SELECT EventId, Title, Author, ShortBlurb, SpecialEvent,';
-  $sql .= ' IsSmallGameContestEntry,';
+  $sql .= ' IsSmallGameContestEntry, GameType, Fee,';
   $sql .= ' LENGTH(Description) AS DescLen';
   $sql .= ' FROM Events';
   $sql .= ' ORDER BY Title';
@@ -3276,7 +3276,8 @@ function list_games_alphabetically ()
   if ($n > 0)
   {
     echo "<hr width=\"50%\">\n";
-    echo "<b>Select game to view:</b>\n";
+    if (SELECTEVENTS_ENABLED)
+        echo "<b>Select event to view:</b>\n";
 
     while ($row = mysql_fetch_object ($result))
     {
@@ -3289,19 +3290,25 @@ function list_games_alphabetically ()
       // If there's no long description, don't offer a link
 
       echo "<p>\n";
-      if ($row->DescLen > 0)
-	printf ("<a href=\"Schedule.php?action=%d&EventId=%d\">%s</a>\n",
+      if ($row->DescLen > 0 && SELECTEVENTS_ENABLED)
+	printf ("<a href=\"Schedule.php?action=%d&EventId=%d\">%s</a> \n",
 		SCHEDULE_SHOW_GAME,
 		$row->EventId,
 		$row->Title);
       else
-	echo "$row->Title\n";
+	echo "<b>$row->Title</b> \n";
 
-      if ('' != $row->Author)
+      if ('Other' != $row->GameType)
+	echo "($row->GameType)";
+
+      if ('' != $row->Author && 'X' != $row->Author)
 	echo "<br><i>by $row->Author</i>\n";
 
       if ('' != $row->ShortBlurb)
 	echo "<br>\n$row->ShortBlurb\n";
+
+      if ('' != $row->Fee)
+	echo "<br>\n<i><font color=red>This event has a fee:  $row->Fee</font></i>\n";
 
       echo "</p>\n";
 
