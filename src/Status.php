@@ -64,10 +64,10 @@ function form_show_schedule ($display, $key)
   switch ($_POST[$key])
   {
     default:
+    case 'No':   $sel_n = 'SELECTED';    break;
     case 'Yes':  $sel_y = 'SELECTED';    break;
     case 'GMs':  $sel_gms = 'SELECTED';  break;
     case 'Priv': $sel_priv = 'SELECTED'; break;
-    case 'No':   $sel_n = 'SELECTED';    break;
   }
 
   echo "  <TR>\n";
@@ -199,20 +199,26 @@ function show_status ()
 				$sql);
 
   // Sanity check.  There should only be single row
-
+  $usedb = true;
   if (0 == mysql_num_rows ($result))
-    return display_error ('Failed to find convention information');
+  {
+    $usedb = false;
+    display_error ('Failed to find convention information.  Using defaults.');
+  }
 
-  if (1 != mysql_num_rows ($result))
+  if (mysql_num_rows ($result) > 1)
     return display_error ('Found more than one row of convention information?!');
 
-  $row = mysql_fetch_object ($result);
-
-  // Fill the $_POST array from the object
-
-  foreach ($row as $key => $value)
+  if ($usedb)
   {
-    $_POST[$key] = $value;
+      $row = mysql_fetch_object ($result);
+
+      // Fill the $_POST array from the object
+
+      foreach ($row as $key => $value)
+      {
+        $_POST[$key] = $value;
+      }
   }
 
   echo "<FORM METHOD=POST ACTION=Status.php>\n";
