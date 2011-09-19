@@ -2,6 +2,7 @@ set :application, "intercon-l"
 set :user, "neiladmin"
 set :domain, "#{user}@apocalypse.dreamhost.com"
 set :repository, "file:///home/#{user}/svn/intercon/trunk/src"
+set :skip_scm, false
 
 task :sandbox do
   set :deploy_to, "/home/#{user}/sandbox.interactiveliterature.org"
