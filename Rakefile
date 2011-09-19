@@ -1,3 +1,6 @@
+require 'bundler'
+Bundler.setup
+
 require 'hoe'
 
 begin
