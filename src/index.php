@@ -1473,9 +1473,9 @@ function show_user_homepage_status ()
   {
       echo "The schedule for " . CON_NAME . " is not yet available.  You \n";
       echo "can see the list of games being planned by clicking on \n";
-      printf ("<A HREF=Schedule.php?action=%d>List of Games</A>\n",
-	      LIST_GAMES);
-      echo "on the menu in the left column.<p>\n";
+      printf ("<A HREF=Schedule.php?action=%d>LARPs at %s</A>\n",
+	      LIST_GAMES, CON_NAME);
+      echo "in the Navigation menu.<p>\n";
       return true;
   }
 
