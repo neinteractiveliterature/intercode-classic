@@ -11,6 +11,19 @@
 // requires Firebug or Firebug Lite
 define("PCSG_DEBUG", 0);
 
+
+if (PCSG_DEBUG) {
+?>
+<script type="text/javascript">
+// In case we forget to take out console statements. IE becomes very unhappy when we forget. Let's not make IE unhappy
+if(typeof(console) === 'undefined') {
+    var console = {}
+    console.log = console.error = console.info = console.debug = console.warn = console.trace = console.dir = console.dirxml = console.group = console.groupEnd = console.time = console.timeEnd = console.assert = console.profile = function() {};
+}
+</script>
+<?php
+}
+
 class ScheduleBlock {
   public $startHour;
   public $endHour;
@@ -137,6 +150,9 @@ class ScheduleBlock {
         $sortedCurrentRuns[$columnReservations->getRunColumn($currentRun->id)] = $currentRun;
       }
       ksort($sortedCurrentRuns);
+      $scrDebug = "";
+      foreach ($sortedCurrentRuns as $scr) { $scrDebug .= $columnReservations->getRunColumn($scr->id) . ", "; }
+      pcsg_debug("Sorted current run columns: " . $scrDebug);
       
       $eventWidth = 100.0 / ($lastColumn + 1);
       $left = 0.0;
@@ -270,12 +286,16 @@ class ColumnReservationSet {
   }
   
   function reserve($colnum, $eventRun) {
+    pcsg_debug("Asked to reserve $colnum for run $eventRun->id");
     if (array_key_exists($colnum, $this->reservations)) {
       $this->reservations[$colnum]->addEventRun($eventRun);
     } else {
       $this->reservations[$colnum] = new ColumnReservation($eventRun);
     }
     
+    if (array_key_exists($eventRun->id, $this->runColumns)) {
+      pcsg_debug("Warning: re-reserving column $colnum for run $eventRun->id");
+    }
     $this->runColumns[$eventRun->id] = $colnum;
   }
   
@@ -388,6 +408,7 @@ class ColumnReservationSet {
   }
   
   function sortColumns() {    
+    pcsg_debug("Sorting columns");
     usort($this->reservations, array("ColumnReservationSet", "columnCmp"));
     $this->recalculateRunColumns();
   }
