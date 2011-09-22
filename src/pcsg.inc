@@ -406,7 +406,7 @@ class ColumnReservationSet {
     } else if ($a->getEndHour() != $b->getEndHour()) {
       return $b->getEndHour() - $a->getEndHour();
     } else {
-      return $a->getEventCount() - $b->getEventCount();
+      return $a->getEventRunCount() - $b->getEventRunCount();
     }
   }
   
