@@ -397,13 +397,13 @@ class ColumnReservationSet {
   // in the schedule by allowing events to span columns if possible
   //
   // reservations that start earlier go first.
-  // in case of two reservations starting at the same time, reservations with
-  // fewer runs in them go first.
+  // in case of two reservations starting at the same time, reservations that end
+  // later go first.
   static function columnCmp($a, $b) {
     if ($a->getStartHour() != $b->getStartHour()) {
       return $a->getStartHour() - $b->getStartHour();
     } else {
-      return $a->getEventRunCount() - $b->getEventRunCount();
+      return $b->getEndHour() - $a->getEndHour();
     }
   }
   
