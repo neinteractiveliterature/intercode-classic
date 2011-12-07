@@ -18,7 +18,7 @@ namespace :vlad do
   task :check_deploy_to do
     begin
       Rake::RemoteTask.fetch :deploy_to
-    rescue Vlad::ConfigurationError
+    rescue
       puts "No deployment target set.  Please run using either 'sandbox' or 'production'."
       puts "For example: rake sandbox vlad:update"
     end
