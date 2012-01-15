@@ -123,10 +123,12 @@ html_end ($bShowCopyright);
 
 function report_how_heard()
 {
-  $sql = 'SELECT FirstName, LastName, HowHeard';
+  $sql = 'SELECT FirstName, LastName, HowHeard,Created,';
+  $sql .= 'DATE_FORMAT(Created, "%d-%b-%Y") AS CreDate';
   $sql .= ' FROM Users';
   $sql .= ' WHERE HowHeard != ""';
-  $sql .= ' ORDER BY LastName, FirstName';
+  $sql .= ' ORDER BY Created DESC';
+  //  $sql .= ' ORDER BY LastName, FirstName';
   $result = mysql_query ($sql);
   if (! $result)
     return display_mysql_error ('Query for list of users failed', $sql);
@@ -140,14 +142,16 @@ function report_how_heard()
 
   echo "<table border=\"1\">\n";
   echo "  <tr align=\"left\">\n";
+  echo "    <th>&nbsp;Created</th>\n";
   echo "    <th>&nbsp;User</th><th>&nbsp;How They Heard&nbsp;</th>\n";
   echo "  </tr>\n";
 
   while ($row = mysql_fetch_object ($result))
   {
-    echo "  <tr>\n";
+    echo "  <tr valign=\"top\">\n";
+    echo "    <td nowrap>&nbsp;$row->CreDate&nbsp;</td>\n";
     printf ("    <td>&nbsp;%s&nbsp;</td>\n",
-	    trim ("$row->LastName, $row->FirstName"));
+	    	    trim ("$row->LastName, $row->FirstName"));
     echo "    <td>&nbsp;$row->HowHeard&nbsp;</td>\n";
     echo "  </tr>\n";
   }

@@ -4275,6 +4275,10 @@ function who_is_who ()
     $first_name = $tmp[1];
     $nick_name = $tmp[2];
 
+    $name = trim ("$first_name $last_name");
+    $Bio = '';
+    $Title = '';
+
     $sql = "SELECT * FROM Bios WHERE UserId=$user_id";
     $result = mysql_query ($sql);
     if (! $result)
@@ -4285,19 +4289,11 @@ function who_is_who ()
     {
       if ($row->ShowNickname && ('' != $nick_name))
 	$name = trim ("$first_name \"$nick_name\" $last_name");
-      else
-	$name = trim ("$first_name $last_name");
 
       if ('' != $row->Title)
 	$Title = $row->Title;
 
       $Bio = $row->BioText;
-    }
-    else
-    {
-      $name = trim ("$first_name $last_name");
-      $Bio = '';
-      $Title = '';
     }
 
     display_header ($name);
