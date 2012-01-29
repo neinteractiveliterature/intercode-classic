@@ -355,11 +355,13 @@ function build_print_materials_subnavbar() {
   {
     $opsSection->push('Program Cover.pub', NavBarItem::newProgram(PROGRAM_PUB_PREFIX, 'Cover.pub'));
     $opsSection->push('Program Interior.pub', NavBarItem::newProgram(PROGRAM_PUB_PREFIX, 'Interior.pub'));
+    $opsSection->push('Program Schedule.pub', NavBarItem::newProgram(PROGRAM_PUB_PREFIX, 'Schedule.pub'));
   }
   if (defined ('PROGRAM_PDF_PREFIX'))
   {
     $opsSection->push(NavBarItem::newProgram("Program Cover", PROGRAM_PDF_PREFIX, "Cover.pdf"));
     $opsSection->push(NavBarItem::newProgram("Program Interior", PROGRAM_PDF_PREFIX, "Interior.pdf"));
+    $opsSection->push(NavBarItem::newProgram("Program Schedule", PROGRAM_PDF_PREFIX, "Schedule.pdf"));
   }
   
   return $opsSection;
