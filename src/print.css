@@ -29,6 +29,11 @@ body
 	page-break-after: always;
 }
 
+.print_break 
+{
+	page-break-after: always;
+}
+
 p.dev_warning
 {
 	font-size: large;

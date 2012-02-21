@@ -335,6 +335,8 @@ function report_per_room ()
     write_room_report ($room_name, 'Sat', SAT_TEXT);
     write_room_report ($room_name, 'Sun', SUN_TEXT);
     echo "</table>\n";
+	
+	echo "<div class=print_break></div>";
   }
 
   // Suppress the copyright display
@@ -1352,7 +1354,7 @@ function registration_report ()
     else
       $nickname = "\"$row->Nickname\"";
 
-    echo "<table width=\"100%\" style=\"page-break-inside: avoid\">\n";
+    echo "<div style=\"page-break-inside: avoid\"><table width=\"100%\">\n";
     echo "  <tr>\n";
     echo "    <td>\n";
     echo "<b><big>$row->LastName, $row->FirstName $nickname</big></b><br>\n";
@@ -1383,7 +1385,7 @@ function registration_report ()
     echo "    <td width=50 style=\"border-bottom: thin solid black\">&nbsp;</td>\n";
     echo "</tr>\n";
     echo "<tr><td>&nbsp;<!-- extra space for notes--></td></tr>\n";
-    echo "</table>\n";
+    echo "</table></div>\n";
   }
 }
 
