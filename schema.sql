@@ -565,6 +565,7 @@ CREATE TABLE `PreConEvents` (
   `SpecialRequests` varchar(128) NOT NULL DEFAULT '',
   `InviteOthers` enum('Y','N') NOT NULL DEFAULT 'N',
   `Kind` varchar(64) NOT NULL DEFAULT '',
+  `Thursday20` enum('-','1','2','3','X') NOT NULL DEFAULT '-',
   `Thursday21` enum('-','1','2','3','X') NOT NULL DEFAULT '-',
   `Thursday22` enum('-','1','2','3','X') NOT NULL DEFAULT '-',
   `Thursday23` enum('-','1','2','3','X') NOT NULL DEFAULT '-',
