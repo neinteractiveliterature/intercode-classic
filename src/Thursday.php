@@ -114,7 +114,7 @@ function list_accepted_events()
   if (! $result)
     return display_mysql_error('Query for PreCon events failed', $sql);
   
-  $thursday = new ScheduleBlock(21, 24);
+  $thursday = new ScheduleBlock(20, 24);
   $friday = new ScheduleBlock(12, 18);
   $runs = array();
   
@@ -1012,7 +1012,8 @@ function display_precon_event_form()
   echo "  <tr>\n";
   echo "    <td colspan=\"2\">\n";
   echo "      <table border=\"1\">\n";
-  schedule_table_entry ('Thursday', THR_DATE, 21, 3);
+  schedule_table_entry ('Thursday', THR_DATE, 20, 4);
+  schedule_table_entry ('Thursday', THR_DATE, 21);
   schedule_table_entry ('Thursday', THR_DATE, 22);
   schedule_table_entry ('Thursday', THR_DATE, 23);
   schedule_table_entry ('Friday',   FRI_DATE, 9, 9);
@@ -1114,6 +1115,7 @@ function process_precon_event_form()
   $sql .= build_sql_string('Title', $_REQUEST['Title'], false);
   $sql .= build_sql_string('Hours');
   $sql .= build_sql_string('SpecialRequests');
+  $sql .= build_sql_string('Thursday20');
   $sql .= build_sql_string('Thursday21');
   $sql .= build_sql_string('Thursday22');
   $sql .= build_sql_string('Thursday23');
@@ -1414,6 +1416,7 @@ function show_status_form()
   echo "    <td>\n";
   echo "      <select name=\"StartTime\">\n";
   echo "        <option value=\"None\" $none_selected>None</option>\n";
+  scheduling_start_option('Thursday', 20, '');
   scheduling_start_option('Thursday', 21, '');
   scheduling_start_option('Thursday', 22, '');
   scheduling_start_option('Thursday', 23, '');
@@ -1436,8 +1439,9 @@ function show_status_form()
   echo "  <tr>\n";
   echo "    <td colspan=\"2\">\n";
   echo "      <table border=\"1\">\n";
-  
-  scheduling_preference_row('Thursday', 21, $ary, 3);
+
+  scheduling_preference_row('Thursday', 20, $ary, 4);  
+  scheduling_preference_row('Thursday', 21, $ary);
   scheduling_preference_row('Thursday', 22, $ary);
   scheduling_preference_row('Thursday', 23, $ary);
   scheduling_preference_row('Friday', 9, $ary, 9);
@@ -1581,6 +1585,11 @@ function process_status_form()
   {
     case 'None':
       return true;  // We're done!
+
+    case 'Thursday20':
+	  $day = 'Thu';
+	  $hour = 20;
+	  break;
 
     case 'Thursday21':
       $day = 'Thu';
@@ -1747,6 +1756,7 @@ function show_run_form()
   echo "    <td>\n";
   echo "      <select name=\"StartTime\">\n";
   echo "        <option value=\"None\" $none_selected>None</option>\n";
+  scheduling_start_option('Thursday', 20, $start_time_selection);
   scheduling_start_option('Thursday', 21, $start_time_selection);
   scheduling_start_option('Thursday', 22, $start_time_selection);
   scheduling_start_option('Thursday', 23, $start_time_selection);
