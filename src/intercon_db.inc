@@ -558,10 +558,12 @@ function html_begin ($bShowLogo=true)
   //  dump_array ('$_COOKIE', $_COOKIE);
 
   echo "<!-- Begin Standard Prefix -->\n";
-  echo "<HTML>\n";
-  echo "<HEAD>\n";
-  printf ("<TITLE>%s</TITLE>\n", CON_NAME);
-  echo "<META HTTP-EQUIV=\"charset\" content=\"iso-8859-1\">\n";
+  echo "<html>\n";
+  echo "<head>\n";
+  printf ("<title>%s</title>\n", CON_NAME);
+  echo "<meta http-equiv=\"charset\" content=\"iso-8859-1\">\n";
+  // Verification for Google apps for intercon-m.org
+  echo "<meta name="google-site-verification" content="9yWQZ9402aK1LXPwNS5VqaZFV0-O7IGI_ZTMi1Fws3M" />\n";
   echo "<link href='screen.css.php' rel='stylesheet' type='text/css' media='screen'>\n";
   echo "<link href='print.css' rel='stylesheet' type='text/css' media='print'>\n";
   echo "<STYLE>\n";
