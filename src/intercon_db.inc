@@ -563,7 +563,7 @@ function html_begin ($bShowLogo=true)
   printf ("<title>%s</title>\n", CON_NAME);
   echo "<meta http-equiv=\"charset\" content=\"iso-8859-1\">\n";
   // Verification for Google apps for intercon-m.org
-  echo "<meta name="google-site-verification" content="9yWQZ9402aK1LXPwNS5VqaZFV0-O7IGI_ZTMi1Fws3M" />\n";
+  echo "<meta name=\"google-site-verification\" content=\"9yWQZ9402aK1LXPwNS5VqaZFV0-O7IGI_ZTMi1Fws3M\" />\n";
   echo "<link href='screen.css.php' rel='stylesheet' type='text/css' media='screen'>\n";
   echo "<link href='print.css' rel='stylesheet' type='text/css' media='print'>\n";
   echo "<STYLE>\n";
