@@ -777,14 +777,17 @@ function schedule_day ($day, $away_all_day, $away_hours,
   // Get the day's events
 
   $sql = 'SELECT Runs.RunId, Runs.Track, Runs.TitleSuffix, Runs.StartHour,';
-  $sql .= ' Runs.Span, Runs.ScheduleNote, Runs.Rooms, Runs.Track,';
+  $sql .= ' Runs.Span, Runs.ScheduleNote, Runs.Track,';
   $sql .= ' Events.EventId, Events.SpecialEvent, Events.Hours, Events.Title,';
   $sql .= ' Events.CanPlayConcurrently, LENGTH(Events.Description) AS DescLen,';
   $sql .= ' MaxPlayersMale, MaxPlayersFemale, MaxPlayersNeutral, ';
   $sql .= ' MinPlayersMale, MinPlayersFemale, MinPlayersNeutral, ';
   $sql .= ' PrefPlayersMale, PrefPlayersFemale, PrefPlayersNeutral, ';
-  $sql .= ' Events.IsOps, Events.IsConSuite ';
+  $sql .= ' Events.IsOps, Events.IsConSuite, ';
+  $sql .= " GROUP_CONCAT(RoomName ORDER BY RoomName SEPARATOR ', ') Rooms";
   $sql .= ' FROM Events, Runs';
+  $sql .= ' LEFT JOIN RunsRooms on RunsRooms.RunId = Runs.RunId';
+  $sql .= ' LEFT JOIN Rooms on Rooms.RoomId = RunsRooms.RoomId';
   $sql .= " WHERE Events.EventId=Runs.EventId AND Day='$day'";
   $sql .= ' ORDER BY StartHour, Hours DESC, Events.Title';
 
