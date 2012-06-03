@@ -498,7 +498,7 @@ function report_per_game ()
   $sql .= ' Runs.TitleSuffix, Runs.RunId, Runs.Day, Runs.StartHour,';
   $sql .= " GROUP_CONCAT(RoomName ORDER BY RoomName SEPARATOR ', ') Rooms";
   $sql .= ' FROM Events';
-  $sql .= ' INNER JOIN Runs on Events.EventId=Runs.EventId'
+  $sql .= ' INNER JOIN Runs on Events.EventId=Runs.EventId';
   $sql .= ' LEFT JOIN RunsRooms on RunsRooms.RunId = Runs.RunId';
   $sql .= ' LEFT JOIN Rooms on Rooms.RoomId = RunsRooms.RoomId';
   $sql .= ' WHERE SpecialEvent=0';
