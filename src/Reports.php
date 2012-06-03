@@ -504,6 +504,7 @@ function report_per_game ()
   $sql .= ' WHERE SpecialEvent=0';
   $sql .= '   AND IsOps="N"';
   $sql .= '   AND IsConSuite="N"';
+  $sql .= '   AND Runs.RunId IS NOT NULL'
   $sql .= ' ORDER BY Events.Title, Runs.Day, Runs.StartHour';
 
   $result = mysql_query ($sql);
