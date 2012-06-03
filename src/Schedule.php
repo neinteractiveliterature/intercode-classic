@@ -1841,7 +1841,9 @@ function show_game ()
 
     // Extract information for the runs of this game
 
-    $sql = "SELECT RunId, Day, StartHour, Rooms FROM Runs";
+    $sql = "SELECT Runs.RunId RunId, Day, StartHour, GROUP_CONCAT(RoomName ORDER BY RoomName SEPARATOR ', ') Rooms FROM Runs";
+	$sql .= ' LEFT JOIN LEFT JOIN RunsRooms on RunsRooms.RunId = Runs.RunId';
+	$sql .= ' LEFT JOIN Rooms on Rooms.RoomId = RunsRooms.RoomId';
     $sql .= ' WHERE EventId=' . $game_row->EventId;
     $sql .= ' ORDER BY Day, StartHour';
     $runs_result = mysql_query ($sql);
