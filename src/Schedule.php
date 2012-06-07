@@ -784,11 +784,9 @@ function schedule_day ($day, $away_all_day, $away_hours,
   $sql .= ' MinPlayersMale, MinPlayersFemale, MinPlayersNeutral, ';
   $sql .= ' PrefPlayersMale, PrefPlayersFemale, PrefPlayersNeutral, ';
   $sql .= ' Events.IsOps, Events.IsConSuite, ';
-  $sql .= " GROUP_CONCAT(RoomName ORDER BY RoomName SEPARATOR ', ') Rooms";
+  $sql .= " room_names(Runs.RunId) Rooms";
   $sql .= ' FROM Events';
   $sql .= ' INNER JOIN Runs ON Events.EventId=Runs.EventId';
-  $sql .= ' LEFT JOIN RunsRooms on RunsRooms.RunId = Runs.RunId';
-  $sql .= ' LEFT JOIN Rooms on Rooms.RoomId = RunsRooms.RoomId';
   $sql .= " WHERE Day='$day'";
   $sql .= ' ORDER BY StartHour, Hours DESC, Events.Title';
 
@@ -1845,9 +1843,7 @@ function show_game ()
 
     // Extract information for the runs of this game
 
-    $sql = "SELECT Runs.RunId RunId, Day, StartHour, GROUP_CONCAT(RoomName ORDER BY RoomName SEPARATOR ', ') Rooms FROM Runs";
-	$sql .= ' LEFT JOIN RunsRooms on RunsRooms.RunId = Runs.RunId';
-	$sql .= ' LEFT JOIN Rooms on Rooms.RoomId = RunsRooms.RoomId';
+    $sql = "SELECT Runs.RunId RunId, Day, StartHour, room_names(Runs.RunId) Rooms FROM Runs";
     $sql .= ' WHERE EventId=' . $game_row->EventId;
     $sql .= ' ORDER BY Day, StartHour';
     $runs_result = mysql_query ($sql);

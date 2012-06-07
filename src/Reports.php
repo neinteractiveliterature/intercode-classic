@@ -232,11 +232,9 @@ function ampm_time($h)
 function write_room_report($room, $day, $day_title)
 {
   $sql = 'SELECT Runs.StartHour, Events.Title, Events.Hours,';
-  $sql .= " GROUP_CONCAT(RoomName ORDER BY RoomName SEPARATOR ',') Rooms";
+  $sql .= " room_names(Runs.RunId) Rooms";
   $sql .= ' FROM Events';
   $sql .= ' INNER JOIN Runs ON Runs.EventId = Events.EventId';
-  $sql .= ' LEFT JOIN RunsRooms on RunsRooms.RunId = Runs.RunId';
-  $sql .= ' LEFT JOIN Rooms on Rooms.RoomId = RunsRooms.RoomId';  
   $sql .= " WHERE Runs.Day='$day'";
   $sql .= "   AND FIND_IN_SET('$room', Runs.Rooms) > 0";
   $sql .= ' ORDER BY Runs.StartHour';
@@ -429,13 +427,11 @@ function write_user_report ($name, $user_id)
   $sql = 'SELECT Events.Title, Events.Hours, Events.EventId,';
   $sql .= ' Runs.Day, Runs.StartHour, Runs.TitleSuffix,';
   $sql .= ' Signup.State,';
-  $sql .= " GROUP_CONCAT(RoomName ORDER BY RoomName SEPARATOR ',') Rooms";
+  $sql .= " room_names(Runs.RunId) Rooms";
   $sql .= ' FROM Signup';
   $sql .= ' INNER JOIN Users ON Users.UserId=Signup.UserId';
   $sql .= ' INNER JOIN Runs ON Runs.RunId=Signup.RunId';
   $sql .= ' INNER JOIN Events ON Events.EventId=Runs.EventId';
-  $sql .= ' LEFT JOIN RunsRooms on RunsRooms.RunId = Runs.RunId';
-  $sql .= ' LEFT JOIN Rooms on Rooms.RoomId = RunsRooms.RoomId';
   $sql .= ' WHERE Signup.State!="Withdrawn"';
   $sql .= "   AND Signup.UserId=$user_id";
   $sql .= ' ORDER BY Day, StartHour';
@@ -496,11 +492,9 @@ function report_per_game ()
   $sql .= ' Events.MinPlayersFemale, Events.MaxPlayersFemale,';
   $sql .= ' Events.MinPlayersNeutral, Events.MaxPlayersNeutral,';
   $sql .= ' Runs.TitleSuffix, Runs.RunId, Runs.Day, Runs.StartHour,';
-  $sql .= " GROUP_CONCAT(RoomName ORDER BY RoomName SEPARATOR ', ') Rooms";
+  $sql .= " room_names(Runs.RunId) Rooms";
   $sql .= ' FROM Events';
   $sql .= ' INNER JOIN Runs on Events.EventId=Runs.EventId';
-  $sql .= ' LEFT JOIN RunsRooms on RunsRooms.RunId = Runs.RunId';
-  $sql .= ' LEFT JOIN Rooms on Rooms.RoomId = RunsRooms.RoomId';
   $sql .= ' WHERE SpecialEvent=0';
   $sql .= '   AND IsOps="N"';
   $sql .= '   AND IsConSuite="N"';
@@ -1154,7 +1148,7 @@ function report_games_by_time ($day)
 
   $sql = 'SELECT Events.Title, Events.Hours,';
   $sql .= ' Runs.Day, Runs.StartHour, Runs.TitleSuffix,';
-  $sql .= " GROUP_CONCAT(RoomName ORDER BY RoomName SEPARATOR ', ') Rooms";
+  $sql .= " room_names(Runs.RunId) Rooms";
   $sql .= ' FROM Events';
   $sql .= ' INNER JOIN Runs ON Events.Eventid=Runs.EventId';
   $sql .= ' LEFT JOIN RunsRooms on RunsRooms.RunId = Runs.RunId';
