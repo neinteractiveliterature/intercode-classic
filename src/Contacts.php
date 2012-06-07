@@ -65,7 +65,7 @@ function DisplayContactsPage ()
   echo "<p>\n";
   echo "<table cellspacing=2 cellpadding=5 bgcolor=#4b067a>\n";
   echo "  <tr valign=top align=left bgcolor=white>\n";
-  echo "    <th rowspan=2>Con Chair</th>\n";
+  echo "    <th>Con Chair</th>\n";
   printf ("    <td>%s</td><td>%s</td>\n",
 	  NAME_CON_CHAIR,
 	  mailto_or_obfuscated_email_address (EMAIL_CON_CHAIR));
