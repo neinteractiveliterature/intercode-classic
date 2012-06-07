@@ -2560,7 +2560,7 @@ function form_vote ($key)
     case 'Author':      $a  = 'selected'; break;
   }
 
-  echo "    <td>\n";
+  echo "    <td valign=\"top\">\n";
   echo "      <select name=\"$key\" size=\"1\">\n";
   echo "        <option value=\"Strong Yes\" $sy>Strong Yes&nbsp;&nbsp;</option>\n";
   echo "        <option value=\"Yes\" $y>Yes&nbsp;&nbsp;</option>\n";
