@@ -1,0 +1,3 @@
+ALTER TABLE `BidFeedback` CHANGE  `Issues`  `Issues` TEXT NOT NULL DEFAULT '';
+ALTER TABLE `Bids` ADD COLUMN `AgeAppropriate` TEXT DEFAULT NULL;
+ALTER TABLE  `BidStatus` CHANGE  `Issues`  `Issues` TEXT NULL DEFAULT NULL;

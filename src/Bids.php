@@ -2733,7 +2733,7 @@ function update_feedback_by_game ()
   echo "  <tr><td>&nbsp;</td></tr>\n";
 
   form_bid_consensus ('Consensus');
-
+  
   // If magic quotes are on, strip off the slashes
 
   $key = 'Issues';
