@@ -2582,8 +2582,8 @@ function form_issues($key)
   else
     $text = $_POST[$key];
 
-  printf ('    <td><textarea name="%s" rows="5" ' .
-	  " value=\"%s\"></td>\n",
+  printf ('    <td><textarea name="%s" rows="5">' .
+	  "%s</textarea></td>\n",
 	  $key,
 	  $text);
 }
