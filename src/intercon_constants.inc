@@ -44,7 +44,7 @@ define (DEVELOPMENT_MAIL_ADDR, 'natbudin@gmail.com');
 //Copy the intercontext directory to yours and then edit the files there
 //For your con specific text.  NEIL Intercons can skip this step.
 
-define (TEXT_DIR, 'steamtext');
+define (TEXT_DIR, 'intercontext');
 
 // Set to 0 to disable the poll
 

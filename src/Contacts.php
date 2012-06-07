@@ -70,9 +70,9 @@ function DisplayContactsPage ()
 	  NAME_CON_CHAIR,
 	  mailto_or_obfuscated_email_address (EMAIL_CON_CHAIR));
   echo "  </tr>\n";
-  echo "  <tr bgcolor=white>\n";
+/*  echo "  <tr bgcolor=white>\n";
   printf ("    <td colspan=2>%s</td>\n", ADDR_CON_CHAIR);
-  echo "  </tr>\n";
+  echo "  </tr>\n"; */
 
   DisplayContact ('Advertising',   NAME_ADVERTISING,   EMAIL_ADVERTISING);
   DisplayContact ('Hospitality',   NAME_CON_SUITE,     EMAIL_CON_SUITE);
