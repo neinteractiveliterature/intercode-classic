@@ -2723,7 +2723,7 @@ function update_feedback_by_game ()
     form_hidden_value ("uid_$i", $_POST["uid_$i"]);
 
     echo "  <tr>\n";
-    echo "    <td align=\"right\">$k:&nbsp;&nbsp;</td>\n";
+    echo "    <td valign=\"top\" align=\"right\">$k:&nbsp;&nbsp;</td>\n";
 
     form_vote ("vote_$i");
     form_issues ("issues_$i");
