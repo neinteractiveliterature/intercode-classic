@@ -2582,7 +2582,7 @@ function form_issues($key)
   else
     $text = $_POST[$key];
 
-  printf ('    <td><textarea name="%s" rows="5">' .
+  printf ('    <td><textarea name="%s" cols="64" rows="5">' .
 	  "%s</textarea></td>\n",
 	  $key,
 	  $text);
