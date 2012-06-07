@@ -2745,7 +2745,7 @@ function update_feedback_by_game ()
   echo "  <tr>\n";
   echo "    <td align=\"right\">Issue Summary:</td>\n";
   echo "    <td colspan=\"2\">\n";
-  echo "    <INPUT TYPE=TEXT NAME=$key SIZE=80 MAXLENGTH=128 VALUE=\"$text\">\n";
+  echo "    <TEXTAREA NAME=$key COLS=80 ROWS=5>$text</TEXTAREA>\n";
   echo "    </td>\n";
   echo"  </tr>\n";
 
