@@ -995,7 +995,7 @@ function display_bid_form ($first_try)
 
   if ($gametype != 'Board Game')
   {
-      form_textarea ('Additional Background Information for the Bid Committee Only', 'Premise', 3, TRUE, TRUE);
+      form_textarea ('Please enter any additional background information here.  This information will be shown only to the Bid Committee.', 'Premise', 3, TRUE, TRUE);
   }
   else
   {
