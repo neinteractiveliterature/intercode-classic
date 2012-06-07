@@ -2934,11 +2934,11 @@ function show_bid_feedback_entry_form()
 
   echo "<table>\n";
   echo "  <tr>\n";
-  echo "    <th align=\"right\">Vote:&nbsp;&nbsp;</th>\n";
+  echo "    <th valign=\"top\" align=\"right\">Vote:&nbsp;&nbsp;</th>\n";
   form_vote('Vote');
   echo "  </tr>\n";
   echo "  <tr>\n";
-  echo "    <th align=\"right\">Issues:&nbsp;&nbsp;</th>\n";
+  echo "    <th valign=\"top\" align=\"right\">Issues:&nbsp;&nbsp;</th>\n";
   form_issues('Issues');
   echo "  </tr>\n";
   form_submit ('Update Feedback');
