@@ -531,7 +531,7 @@ function show_bid ()
   show_text ('Ongoing Campaign', $bid_row['OngoingCampaign']);
 /*  show_text ('LARPA Small Game<br>Contest Entry',
 	     $bid_row['IsSmallGameContestEntry']); */
-  show_text ('Basic Premise', $bid_row['Premise']);
+  show_text ('Additional Background Info', $bid_row['Premise']);
   show_text ('Run Before', $bid_row['RunBefore']);
   show_text ('Game System', $bid_row['GameSystem']);
   show_text ('Combat Resolution', $bid_row['CombatResolution']);
@@ -542,6 +542,7 @@ function show_bid ()
   show_text ('Offensive', $bid_row['Offensive']);
   show_text ('Physical Restrictions', $bid_row['PhysicalRestrictions']);
   show_text ('Age Restrictions', $bid_row['AgeRestrictions']);
+  show_text ('Age Appropriate', $bid_row['AgeAppropriate']);
 
   show_section ('Scheduling Information');
 
@@ -994,7 +995,7 @@ function display_bid_form ($first_try)
 
   if ($gametype != 'Board Game')
   {
-      form_textarea ('Basic Premise', 'Premise', 3, TRUE, TRUE);
+      form_textarea ('Additional Background Information for the Bid Committee Only', 'Premise', 3, TRUE, TRUE);
   }
   else
   {
@@ -1088,10 +1089,13 @@ function display_bid_form ($first_try)
   
   $text = "Are there any components of your {$thingstring} that might be illegal for\n";
   $text .= "attendees under the age of 18?  For example, props or items that\n";
-  $text .= "are illegal for a minor to possess, alchol, etc.  If so, please\n";
+  $text .= "are illegal for a minor to possess, alcohol, etc.  If so, please\n";
   $text .= "explain.";
   form_textarea ($text, 'AgeRestrictions', 5);
- 
+  
+  $text = "Is your game appropriate for players under the age of 18? Please discuss any\n";
+  $text .= "age restrictions here.";
+  form_textarea ($text, 'AgeAppropriate', 5);
   
  if (ALLOW_EVENT_FEES)
     form_yn ("&nbsp;<BR>Do you wish to charge a fee for your {$thingstring}?  If so, con will be in touch to discuss this.",
@@ -1420,6 +1424,7 @@ function process_bid_form ()
   $sql .= build_sql_string ('Offensive', '', FALSE, TRUE);
   $sql .= build_sql_string ('PhysicalRestrictions', '', TRUE, TRUE);
   $sql .= build_sql_string ('AgeRestrictions', '', TRUE, TRUE);
+  $sql .= build_sql_string ('AgeAppropriate', '', TRUE, TRUE);
   $sql .= build_sql_string ('SchedulingConstraints', '', TRUE, TRUE);
   $sql .= build_sql_string ('SpaceRequirements', '', TRUE, TRUE);
   $sql .= build_sql_string ('MultipleRuns');
