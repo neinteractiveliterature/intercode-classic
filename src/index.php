@@ -1681,8 +1681,8 @@ function show_user_homepage ()
 
   // Show whether the user has signed up for the Thursday Thing
 
-  if (THURSDAY_ENABLED)
-    show_user_homepage_thursday($_SESSION[SESSION_LOGIN_USER_ID]);
+  //  if (THURSDAY_ENABLED)
+  //    show_user_homepage_thursday($_SESSION[SESSION_LOGIN_USER_ID]);
 
   // If the user is a GM, provide a link to their game(s)
 
