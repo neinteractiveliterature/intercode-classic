@@ -458,7 +458,6 @@ function display_main_navbar() {
 function display_links_navbar() {
   $links = new NavBar();
   $links->push(new NavBarTitle("Links"));
-  $links->push(NavBarItem::newExternal("NEIL Forum", "http://forums.interactiveliterature.org"));
   $links->push(NavBarItem::newExternal('New England Interactive Literature',
 			  'http://www.interactiveliterature.org'));
 	if (user_has_priv(PRIV_CON_COM)) {
