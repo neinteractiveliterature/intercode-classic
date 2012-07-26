@@ -262,43 +262,15 @@ function thursday_thing()
   $paid = false;
   $url = '';
   
-  if (precon_bids_allowed()) {
-      echo "<td id=\"precon_bid\" class=\"menulike\">";
-      echo "<p class=\"title\">Bid a Pre-Convention Event!</p>\n";
-      if (isset ($_SESSION[SESSION_LOGIN_USER_ID]))
-      {
-        if (0)
-        {
-          echo "<p>If you'd like to propose a panel, discussion or workshop\n";
-          printf ("please contact %s at %s.</p>\n",
-    	      NAME_THURSDAY,
-    	      mailto_or_obfuscated_email_address (EMAIL_THURSDAY));
-        }
-        else
-        {
-          echo "<p>Want to propose a panel, discussion or workshop?\n";
-          echo "We'd love to hear about it!</p>\n";
-      
-          echo "<p>";
-          printf ('<a href="Thursday.php?action=%d">',
-    	      PRECON_SHOW_EVENT_FORM);
-          echo "To bid an event, please fill out this quick form and we'll get back";
-          echo " to you by email.</a>  Thanks!</p>";
-      
-        }
-    
-      } else {
-        echo "<p>Want to run an event at the Pre-Convention?  We'd love to hear ";
-        echo "about it!  But you'll need to <a href=\"index.php\">log in</a> to ";
-        echo "tell us.</p>\n";
-      }
-      echo "</td>\n";
-  } else {
-      // precon is not accepting bids.  Put an empty placeholder cell here.
-      echo "<td></td>\n";
-  }
+  echo "<td id=\"precon_bid\" class=\"menulike\">";
+  echo "<p class=\"title\">Bid a Pre-Convention Event!</p>\n";
+  echo "<p>If you'd like to propose a panel, discussion or workshop\n";
+  printf ("please contact %s at %s.</p>\n",
+      NAME_THURSDAY,
+      mailto_or_obfuscated_email_address (EMAIL_THURSDAY));
+  echo "</td>\n";
   
-  echo "</td></tr></table>\n\n";
+  echo "</tr></table>\n\n";
 
   echo "<p>If you have any questions about the Pre-Convention, we'd be happy to";
   echo " help.  Email the Pre-Convention coordinator, ".NAME_THURSDAY.", at ";
