@@ -14,7 +14,7 @@ define (DEVELOPMENT_VERSION, 1);
 // Per-con values - The values of all of these should be visible on
 // the status page
 
-define (DB_SERVER, 'localhost');
+define (DB_SERVER, '127.0.0.1');
 define (DB_NAME,   'itest');
 //define (DB_SERVER, 'mysql.interactiveliterature.org');
 //define (DB_NAME,   'intercon_j');

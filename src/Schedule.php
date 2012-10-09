@@ -3300,7 +3300,7 @@ function list_games_alphabetically ()
       else
 	echo "<b>$row->Title</b> \n";
 
-      if ('Other' != $row->GameType)
+  if ($row->GameType && 'Other' != $row->GameType)
 	echo "($row->GameType)";
 
       if ('' != $row->Author && 'X' != $row->Author)
