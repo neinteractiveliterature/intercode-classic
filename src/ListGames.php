@@ -587,15 +587,14 @@ function process_add_run ()
     return false;
 
   $Rooms = '';
-  if (array_key_exists('Rooms', $_POST))
-    $Rooms = implode(',', $_POST['Rooms']);
+  
 
   $sql = "$verb Runs SET EventId=$EventId";
   $sql .= build_sql_string ('Day');
   $sql .= build_sql_string ('StartHour');
   $sql .= build_sql_string ('TitleSuffix');
   $sql .= build_sql_string ('ScheduleNote');
-  $sql .= build_sql_string ('Rooms', $Rooms);
+//  $sql .= build_sql_string ('Rooms', $Rooms);
   $sql .= build_sql_string ('UpdatedById', $_SESSION[SESSION_LOGIN_USER_ID]);
 
   if ($Update)
@@ -613,6 +612,17 @@ function process_add_run ()
   {
     $RunId = mysql_insert_id ();
     echo "Inserted run $RunId for <i>$Title</I>\n<p>\n";
+  }
+
+  $result = mysql_query("DELETE FROM RunsRooms WHERE RunId = $RunId");
+  if (! $result)
+     return display_error ('Delete from RunRooms table failed: ' . mysql_error ());
+
+  if (array_key_exists('Rooms', $_POST)) {
+    $Rooms = implode(',', array_map("mysql_real_escape_string", $_POST['Rooms']));
+    $result = mysql_query("INSERT INTO RunsRooms (RunId, RoomId) SELECT $RunId, RoomId FROM Rooms WHERE RoomName IN (" . $Rooms . ")");
+    if (! $result)
+       return display_error ('Insert into RunRooms table failed: ' . mysql_error ());
   }
 
   return $RunId;
