@@ -372,7 +372,7 @@ function add_run_form ($update)
     $RunId = $_REQUEST['RunId'];
 
     $sql = 'SELECT EventId, Track, Span, Day, TitleSuffix, ScheduleNote,';
-    $sql .= ' StartHour, TitleSuffix, Rooms';
+    $sql .= ' StartHour, TitleSuffix, room_names(Runs.RunId) Rooms';
     $sql .= " FROM Runs WHERE RunId=$RunId";
 
     $result = mysql_query ($sql);
