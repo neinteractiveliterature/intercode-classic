@@ -153,7 +153,7 @@ function list_games_alphabetically ()
 
   while ($game_row = mysql_fetch_object ($game_result))
   {
-    $sql = 'SELECT RunId, Track, Day, Span, TitleSuffix, ScheduleNote,';
+    $sql = 'SELECT Runs.RunId RunId, Track, Day, Span, TitleSuffix, ScheduleNote,';
     $sql .= ' StartHour, room_names(Runs.RunId) Rooms';
     $sql .= ' FROM Runs';
     $sql .= ' LEFT JOIN RunsRooms on RunsRooms.RunId = Runs.RunId';
