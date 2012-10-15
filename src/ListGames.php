@@ -154,8 +154,10 @@ function list_games_alphabetically ()
   while ($game_row = mysql_fetch_object ($game_result))
   {
     $sql = 'SELECT RunId, Track, Day, Span, TitleSuffix, ScheduleNote,';
-    $sql .= ' StartHour, Rooms';
+    $sql .= ' StartHour, room_names(Runs.RunId) Rooms';
     $sql .= ' FROM Runs';
+    $sql .= ' LEFT JOIN RunsRooms on RunsRooms.RunId = Runs.RunId';
+    $sql .= ' LEFT JOIN Rooms on Rooms.RoomId = RunsRooms.RoomId';
     $sql .= ' WHERE EventId=' . $game_row->EventId;
     $sql .= ' ORDER BY Day, StartHour';
 
