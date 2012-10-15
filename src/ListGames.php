@@ -619,7 +619,7 @@ function process_add_run ()
      return display_error ('Delete from RunRooms table failed: ' . mysql_error ());
 
   if (array_key_exists('Rooms', $_POST)) {
-    $Rooms = implode(',', array_map("mysql_real_escape_string", $_POST['Rooms']));
+    $Rooms = "'" . implode("', '", array_map("mysql_real_escape_string", $_POST['Rooms'])) . "'";
     $result = mysql_query("INSERT INTO RunsRooms (RunId, RoomId) SELECT $RunId, RoomId FROM Rooms WHERE RoomName IN (" . $Rooms . ")");
     if (! $result)
        return display_error ('Insert into RunRooms table failed: ' . mysql_error ());
