@@ -215,10 +215,6 @@ function process_special_event_form ()
   if (! validate_day_time ('StartHour', 'Day'))
     return FALSE;
 
-  $Rooms = '';
-  if (array_key_exists('Rooms', $_POST))
-    $Rooms = implode(',', $_POST['Rooms']);
-
   $sql = "$verb Events SET Title='$Title', SpecialEvent=1";
   $sql .= build_sql_string ('Hours');
   $sql .= build_sql_string ('ShortBlurb');
@@ -239,7 +235,6 @@ function process_special_event_form ()
   $sql = "$verb Runs SET EventId=$EventId";
   $sql .= build_sql_string ('Day');
   $sql .= build_sql_string ('StartHour');
-  $sql .= build_sql_string ('Rooms', $Rooms);
   $sql .= build_sql_string ('UpdatedById', $_SESSION[SESSION_LOGIN_USER_ID]);
   if ($update)
     $sql .= " WHERE RunId=$RunId";
@@ -249,6 +244,20 @@ function process_special_event_form ()
   $result = mysql_query ($sql);
   if (! $result)
     return display_error ("$action_failed Runs table failed: " . mysql_error ());
+
+  if (! $update)
+    $RunId = mysql_insert_id ();
+
+  $result = mysql_query("DELETE FROM RunsRooms WHERE RunId = $RunId");
+  if (! $result)
+     return display_error ('Delete from RunRooms table failed: ' . mysql_error ());
+
+  if (array_key_exists('Rooms', $_POST)) {
+    $Rooms = "'" . implode("', '", array_map("mysql_real_escape_string", $_POST['Rooms'])) . "'";
+    $result = mysql_query("INSERT INTO RunsRooms (RunId, RoomId) SELECT $RunId, RoomId FROM Rooms WHERE RoomName IN (" . $Rooms . ")");
+    if (! $result)
+       return display_error ('Insert into RunRooms table failed: ' . mysql_error ());
+  }
 
   return TRUE;
 }
