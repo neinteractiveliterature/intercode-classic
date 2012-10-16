@@ -273,7 +273,7 @@ function list_special_events ()
   echo "<h2>Special Events</h2>";
 
   $sql = 'SELECT Runs.RunId, Runs.EventId, Runs.StartHour,';
-  $sql .= ' Runs.Day, Runs.Rooms,';
+  $sql .= ' Runs.Day, room_names(Runs.RunId) Rooms,';
   $sql .= ' Events.Hours, Events.Title';
   $sql .= ' FROM Events, Runs';
   $sql .= ' WHERE Events.EventId=Runs.EventId AND Events.SpecialEvent=1';
