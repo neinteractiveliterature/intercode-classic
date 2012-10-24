@@ -114,8 +114,8 @@ function list_accepted_events()
   if (! $result)
     return display_mysql_error('Query for PreCon events failed', $sql);
   
-  $thursday = new ScheduleBlock(21, 24);
-  $friday = new ScheduleBlock(12, 18);
+  $thursday = new ScheduleBlock(20, 24);
+  $friday = new ScheduleBlock(9, 18);
   $runs = array();
   
   while ($row = mysql_fetch_object($result))
@@ -896,7 +896,8 @@ function display_precon_event_form()
   echo "  <tr>\n";
   echo "    <td colspan=\"2\">\n";
   echo "      <table border=\"1\">\n";
-  schedule_table_entry ('Thursday', THR_DATE, 21, 3);
+  schedule_table_entry ('Thursday', THR_DATE, 20, 4);
+  schedule_table_entry ('Thursday', THR_DATE, 21);
   schedule_table_entry ('Thursday', THR_DATE, 22);
   schedule_table_entry ('Thursday', THR_DATE, 23);
   schedule_table_entry ('Friday',   FRI_DATE, 9, 9);
@@ -1353,6 +1354,7 @@ function show_precon_event()
   $sql = 'SELECT PreConEvents.Title, PreConEvents.Hours,';
   $sql .= ' PreConEvents.Description, Users.FirstName, Users.LastName,';
   $sql .= ' PreConEvents.UpdatedById, PreConEvents.SubmitterUserId,';
+  $sql .= ' PreConEvents.Rooms,';
   $sql .= ' DATE_FORMAT(PreConEvents.LastUpdated, "%d-%b-%Y %H:%i") AS Timestamp';
   $sql .= ' FROM PreConEvents, Users';
   $sql .= " WHERE PreConEventId=$PreConEventId";
@@ -1387,6 +1389,9 @@ function show_precon_event()
 	    PRECON_SHOW_EVENT_FORM,
 	    $PreConEventId);
   }
+  echo "  </tr>\n";
+  echo "  <tr>\n";
+  echo "    <td>" . pretty_rooms($row->Rooms) . "</td>\n";
   echo "  </tr>\n";
   echo "</table>\n";
 
