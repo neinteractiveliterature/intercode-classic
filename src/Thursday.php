@@ -1354,12 +1354,10 @@ function show_precon_event()
   $sql = 'SELECT PreConEvents.Title, PreConEvents.Hours,';
   $sql .= ' PreConEvents.Description, Users.FirstName, Users.LastName,';
   $sql .= ' PreConEvents.UpdatedById, PreConEvents.SubmitterUserId,';
-  $sql .= ' PreConRuns.Rooms, Day, StartHour, Hours,';
   $sql .= ' DATE_FORMAT(PreConEvents.LastUpdated, "%d-%b-%Y %H:%i") AS Timestamp';
-  $sql .= ' FROM PreConEvents, Users, PreConRuns';
+  $sql .= ' FROM PreConEvents, Users';
   $sql .= " WHERE PreConEvents.PreConEventId=$PreConEventId";
   $sql .= '   AND Users.UserId=PreConEvents.SubmitterUserId';
-  $sql .= '   AND PreConRuns.PreConEventId = PreConEvents.PreConEventId';
 
   $result = mysql_query($sql);
   if (! $result)
@@ -1373,6 +1371,14 @@ function show_precon_event()
     return display_error ("Found multiple rows for PreConEventId $PreConEventId");
 
   $row = mysql_fetch_object($result);
+
+  $runSql = 'SELECT Rooms, Day, StartHour, Hours';
+  $runSql .= ' FROM PreConRuns';
+  $runSql .= " WHERE PreConEventId = $PreConEventId";
+  $runResult = mysql_query($sql);
+    if (! $runResult)
+    return display_mysql_error("Query for PreConRuns for event ID $PreConEventId failed",
+             $sql);
 
   $can_edit_event = user_has_priv(PRIV_PRECON_BID_CHAIR);
   if (array_key_exists(SESSION_LOGIN_USER_ID, $_SESSION))
@@ -1391,12 +1397,14 @@ function show_precon_event()
 	    $PreConEventId);
   }
   echo "  </tr>\n";
-  echo "  <tr>\n";
-  echo "    <td>";
-  echo pretty_rooms($row->Rooms) . " - ";
-  echo $row->Day . ", " . $row->StartHour .":00 - " . ($row->StartHour + $row->Hours). ":00";
-  echo "  </td>\n";
-  echo "  </tr>\n";
+  while ($runRow = mysql_fetch_object($runResult)) {
+    echo "  <tr>\n";
+    echo "    <td>";
+    echo pretty_rooms($runRow->Rooms) . " - ";
+    echo $runRow->Day . ", " . $runRow->StartHour .":00 - " . ($runRow->StartHour + $row->Hours). ":00";
+    echo "    </td>\n";
+    echo "  </tr>\n";
+  }
   echo "</table>\n";
 
   $name = trim("$row->FirstName $row->LastName");
