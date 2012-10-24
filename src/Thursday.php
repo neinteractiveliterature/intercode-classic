@@ -1359,7 +1359,7 @@ function show_precon_event()
   $sql .= ' FROM PreConEvents, Users, PreConRuns';
   $sql .= " WHERE PreConEventId=$PreConEventId";
   $sql .= '   AND Users.UserId=PreConEvents.SubmitterUserId';
-  $sql .= '   AND PreConRuns.EventId = PreConEventId';
+  $sql .= '   AND PreConRuns.PreConEventId = PreConEvents.PreConEventId';
 
   $result = mysql_query($sql);
   if (! $result)
