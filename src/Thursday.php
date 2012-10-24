@@ -1372,7 +1372,7 @@ function show_precon_event()
 
   $row = mysql_fetch_object($result);
 
-  $runSql = 'SELECT Rooms, Day, StartHour, Hours';
+  $runSql = 'SELECT Rooms, Day, StartHour';
   $runSql .= ' FROM PreConRuns';
   $runSql .= " WHERE PreConEventId = $PreConEventId";
   $runResult = mysql_query($runSql);
