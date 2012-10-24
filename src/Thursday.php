@@ -1357,7 +1357,7 @@ function show_precon_event()
   $sql .= ' PreConRuns.Rooms,';
   $sql .= ' DATE_FORMAT(PreConEvents.LastUpdated, "%d-%b-%Y %H:%i") AS Timestamp';
   $sql .= ' FROM PreConEvents, Users, PreConRuns';
-  $sql .= " WHERE PreConEventId=$PreConEventId";
+  $sql .= " WHERE PreConEvents.PreConEventId=$PreConEventId";
   $sql .= '   AND Users.UserId=PreConEvents.SubmitterUserId';
   $sql .= '   AND PreConRuns.PreConEventId = PreConEvents.PreConEventId';
 
