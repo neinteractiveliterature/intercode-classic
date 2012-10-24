@@ -1375,7 +1375,7 @@ function show_precon_event()
   $runSql = 'SELECT Rooms, Day, StartHour, Hours';
   $runSql .= ' FROM PreConRuns';
   $runSql .= " WHERE PreConEventId = $PreConEventId";
-  $runResult = mysql_query($sql);
+  $runResult = mysql_query($runSql);
     if (! $runResult)
     return display_mysql_error("Query for PreConRuns for event ID $PreConEventId failed",
              $sql);
