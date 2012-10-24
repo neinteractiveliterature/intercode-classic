@@ -1354,11 +1354,12 @@ function show_precon_event()
   $sql = 'SELECT PreConEvents.Title, PreConEvents.Hours,';
   $sql .= ' PreConEvents.Description, Users.FirstName, Users.LastName,';
   $sql .= ' PreConEvents.UpdatedById, PreConEvents.SubmitterUserId,';
-  $sql .= ' PreConEvents.Rooms,';
+  $sql .= ' PreConRuns.Rooms,';
   $sql .= ' DATE_FORMAT(PreConEvents.LastUpdated, "%d-%b-%Y %H:%i") AS Timestamp';
-  $sql .= ' FROM PreConEvents, Users';
+  $sql .= ' FROM PreConEvents, Users, PreConRuns';
   $sql .= " WHERE PreConEventId=$PreConEventId";
   $sql .= '   AND Users.UserId=PreConEvents.SubmitterUserId';
+  $sql .= '   AND PreConRuns.EventId = PreConEventId';
 
   $result = mysql_query($sql);
   if (! $result)
