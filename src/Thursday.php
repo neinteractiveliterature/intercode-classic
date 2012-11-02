@@ -277,6 +277,9 @@ function thursday_thing()
   echo mailto_or_obfuscated_email_address (EMAIL_THURSDAY);
   echo ".</p>\n\n";
 
+  if (is_readable (TEXT_DIR."/precon-news.html"))
+      include (TEXT_DIR."/precon-news.html");
+
   list_accepted_events();
 }
 
