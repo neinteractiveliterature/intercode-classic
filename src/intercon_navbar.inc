@@ -238,7 +238,7 @@ function build_larps_subnavbar() {
   }
   $larpSection->push(NavBarItem::newAction("List of Games", "Schedule.php", LIST_GAMES));
   if (IRONGM_ENABLED)
-    $larpSection->push(NavBarItem::newExternal('Iron GM Contest', 'http://irongm.rachl.in'));
+    $larpSection->push(NavBarItem::newStatic('Iron GM Contest', 'irongm'));
   if (can_show_schedule() && user_has_priv(PRIV_CON_COM)) {
     $larpSection->push(NavBarItem::newAction('Player Signups', 'UserSignupScan.php'));
     $larpSection->push(NavBarItem::newAction('Last 100 Signups', 'SignupSpy.php'));    
