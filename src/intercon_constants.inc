@@ -61,7 +61,7 @@ define (DEAD_DOG_MAX, 100);
 
 // Set to 0 to disable the Iron GM contest
 
-define (IRONGM_ENABLED, 0);
+define (IRONGM_ENABLED, 1);
 
 // Set to 0 to disable allowing players to select events.
 
