@@ -441,11 +441,12 @@ class RunDimensions {
   }
   
   function getCSS() {
-    $css = "top: " . $this->top . "%; ";
+    $css .= "top: " . $this->top . "%; ";
     $css .= "left: " . $this->left ."%; ";
     $css .= "width: " . $this->width ."%; ";
     $css .= "height: " . $this->height ."%; ";
-    $css .= "position: absolute;";
+    $css .= "position: absolute; ";
+    $css .= "z-index: " . intval($this->left) . ";";
     return $css;
   }
 }
