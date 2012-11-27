@@ -365,18 +365,27 @@ function show_tshirt_form ()
   echo "  <tr>\n";
   if (0 == $count)
   {
+
+    echo "<td align=center>";
+    echo("This year there will be FOUR shirts for you to choose from!  Sadly, we're not quite ready to take your order just yet.\n");
+    echo "We'll have information about these shirts for you soon, once we've finished updating our online store.";
+    echo "</td>";
+
+/*  
+    TODO TODO TODO
+
+    Uncomment this section, and remove the above echo statements, once shirts are ready for Intercon M.
+
     echo "    <td align=center>\n";
     printf ("Shirts cost \$%d.00 per shirt, payable when you order them.<p>\n",
 	    TSHIRT_DOLLARS);
 
     $email = mailto_or_obfuscated_email_address (EMAIL_OPS);
     echo "This year there are TWO shirts for you to choose from! ";
-    /*
-    echo "The\n";
-    echo "first is a burgundy men's polo shirt.\n";
-    echo "The second is a baby blue babydoll-style shirt.\n";
-    echo "Both shirts are 100% cotton.\n";
-    */
+//    echo "The\n";
+//    echo "first is a burgundy men's polo shirt.\n";
+//    echo "The second is a baby blue babydoll-style shirt.\n";
+//    echo "Both shirts are 100% cotton.\n";
     
     echo "We'll have information about these shirts for you soon, once we finalize ";
     echo "the designs.\n";
@@ -387,7 +396,7 @@ function show_tshirt_form ()
     echo "to be sure of getting one in your size, be sure to order it\n";
     echo "now.\n";
 
-    echo "    </td>\n";
+    echo "    </td>\n"; */
   }
   else
   {
@@ -407,6 +416,13 @@ function show_tshirt_form ()
   }
 
   echo "  </tr>\n";
+
+  /* 
+
+  TODO TODO TODO
+  
+  Uncomment this once shirts are ready to order for Intercon M.
+
   echo "  <tr class=\"shirtBody\">\n";
   echo "    <td align=center>\n";
   echo "      <table>\n";
@@ -454,6 +470,7 @@ function show_tshirt_form ()
   echo "      </table>\n";
   echo "    </td>\n";
   echo "  </tr>\n";
+  */
   echo "</table>\n";
   echo "</form>\n";
   echo "<p>\n";
