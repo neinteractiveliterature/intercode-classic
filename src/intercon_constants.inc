@@ -151,14 +151,14 @@ define (FRI_DATE, '12-Mar-2010');
 
 define (REGISTRATION_CLOSE, '2011-02-24');
 define (CON_OVER, '2011-03-14');
-define (SHIRT_CLOSE, '2011-02-01');
+define (SHIRT_CLOSE, '2013-02-01');
 define (BIO_CLOSE, '2010-12-25');
 
 // Information about the next convention for people who can't sign up for this one
 define (NEXT_CON_INFO, "Registration for Intercon L will open in March 2011.");
 
 // Shirt stuff
-define (SHOW_TSHIRTS, 0);
+define (SHOW_TSHIRTS, 1);
 define (TSHIRT_DOLLARS, 20);
 
 define (SHIRT_IMG_AVAILABLE, 1);
