@@ -3302,6 +3302,7 @@ function form_con_rooms($display, $key)
   room_check($rooms, 'Salon A');
   room_check($rooms, 'Salon B');
   room_check($rooms, 'Salon C');
+  room_check($rooms, 'Presidential Suite');
   room_check($rooms, 'Suite A');
   room_check($rooms, 'Suite B');
   room_check($rooms, 'Suite C');
