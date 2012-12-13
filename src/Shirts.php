@@ -503,8 +503,8 @@ function process_shirt_form()
   $OrderId = $order->order_id();
   $url = build_paypal_url($order->order_id(), $cost);
 
-  echo "<p>Paypal URL (pay no attention to the browser parsing error\n";
-  echo "around &amp;curren): $url</p>\n";
+  // echo "<p>Paypal URL (pay no attention to the browser parsing error\n";
+  // echo "around &amp;curren): $url</p>\n";
 
   echo "<p><b>Note:</b> Your order is not complete until you pay for it!</p>\n";
   echo "<p>To complete your purchase, click <a href=$url>here</a> to\n";
