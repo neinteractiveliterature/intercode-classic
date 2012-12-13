@@ -773,7 +773,7 @@ function show_shirts($status, $desc)
       $thumbnail[$key] = $row->ThumbnailFilename;
       $fullimage[$key] = $row->ImageFilename;
     }
-    $singluar[$key] = $row->Singular;
+    $singular[$key] = $row->Singular;
     $plural[$key] = $row->Plural;
 
     if ('N' == $row->Available)
