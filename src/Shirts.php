@@ -290,6 +290,8 @@ function delete_store_item()
 
 function no_new_shirt_orders()
 {
+  $shirt_close = strftime ('%d-%b-%Y', parse_date (SHIRT_CLOSE));
+
   // See if there are any unpaid orders in the database for this user?
   $sql = 'SELECT * FROM StoreOrders';
   $sql .= ' WHERE UserId=' . $_SESSION[SESSION_LOGIN_USER_ID];
