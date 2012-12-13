@@ -441,6 +441,7 @@ class RunDimensions {
   }
   
   function getCSS() {
+    $css = "";
     $css .= "top: " . $this->top . "%; ";
     $css .= "left: " . $this->left ."%; ";
     $css .= "width: " . $this->width ."%; ";
