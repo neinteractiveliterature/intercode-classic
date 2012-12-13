@@ -406,6 +406,10 @@ function build_website_subnavbar() {
   $websiteSection->push(NavBarItem::newAction('Referring Sites', 'Referrers.php', VIEW_REFERRERS));
   $websiteSection->push(NavBarItem::newAction('Referring Site Summary',
 	  'Referrers.php', SUMMARIZE_REFERRERS));
+  if (user_has_priv(PRIV_STAFF))
+    $websiteSection->push(NavBarItem::newAction('Store Items',
+                        'Shirts.php',
+                        SHOW_STORE_ITEM_FORM));
 	  
 	return $websiteSection;
 }
