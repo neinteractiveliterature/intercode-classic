@@ -14,302 +14,312 @@ require ('intercon_constants.inc');
 require ('intercon_navbar.inc');
 require ('Mail.php');
 
-define (SHOW_TSHIRTS, 1);
-define (TSHIRT_DOLLARS, 20);
-define (UNLIMITED_SIGNUPS, 100);
+define ('SHOW_TSHIRTS', 1);
+define ('TSHIRT_DOLLARS', 20);
+define ('UNLIMITED_SIGNUPS', 100);
 
 // Orderings
 
-define (ORDER_BY_SEQ, 1);
-define (ORDER_BY_NAME, 2);
-define (ORDER_BY_AGE, 3);
-define (ORDER_BY_GENDER, 4);
-define (ORDER_BY_CREATION, 5);
-define (ORDER_BY_PAYMENT_STATUS_CHANGE, 6);
-define (ORDER_BY_LAST_MODIFIED, 7);
-define (ORDER_BY_LAST_LOGIN, 8);
+define ('ORDER_BY_SEQ', 1);
+define ('ORDER_BY_NAME', 2);
+define ('ORDER_BY_AGE', 3);
+define ('ORDER_BY_GENDER', 4);
+define ('ORDER_BY_CREATION', 5);
+define ('ORDER_BY_PAYMENT_STATUS_CHANGE', 6);
+define ('ORDER_BY_LAST_MODIFIED', 7);
+define ('ORDER_BY_LAST_LOGIN', 8);
 
 // Privileges - These must match the database SET for the User Priv field
 
-define (PRIV_BID_COM, 'BidCom');
-define (PRIV_BID_CHAIR, 'BidChair');
-define (PRIV_CON_COM, 'ConCom');
-define (PRIV_GM_LIAISON, 'GMLiaison');
-define (PRIV_OUTREACH, 'Outreach');
-define (PRIV_REGISTRAR, 'Registrar');
-define (PRIV_SCHEDULING, 'Scheduling');
-define (PRIV_VENDORS, 'Vendors');
-define (PRIV_DONORS, 'Donors');
-define (PRIV_PRECON_BID_CHAIR, 'PreConBidChair');
-define (PRIV_PRECON_SCHEDULING, 'PreConScheduling');
+define ('PRIV_BID_COM', 'BidCom');
+define ('PRIV_BID_CHAIR', 'BidChair');
+define ('PRIV_CON_COM', 'ConCom');
+define ('PRIV_GM_LIAISON', 'GMLiaison');
+define ('PRIV_OUTREACH', 'Outreach');
+define ('PRIV_REGISTRAR', 'Registrar');
+define ('PRIV_SCHEDULING', 'Scheduling');
+define ('PRIV_VENDORS', 'Vendors');
+define ('PRIV_DONORS', 'Donors');
+define ('PRIV_PRECON_BID_CHAIR', 'PreConBidChair');
+define ('PRIV_PRECON_SCHEDULING', 'PreConScheduling');
 
 // Mail privileges
 
-define (PRIV_MAIL_GMS, 'MailToGMs');
-define (PRIV_MAIL_ATTENDEES, 'MailToAttendees');
-define (PRIV_MAIL_ALL, 'MailToAll');
-define (PRIV_MAIL_VENDORS, 'MailToVendors');
-define (PRIV_MAIL_UNPAID, 'MailToUnpaid');
-define (PRIV_MAIL_ALUMNI, 'MailToAlumni');
+define ('PRIV_MAIL_GMS', 'MailToGMs');
+define ('PRIV_MAIL_ATTENDEES', 'MailToAttendees');
+define ('PRIV_MAIL_ALL', 'MailToAll');
+define ('PRIV_MAIL_VENDORS', 'MailToVendors');
+define ('PRIV_MAIL_UNPAID', 'MailToUnpaid');
+define ('PRIV_MAIL_ALUMNI', 'MailToAlumni');
 
 
 // God privileges
 
-define (PRIV_STAFF, 'Staff');
-define (PRIV_ADMIN, 'Admin');
+define ('PRIV_STAFF', 'Staff');
+define ('PRIV_ADMIN', 'Admin');
 
 // Comp limit
 
-define (COMPS_PER_GAME, 2);
+define ('COMPS_PER_GAME', 2);
 
 // Action values - index.php
 
-define (PROMPT_FOR_LOGIN, 0);
-define (LOGIN_USER, 1);
-define (SHOW_USER_HOMEPAGE, 2);
-define (WITHDRAW_FROM_GAME, 3);
-define (LOGOUT_USER, 4);
-define (NEW_USER, 5);
-define (ADD_USER, 6);
-define (UPDATE_USER, 7);
-define (SHOW_USER, 8);
-define (SEND_PASSWORD, 9);
-define (REQUEST_PASSWORD, 10);
-define (CHANGE_PASSWORD, 11);
-define (PROCESS_PASSWORD_CHANGE, 12);
-define (SELECT_USER_TO_EDIT, 13);
-define (EDIT_USER, 14);
-define (PROCESS_EDIT_USER, 15);
-define (PAID_UP, 16);
-define (SHOW_COMPED_USERS, 17);
-define (SELECT_USER_TO_DELETE, 18);
-define (SHOW_USER_TO_DELETE, 19);
-define (DELETE_USER, 80);
-define (SELECT_USER_TO_VIEW, 81);
-define (VIEW_USER, 82);
-define (WITHDRAW_FROM_GAME_CONFIRMED, 83);
-define (EDIT_BIO, 84);
-define (UPDATE_BIO, 85);
-define (BIO_REPORT, 86);
-define (WHO_IS_WHO, 87);
-define (WITHDRAW_USER_FROM_ALL_GAMES, 88);
-define (WITHDRAW_USER_FROM_ALL_GAMES_CONFIRMED, 89);
-define (SELECT_USER_TO_SET_PASSWORD, 140);
-define (DISPLAY_PASSWORD_FORM_FOR_USER, 141);
-define (PROCESS_PASSWORD_FORM_FOR_USER, 142);
-define (SELECT_USER_TO_BECOME, 143);
-define (BECOME_USER, 144);
-define (DISPLAY_POLL_FORM, 145);
-define (PROCESS_POLL_FORM, 146);
-define (CONVERT_AGE_TO_YEAR, 147);
+define ('PROMPT_FOR_LOGIN', 0);
+define ('LOGIN_USER', 1);
+define ('SHOW_USER_HOMEPAGE', 2);
+define ('WITHDRAW_FROM_GAME', 3);
+define ('LOGOUT_USER', 4);
+define ('NEW_USER', 5);
+define ('ADD_USER', 6);
+define ('UPDATE_USER', 7);
+define ('SHOW_USER', 8);
+define ('SEND_PASSWORD', 9);
+define ('REQUEST_PASSWORD', 10);
+define ('CHANGE_PASSWORD', 11);
+define ('PROCESS_PASSWORD_CHANGE', 12);
+define ('SELECT_USER_TO_EDIT', 13);
+define ('EDIT_USER', 14);
+define ('PROCESS_EDIT_USER', 15);
+define ('PAID_UP', 16);
+define ('SHOW_COMPED_USERS', 17);
+define ('SELECT_USER_TO_DELETE', 18);
+define ('SHOW_USER_TO_DELETE', 19);
+define ('DELETE_USER', 80);
+define ('SELECT_USER_TO_VIEW', 81);
+define ('VIEW_USER', 82);
+define ('WITHDRAW_FROM_GAME_CONFIRMED', 83);
+define ('EDIT_BIO', 84);
+define ('UPDATE_BIO', 85);
+define ('BIO_REPORT', 86);
+define ('WHO_IS_WHO', 87);
+define ('WITHDRAW_USER_FROM_ALL_GAMES', 88);
+define ('WITHDRAW_USER_FROM_ALL_GAMES_CONFIRMED', 89);
+define ('SELECT_USER_TO_SET_PASSWORD', 140);
+define ('DISPLAY_PASSWORD_FORM_FOR_USER', 141);
+define ('PROCESS_PASSWORD_FORM_FOR_USER', 142);
+define ('SELECT_USER_TO_BECOME', 143);
+define ('BECOME_USER', 144);
+define ('DISPLAY_POLL_FORM', 145);
+define ('PROCESS_POLL_FORM', 146);
+define ('CONVERT_AGE_TO_YEAR', 147);
 
 
 // Action values - Schedule.php
 
-define (PROCESS_ADD_GAME, 21);
-define (EDIT_GAME, 22);
-define (LIST_GAMES, 23);
-define (SCHEDULE_SHOW, 24);
-define (SCHEDULE_SHOW_GAME, 25);
-define (SCHEDULE_SIGNUP, 26);
-define (SCHEDULE_SHOW_SIGNUPS, 27);
-define (SCHEDULE_UPDATE_SIGNUP, 28);
-define (DISPLAY_GM_LIST, 29);
-define (EDIT_GM, 30);
-define (ADD_GM, 31);
-define (PROCESS_ADD_GM, 32);
-define (SCHEDULE_UPDATE_GM, 33);
-define (SCHEDULE_WITH_COUNTS, 34);
-define (SCHEDULE_AWAY_FORM, 35);
-define (SCHEDULE_PROCESS_AWAY_FORM, 36);
-define (SCHEDULE_SHOW_ALL_SIGNUPS, 37);
-define (SCHEDULE_FREEZE_GENDER_BALANCE, 38);
-define (SCHEDULE_CONFIRM_FREEZE_GENDER_BALANCE, 39);
-define (SCHEDULE_COMP_USER_FOR_EVENT, 160);
-define (SCHEDULE_IRON_GM_TEAM_LIST, 161);
-define (SCHEDULE_SHOW_IRON_GM_TEAM_FORM, 162);
-define (SCHEDULE_PROCESS_IRON_GM_TEAM_FORM, 163);
-define (SCHEDULE_SELECT_USER_FOR_IRON_GM, 164);
-define (SCHEDULE_ADD_IRON_GM, 165);
+define ('PROCESS_ADD_GAME', 21);
+define ('EDIT_GAME', 22);
+define ('SCHEDULE_SHOW', 24);
+define ('SCHEDULE_SHOW_GAME', 25);
+define ('SCHEDULE_SIGNUP', 26);
+define ('SCHEDULE_SHOW_SIGNUPS', 27);
+define ('SCHEDULE_UPDATE_SIGNUP', 28);
+define ('DISPLAY_GM_LIST', 29);
+define ('EDIT_GM', 30);
+define ('ADD_GM', 31);
+define ('PROCESS_ADD_GM', 32);
+define ('SCHEDULE_UPDATE_GM', 33);
+define ('SCHEDULE_WITH_COUNTS', 34);
+define ('SCHEDULE_AWAY_FORM', 35);
+define ('SCHEDULE_PROCESS_AWAY_FORM', 36);
+define ('SCHEDULE_SHOW_ALL_SIGNUPS', 37);
+define ('SCHEDULE_FREEZE_GENDER_BALANCE', 38);
+define ('SCHEDULE_CONFIRM_FREEZE_GENDER_BALANCE', 39);
+define ('SCHEDULE_COMP_USER_FOR_EVENT', 160);
+define ('SCHEDULE_IRON_GM_TEAM_LIST', 161);
+define ('SCHEDULE_SHOW_IRON_GM_TEAM_FORM', 162);
+define ('SCHEDULE_PROCESS_IRON_GM_TEAM_FORM', 163);
+define ('SCHEDULE_SELECT_USER_FOR_IRON_GM', 164);
+define ('SCHEDULE_ADD_IRON_GM', 165);
 
 // Action values in SpecialEvents.php
 
-define (SPECIAL_EVENT_FORM, 40);
-define (SPECIAL_EVENT_ADD, 41);
-define (SPECIAL_EVENT_LIST, 42);
+define ('SPECIAL_EVENT_FORM', 40);
+define ('SPECIAL_EVENT_ADD', 41);
+define ('SPECIAL_EVENT_LIST', 42);
 
 // Action values in Bids.php
 
-define (BID_GAME, 50);
-define (BID_PROCESS_FORM, 51);
-define (BID_REVIEW_BIDS, 52);
-define (BID_CHANGE_STATUS, 53);
-define (BID_PROCESS_STATUS_CHANGE, 54);
-define (BID_SHOW_BID, 55);
-//define (BID_REGISTER_SUBMITTER, 56);
-define (BID_FEEDBACK_BY_GAME, 57);
-define (BID_PROCESS_FEEDBACK_BY_GAME, 58);
-define (BID_FEEDBACK_SUMMARY, 59);
-define (BID_FEEDBACK_BY_ENTRY, 200);
-define (BID_FEEDBACK_PROCESS_ENTRY, 201);
-define (BID_FEEDBACK_BY_CONCOM, 202);
-define (BID_FEEDBACK_PROCESS_BY_CONCOM, 203);
+define ('BID_GAME', 50);
+define ('BID_PROCESS_FORM', 51);
+define ('BID_REVIEW_BIDS', 52);
+define ('BID_CHANGE_STATUS', 53);
+define ('BID_PROCESS_STATUS_CHANGE', 54);
+define ('BID_SHOW_BID', 55);
+//define ('BID_REGISTER_SUBMITTER', 56);
+define ('BID_FEEDBACK_BY_GAME', 57);
+define ('BID_PROCESS_FEEDBACK_BY_GAME', 58);
+define ('BID_FEEDBACK_SUMMARY', 59);
+define ('BID_FEEDBACK_BY_ENTRY', 200);
+define ('BID_FEEDBACK_PROCESS_ENTRY', 201);
+define ('BID_FEEDBACK_BY_CONCOM', 202);
+define ('BID_FEEDBACK_PROCESS_BY_CONCOM', 203);
 
 // Action values in ListGames.php
 
-define (LIST_GAMES, 60);
-define (ADD_RUN, 61);
-define (PROCESS_ADD_RUN, 62);
-define (EDIT_RUN, 63);
-define (PROCESS_EDIT_RUN, 64);
-define (LIST_GAMES_BY_TIME, 65);
-//define (ADD_PARALLEL_RUN, 66);
-//define (PROCESS_ADD_PARALLEL_RUN, 67);
-//define (LIST_TO_ADD_PARALLEL_RUN, 68);
-define (LIST_ADD_OPS, 69);
-define (LIST_ADD_CONSUITE, 68);
+define ('LIST_GAMES', 60);
+define ('ADD_RUN', 61);
+define ('PROCESS_ADD_RUN', 62);
+define ('EDIT_RUN', 63);
+define ('PROCESS_EDIT_RUN', 64);
+define ('LIST_GAMES_BY_TIME', 65);
+//define ('ADD_PARALLEL_RUN', 66);
+//define ('PROCESS_ADD_PARALLEL_RUN', 67);
+//define ('LIST_TO_ADD_PARALLEL_RUN', 68);
+define ('LIST_ADD_OPS', 69);
+define ('LIST_ADD_CONSUITE', 68);
 
 // Action values in MailTo.php
 
-define (MAIL_SHOW_FORM, 70);
-define (MAIL_SEND, 71);
-define (MAIL_LISTS, 72);
-define (MAIL_GM_LISTS, 73);
-define (MAIL_BIO_LISTS, 74);
-define (MAIL_WAITLISTED, 75);
-define (MAIL_BID_SUBMITTERS, 76);
-define (MAIL_IRON_GM_LIST, 77);
+define ('MAIL_SHOW_FORM', 70);
+define ('MAIL_SEND', 71);
+define ('MAIL_LISTS', 72);
+define ('MAIL_GM_LISTS', 73);
+define ('MAIL_BIO_LISTS', 74);
+define ('MAIL_WAITLISTED', 75);
+define ('MAIL_BID_SUBMITTERS', 76);
+define ('MAIL_IRON_GM_LIST', 77);
 
 // Action values in ConStatus.php
 
-define (SHOW_STATUS, 90);
-define (UPDATE_STATUS, 91);
+define ('SHOW_STATUS', 90);
+define ('UPDATE_STATUS', 91);
 
 // Action values in Reports.php
 
-define (REPORT_PER_GAME, 100);
-define (REPORT_PER_USER, 101);
-define (REPORT_WHOS_NOT_PLAYING_FORM, 102);
-define (REPORT_WHOS_NOT_PLAYING, 103);
-define (REPORT_OPS_TRACK, 104);
-define (REPORT_GAMES_BY_TIME, 105);
-define (REPORT_USERS_CSV, 106);
-define (REPORT_REGISTRATION, 107);
-define (REPORT_BY_AGE, 108);
-define (REPORT_HOW_HEARD, 109);
-define (REPORT_CONSUITE_TRACK, 190);
-define (REPORT_PER_ROOM, 191);
+define ('REPORT_PER_GAME', 100);
+define ('REPORT_PER_USER', 101);
+define ('REPORT_WHOS_NOT_PLAYING_FORM', 102);
+define ('REPORT_WHOS_NOT_PLAYING', 103);
+define ('REPORT_OPS_TRACK', 104);
+define ('REPORT_GAMES_BY_TIME', 105);
+define ('REPORT_USERS_CSV', 106);
+define ('REPORT_REGISTRATION', 107);
+define ('REPORT_BY_AGE', 108);
+define ('REPORT_HOW_HEARD', 109);
+define ('REPORT_CONSUITE_TRACK', 190);
+define ('REPORT_PER_ROOM', 191);
 
 
 // Action values in Referrers.php
 
-define (VIEW_REFERRERS, 110);
-define (SUMMARIZE_REFERRERS, 111);
+define ('VIEW_REFERRERS', 110);
+define ('SUMMARIZE_REFERRERS', 111);
 
 // Action values in TShirts.php
 
-define (SHOW_TSHIRT_FORM, 120);
-define (PROCESS_TSHIRT_FORM, 121);
-define (SHOW_TSHIRT_REPORT, 122);
-define (SHOW_TSHIRT_SUMMARY, 123);
-define (SHOW_TSHIRT_PAYMENT_LINK, 124);
-define (PROCESS_TSHIRT_PAID, 125);
-define (PROCESS_TSHIRT_CANCEL, 126);
-define (SHOW_INDIV_TSHIRT_FORM, 127);
-define (PROCESS_INDIV_TSHIRT_FORM, 128);
-define (SELECT_USER_TO_SELL_SHIRT, 129);
+define ('SHOW_TSHIRT_FORM', 120);
+define ('PROCESS_TSHIRT_FORM', 121);
+define ('SHOW_TSHIRT_REPORT', 122);
+define ('SHOW_TSHIRT_SUMMARY', 123);
+define ('SHOW_TSHIRT_PAYMENT_LINK', 124);
+define ('PROCESS_TSHIRT_PAID', 125);
+define ('PROCESS_TSHIRT_CANCEL', 126);
+define ('SHOW_INDIV_TSHIRT_FORM', 127);
+define ('PROCESS_INDIV_TSHIRT_FORM', 128);
+define ('SELECT_USER_TO_SELL_SHIRT', 129);
+
+// Action values for Store
+define('SHOW_STORE_ITEM_FORM', 270);
+define('DELETE_STORE_ITEM', 271);
+define('EDIT_STORE_ITEM', 272);
+define('PROCESS_ITEM_FORM', 273);
+define('SHOW_SHIRT_FORM', 274);
+define('PROCESS_SHIRT_FORM', 275);
+define('SHOW_SHIRT_SUMMARY', 276);
+define('SHOW_SHIRT_REPORT', 277);
+define('SHOW_INDIV_SHIRT_FORM', 278);
 
 // Action values for SignupSpy
 
-define (SHOW_LIMITED_SIGNUPS, 130);
-define (SHOW_ALL_SIGNUPS, 131);
+define ('SHOW_LIMITED_SIGNUPS', 130);
+define ('SHOW_ALL_SIGNUPS', 131);
 
 // Action values for Vendors
 
-define (SHOW_VENDORS, 150);
-define (SHOW_DONORS, 155);
-define (EDIT_VENDOR_OR_DONOR, 151);
-define (DELETE_VENDOR_OR_DONOR, 152);
-define (PROCESS_EDIT_VENDOR_OR_DONOR, 153);
-define (PROCESS_DELETE_VENDOR, 154);
+define ('SHOW_VENDORS', 150);
+define ('SHOW_DONORS', 155);
+define ('EDIT_VENDOR_OR_DONOR', 151);
+define ('DELETE_VENDOR_OR_DONOR', 152);
+define ('PROCESS_EDIT_VENDOR_OR_DONOR', 153);
+define ('PROCESS_DELETE_VENDOR', 154);
 
 // Action values for Thursday
 
-define (THURSDAY_THING, 170);
-define (THURSDAY_REPORT, 171);
-define (THURSDAY_SELECT_USER, 172);
-define (THURSDAY_EDIT_USER, 173);
-define (THURSDAY_PROCESS_USER, 174);
+define ('THURSDAY_THING', 170);
+define ('THURSDAY_REPORT', 171);
+define ('THURSDAY_SELECT_USER', 172);
+define ('THURSDAY_EDIT_USER', 173);
+define ('THURSDAY_PROCESS_USER', 174);
 
 // Action values for biddingAGame
 
-define (BAG_SHOW_FORM, 180);
-define (BAG_UPDATE, 181);
-define (BAG_BID_PAGE, 182);
+define ('BAG_SHOW_FORM', 180);
+define ('BAG_UPDATE', 181);
+define ('BAG_BID_PAGE', 182);
 
 // Action values for Plugs
 
-define (PLUGS_SHOW_FORM, 190);
-define (PLUGS_PROCESS_FORM, 191);
-define (PLUGS_SHOW_PAGE, 192);
-define (PLUGS_MANAGE_PLUGS, 193);
-define (PLUGS_CONFIRM_DELETE, 194);
-define (PLUGS_DELETE, 195);
+define ('PLUGS_SHOW_FORM', 190);
+define ('PLUGS_PROCESS_FORM', 191);
+define ('PLUGS_SHOW_PAGE', 192);
+define ('PLUGS_MANAGE_PLUGS', 193);
+define ('PLUGS_CONFIRM_DELETE', 194);
+define ('PLUGS_DELETE', 195);
 
 // Action values for PreConEvents
 
-define (PRECON_SHOW_EVENT_FORM, 210);
-define (PRECON_PROCESS_EVENT_FORM, 211);
-define (PRECON_MANAGE_EVENTS, 212);
-define (PRECON_SHOW_STATUS_FORM, 213);
-define (PRECON_PROCESS_STATUS_FORM, 214);
-define (PRECON_SHOW_EVENT, 215);
-define (PRECON_SHOW_RUN_FORM, 216);
-define (PRECON_PROCESS_RUN_FORM, 217);
+define ('PRECON_SHOW_EVENT_FORM', 210);
+define ('PRECON_PROCESS_EVENT_FORM', 211);
+define ('PRECON_MANAGE_EVENTS', 212);
+define ('PRECON_SHOW_STATUS_FORM', 213);
+define ('PRECON_PROCESS_STATUS_FORM', 214);
+define ('PRECON_SHOW_EVENT', 215);
+define ('PRECON_SHOW_RUN_FORM', 216);
+define ('PRECON_PROCESS_RUN_FORM', 217);
 
 // Action values for Dead Dog
 
-define (DEAD_DOG, 250);
-define (DEAD_DOG_REPORT, 251);
-define (DEAD_DOG_SELECT_USER, 252);
-define (DEAD_DOG_EDIT_USER, 253);
-define (DEAD_DOG_PROCESS_USER, 254);
-define (DEAD_DOG_NEW_USER, 255);
-define (DEAD_DOG_CREATE_USER, 256);
-define (DEAD_DOG_PAYPAL_REDIRECT, 257);
+define ('DEAD_DOG', 250);
+define ('DEAD_DOG_REPORT', 251);
+define ('DEAD_DOG_SELECT_USER', 252);
+define ('DEAD_DOG_EDIT_USER', 253);
+define ('DEAD_DOG_PROCESS_USER', 254);
+define ('DEAD_DOG_NEW_USER', 255);
+define ('DEAD_DOG_CREATE_USER', 256);
+define ('DEAD_DOG_PAYPAL_REDIRECT', 257);
 
 // List types
 
-define (LIST_UNDEFINED, 0);
-define (LIST_BY_GAME, 1);
-define (LIST_BY_TIME, 2);
+define ('LIST_UNDEFINED', 0);
+define ('LIST_BY_GAME', 1);
+define ('LIST_BY_TIME', 2);
 
 // Maximum tracks
 
-define (MAX_TRACKS, 15);
+define ('MAX_TRACKS', 15);
 
 // Minimum and maximum times for con days
 
-define (FRI_MIN, 12);    // 12 noon
-define (FRI_MAX, 31);    // 7AM
-define (SAT_MIN, 8);     // 8AM
-define (SAT_MAX, 31);    // 7AM
-define (SUN_MIN, 8);     // 8AM
-define (SUN_MAX, 16);    // 4PM
+define ('FRI_MIN', 12);    // 12 noon
+define ('FRI_MAX', 31);    // 7AM
+define ('SAT_MIN', 8);     // 8AM
+define ('SAT_MAX', 31);    // 7AM
+define ('SUN_MIN', 8);     // 8AM
+define ('SUN_MAX', 16);    // 4PM
 
-define (SESSION_LOGIN_USER_GM, 'LoginUserGM_' . CON_ID);
-define (SESSION_LOGIN_USER_ID, 'LoginUserId_' . CON_ID);
-define (SESSION_LOGIN_USER_PRIVS, 'LoginUserPrivs_' . CON_ID);
-define (SESSION_REFERRER_ID, 'ReferrerId_' . CON_ID);
-define (SESSION_LOGIN_USER_GENDER, 'LoginUserGender_' . CON_ID);
-define (SESSION_LOGIN_USER_NAME, 'LoginUserName_' . CON_ID);
-define (SESSION_LOGIN_USER_EMAIL, 'LoginUserEMail_' . CON_ID); 
-define (SESSION_CON_SHOW_SCHEDULE, 'ConShowSchedule_' . CON_ID);
-define (SESSION_CON_NEWS, 'ConNews_' . CON_ID);
-define (SESSION_ATTENDENCE_SHOWN, 'AttendenceShown_' . CON_ID);
-define (SESSION_CON_LAST_UPDATED, 'ConLastUpdated_' . CON_ID);
-define (SESSION_SEQUENCE_NUMBER, 'SequenceNumber_' . CON_ID);
-define (SESSION_TIMEOUT, 'Timeout_' . CON_ID);
+define ('SESSION_LOGIN_USER_GM', 'LoginUserGM_' . CON_ID);
+define ('SESSION_LOGIN_USER_ID', 'LoginUserId_' . CON_ID);
+define ('SESSION_LOGIN_USER_PRIVS', 'LoginUserPrivs_' . CON_ID);
+define ('SESSION_REFERRER_ID', 'ReferrerId_' . CON_ID);
+define ('SESSION_LOGIN_USER_GENDER', 'LoginUserGender_' . CON_ID);
+define ('SESSION_LOGIN_USER_NAME', 'LoginUserName_' . CON_ID);
+define ('SESSION_LOGIN_USER_EMAIL', 'LoginUserEMail_' . CON_ID); 
+define ('SESSION_CON_SHOW_SCHEDULE', 'ConShowSchedule_' . CON_ID);
+define ('SESSION_CON_NEWS', 'ConNews_' . CON_ID);
+define ('SESSION_ATTENDENCE_SHOWN', 'AttendenceShown_' . CON_ID);
+define ('SESSION_CON_LAST_UPDATED', 'ConLastUpdated_' . CON_ID);
+define ('SESSION_SEQUENCE_NUMBER', 'SequenceNumber_' . CON_ID);
+define ('SESSION_TIMEOUT', 'Timeout_' . CON_ID);
 
 // Raise the level of error reporting
 
@@ -586,11 +596,6 @@ function html_begin ($bShowLogo=true)
     printf ("<p class=dev_warning>Development Version  %s@%s</p>\n",
 	    DB_NAME,
 	    DB_SERVER);
-
-  // Show the con logo.  Some pages may want to handle this themselves
-
-  if ($bShowLogo)
-    echo "<div class=print_logo><img src=".PAGE_BANNER."></div>\n";
 }
 
 /*
@@ -1455,6 +1460,11 @@ function start_hour_to_24_hour ($t)
   return sprintf ('%02d:00', $t % 24);
 }
 
+/*
+ * validate_int
+ *
+ * Verify that a field contains an integer
+ */
 function validate_int ($key, $min, $max, $display=0)
 {
   if (0 == $display)
@@ -1471,6 +1481,26 @@ function validate_int ($key, $min, $max, $display=0)
     return display_error ("$display must be less than $max");
 
   return TRUE;
+}
+
+/*
+ * validate_file_exists
+ *
+ * Verify that a field contains the name of a file that exists
+ */
+function validate_file_exists ($key, $dir='.', $display=0)
+{
+  if (0 == $display)
+    $display = $key;
+
+  $value = trim ($_POST[$key]);
+  if ('' == $value)
+    return display_error ("You must specify $display");
+
+  if (! file_exists("$dir/$value"))
+    return display_error ("$display $dir/$value not found");
+
+  return true;
 }
 
 /*
@@ -3297,12 +3327,12 @@ function form_con_rooms($display, $key)
   room_check($rooms, 'Middlesex');
   room_check($rooms, 'Parkhurst');
   room_check($rooms, 'Pool');
+  room_check($rooms, 'Presidential Suite');
   echo "          </td>\n";
   echo "          <td>\n";
   room_check($rooms, 'Salon A');
   room_check($rooms, 'Salon B');
   room_check($rooms, 'Salon C');
-  room_check($rooms, 'Presidential Suite');
   room_check($rooms, 'Suite A');
   room_check($rooms, 'Suite B');
   room_check($rooms, 'Suite C');
@@ -3321,4 +3351,43 @@ function form_con_rooms($display, $key)
   echo "    </td>\n";
   echo "  </tr>\n";
 }
+
+function user_id_to_name($UserId, &$name, $first_name_first)
+{
+  $name = 'Error reported';
+
+  // Fetch the name from the database
+  $sql = 'SELECT FirstName, LastName FROM Users';
+  $sql .= " WHERE UserId=$UserId";
+
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Failed to get user name', $sql);
+
+  $n = mysql_num_rows($result);
+
+  if (0 == $n)
+    return display_error("Failed to find UserId $UserId");
+
+  if (1 != $n)
+    return display_error("Found more than 1 user record for UserId $UserId");
+
+  $row = mysql_fetch_object($result);
+  if ($first_name_first)
+    $name = trim("$row->FirstName $row->LastName");
+  else
+    $name = trim("$row->LastName, $row->FirstName");
+
+  return true;
+}
+
+function render_field($value, $tag='', $attributes='')
+{
+  if ('' != $tag)
+    echo "<$tag $attributes>";
+  echo $value;
+  if ('' != $tag)
+    echo "</$tag>";
+}
+
 ?>

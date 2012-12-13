@@ -62,6 +62,10 @@ switch ($action)
      select_user_to_sell_shirt();
      break;
 
+   case SHOW_STORE_ITEM_FORM:
+     show_store_item_form();
+     break;
+
    default:
      display_error ("Unknown action code: $action");
 }
@@ -1385,6 +1389,63 @@ function select_user_to_sell_shirt ()
 	       TRUE,
 	       $highlight,
 	       0 == $alumni);
+}
+class StoreItem
+{
+  function __construct($row)
+  {
+    $this->item_id = $row->ItemId;
+    $this->price = $row->PriceCents/100;
+    $this->name = $row->Name;
+    $this->color = $row->Color;
+    $this->sizes = $row->Sizes;
+    $this->thumbnail = $row->ThumbnailFilename;
+    $this->image = $row->ImageFilename;
+  }
+
+  function render_row()
+  {
+    echo "<td><img src=\"$this->thumbnail\" alt=\"Click for larger picture\"></td>\n";
+    echo "<td>$this->name</td>\n";
+    echo "<td>$this->color</td>\n";
+    echo "<td>$this->sizes</td>\n";
+  }
+  
+  private $item_id;
+  private $price;
+  private $name;
+  private $color;
+  private $sizes;
+  private $thumbnail;
+  private $image;
+}
+
+function show_store_item_form()
+{
+  // Make sure that only users with Staff priv view this page
+  if (! user_has_priv (PRIV_STAFF))
+    return display_access_error ();
+
+  $sql = 'SELECT * FROM StoreItems';
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Query for StoreItems records failed', $sql);
+
+  $shirts = array();
+
+  while ($row = mysql_fetch_object($result))
+  {
+    $shirts->[$row->Name] = new StoreItem($row);
+  }
+
+  echo "<table>\n";
+  foreach ($shirts as $k => $item)
+  {
+    echo "  <tr>\n";
+    $item->render();
+    echo "  </tr>\n";
+  }
+  echo "</table>\n";
 }
 
 ?>

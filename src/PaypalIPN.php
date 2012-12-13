@@ -134,22 +134,22 @@ function mark_user_paid ()
   }
   elseif ($bShirtPayment)
   {
-    // If this is a shirt payment, the custom field is the TShirtId.  Mark the
-    // shirt paid and fetch the UserId from the TShirt record
+    // If this is a shirt payment, the custom field is the OrderId.  Mark the
+    // shirt paid and fetch the UserId from the StoreOrders record
 
-    $TShirtID = 0;
+    $OrderId = 0;
  
     if (array_key_exists ('custom', $_POST))
-      $TShirtID = intval ($_POST['custom']);
+      $OrderId = intval ($_POST['custom']);
 
-    $sql = 'UPDATE TShirts SET Status="Paid"';
+    $sql = 'UPDATE StoreOrders SET Status="Paid"';
     $sql .= ", PaymentNote='$paid_by'";
-    $sql .= ", PaymentAmount=$amount";
-    $sql .= " WHERE TShirtID=$TShirtID";
+    $sql .= ", PaymentCents=$amount";
+    $sql .= " WHERE OrderId=$OrderId";
     //  echo "$sql<p>\n";
     $result = mysql_query ($sql);
     if (! $result)
-      exit_400("Failed to update shirt record $TShirtID with notification from PayPal");
+      exit_400("Failed to update StoreOrders record $Order with notification from PayPal");
 
     // If we've got session info, we're done
 
@@ -159,15 +159,15 @@ function mark_user_paid ()
     // Otherwise, we're going to need the UserId so we can log him (or her)
     // back in
 
-    $sql = "SELECT UserId FROM TShirts WHERE TShirtID=$TShirtID";
+    $sql = "SELECT UserId FROM StoreOrders WHERE OrderId=$OrderId";
     //  echo "$sql<p>\n";
     $result = mysql_query ($sql);
     if (! $result)
-      exit_400("Failed to fetch shirt record $TShirtID");
+      exit_400("Failed to fetch StoreOrders record $OrderId");
 
     $num_rows = mysql_num_rows($result);
     if (1 != mysql_num_rows($result))
-      exit_400("$num_rows rows returned for shirt record $TShirtID");
+      exit_400("$num_rows rows returned for StoreOrders record $OrderId");
     $row = mysql_fetch_object($result);
     $user_id = $row->UserId;
   }

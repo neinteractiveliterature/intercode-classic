@@ -274,11 +274,15 @@ function build_gm_subnavbar() {
 }
 
 function build_shirts_subnavbar() {
-  $shirtsSection = new SubNavBar((USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME) . " <NOBR>Shirts</NOBR>");
-  $shirtsSection->push(NavBarItem::newAction("Order Shirts", "TShirts.php"));
+  $shirtsSection = new SubNavBar(CON_NAME . ' Shirts');
+  $shirtsSection->push(NavBarItem::newAction('Order Shirts', 'Shirts.php'));
   if (user_has_priv(PRIV_CON_COM)) {
-    $shirtsSection->push(NavBarItem::newAction('Shirt Order Summary', 'TShirts.php', SHOW_TSHIRT_SUMMARY));
-    $shirtsSection->push(NavBarItem::newAction('Shirt Order Report', 'TShirts.php', SHOW_TSHIRT_REPORT));
+    $shirtsSection->push(NavBarItem::newAction('Shirt Order Summary',
+                 'Shirts.php',
+                 SHOW_SHIRT_SUMMARY));
+    $shirtsSection->push(NavBarItem::newAction('Shirt Order Report',
+                 'Shirts.php',
+                 SHOW_SHIRT_REPORT));
   }
   return $shirtsSection;
 }
