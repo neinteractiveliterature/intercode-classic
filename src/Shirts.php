@@ -73,6 +73,15 @@ switch ($action)
     show_indiv_shirt_form();
     break;
 
+  case IMPORT_TSHIRTS:
+    import_tshirts();
+    break;
+
+  case PROCESS_CONVERSION_FORM:
+    process_conversion_form();
+    show_shirt_form();
+    break;
+
   default:
     display_error ("Unknown action code: $action");
 }
@@ -358,14 +367,36 @@ function show_shirt_form()
 
   // Display what's for sale
   $num_shirts = $shirts->num_available_shirts();
-  echo "<p>This year there are $num_shirts shirts available.\n";
-  echo "All shirts are 100% cotton. Click on a shirt image to see a\n";
-  echo "larger image with details of the " . CON_NAME . " logo.</p>\n";
+  echo "<p>This year there are $num_shirts 100% cotton shirts available.\n";
+  echo "Click on a shirt image to see a larger image with details of the\n";
+  echo CON_NAME . " logo.</p>\n";
 
   $order->has_unavailable_shirt();
 
   if ($order->has_unavailable_shirt())
+  {
+    if ('Unpaid' == $order->status())
+    {
+      echo "<p>You have ordered one or more unavailable shirts and not yet\n";
+      echo "paid for them. Please do one of the following:</p>\n";
+      echo "<ul>";
+      echo "<li>You can cancel your order by clicking the \"Cancel\" ";
+      echo "button.</li>\n";
+      echo "<li>You can update your order by select from the available\n";
+      echo "shirts and then click \"Update\" button.</li>\n";
+      echo "</ul>\n";
+      echo "<p>You'll be able to pay for your shirts once you've selected\n";
+      echo "shirts from the list available for " . CON_NAME . " and updated\n";
+      echo "your order.</p>\n";
+    }
+    else
+    {
+      echo "<p>You have paid for one or more unavailable shirts.  Please\n";
+      echo "update your order by selecting from the available shirts in the\n";
+      echo "dropdown list(s) and click the \"Update\" button.</p>\n";
+    }
     $order->render_conversion_form($shirts);
+  }
   else
     $shirts->render_sales_form($order);
 
@@ -610,11 +641,13 @@ function show_shirt_summary()
 
 function show_shirt_report ()
 {
-  // You need Staff privilege to see this page
-  if (! user_has_priv (PRIV_REGISTRAR))
+  // You need ConCom privilege to see this page
+  if (! user_has_priv (PRIV_CON_COM))
     return display_access_error ();
 
   display_header (CON_NAME . ' Shirt Order Report');
+
+  $can_edit = user_has_priv(PRIV_REGISTRAR);
 
   // Load the available shirts from the database
   $shirts = new StoreShirts();
@@ -633,8 +666,11 @@ function show_shirt_report ()
   if (! $result)
     return display_mysql_error ('Query for StoreOrders failed', $sql);
 
-  echo "<p>Click on the user name to send mail<br>\n";
-  echo "Click on the status to update the order<br>\n";
+  if ($can_edit)
+  {
+    echo "<p>Click on the user name to send mail<br>\n";
+    echo "Click on the status to update the order<br>\n";
+  }
   
   echo "<table border=\"1\">\n";
   echo "<tr>\n";
@@ -645,12 +681,25 @@ function show_shirt_report ()
   echo "</tr>\n";
   while ($row = mysql_fetch_object($result))
   {
-    echo "<tr valign=\"top\">\n";
-    echo "<td><a href=mailto:$row->EMail>$row->LastName, " .
-         "$row->FirstName</a></td>\n";
-    //    echo "<td align=\"center\">$row->OrderId</td>\n";
-    printf("<td><a href=\"Shirts.php?action=%d&OrderId=%d\">$row->Status" .
-	   "</a></td>\n", SHOW_INDIV_SHIRT_FORM, $row->OrderId);
+    if ('Unpaid' == $row->Status)
+      $bgcolor = " style=\"background-color: #ffcccc;\"";
+    else
+      $bgcolor = '';
+
+    echo "<tr valign=\"top\"$bgcolor>\n";
+    if ($can_edit)
+    {
+      echo "<td><a href=mailto:$row->EMail>$row->LastName, " .
+	"$row->FirstName</a></td>\n";
+      printf("<td align=\"center\">" .
+	     "<a href=\"Shirts.php?action=%d&OrderId=%d\">%s</a></td>\n",
+	     SHOW_INDIV_SHIRT_FORM, $row->OrderId, $row->Status);
+    }
+    else
+    {
+      echo "<td>$row->LastName, $row->FirstName</td>\n";
+      echo "<td align=\"center\">$row->Status</td>\n";
+    }
     echo "<td>\n";
     $order = new StoreOrder;
     if ($order->load_from_order_id($row->OrderId))
@@ -684,7 +733,219 @@ function show_indiv_shirt_form()
 
   display_header ('Shirt Order for ' . $order->user_name());
 
-  $shirts->render_sales_form($OrderId, $order);
+  $shirts->render_sales_form($order);
+}
+
+function add_nonzero_entry(&$row, $size, $OrderId, &$shirts)
+{
+  /*
+  echo "<pre>\n";
+  print_r($row);
+  echo "</pre>\n";
+  */
+  // If there's nothing in this size, skip it
+  if (0 == $row[$size])
+    return true;
+
+  // If this is from shirt 2, then there will be a trailing "_2"
+  $parts = explode("_", $size);
+  if (1 == count($parts))
+    $ItemId = 1;
+  else
+    $ItemId = 2;
+  $new_size = $parts[0];
+  if ('XXLarge' == $new_size)
+    $new_size = 'X2Large';
+
+  $sql = 'INSERT StoreOrderEntries SET ';
+  $sql .= build_sql_string('OrderId', $OrderId, false);
+  $sql .= build_sql_string('ItemId', $ItemId);
+  $sql .= build_sql_string('PricePerItemCents', 2000);
+  $sql .= build_sql_string('Quantity', $row[$size]);
+  $sql .= build_sql_string('Size', $new_size);
+  $sql .= build_sql_string('UpdatedById', $_SESSION[SESSION_LOGIN_USER_ID]);
+
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Failure to INSERT StoreOrders record', $sql);
+
+  $shirts += $row[$size];
+
+  return true;
+}
+
+function import_tshirts()
+{
+  // You need Staff privilege to see this page
+  if (! user_has_priv (PRIV_REGISTRAR))
+    return display_access_error ();
+
+  $sql = 'SELECT * FROM TShirts';
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Query for TShirts failed', $sql);
+
+  $skipped = 0;
+  $recs = 0;
+  $shirts = 0;
+
+  while ($row = mysql_fetch_object($result))
+  {
+    if ('Cancelled' == $row->Status)
+      continue;
+
+    // Users who don't follow instructions and enter new orders are a
+    // pain in the butt.  Yes, I'm thinking of you Anna.
+    if ('Unpaid' == $row->Status)
+    {
+      $sql  = 'SELECT OrderId FROM StoreOrders';
+      $sql .= " WHERE UserId=$row->UserId";
+      $sql .= '   AND Status="Unpaid"';
+
+      $check_result = mysql_query($sql);
+      if (! $check_result)
+	return display_mysql_error("Check for user $row->UserId failed", $sql);
+
+      if (0 != mysql_num_rows($check_result))
+      {
+	user_id_to_name ($row->UserId, $name, true);
+	echo "<p>Skipping order for $name since there's already an Unpaid\n";
+	echo "StoreOrders record for them.</p>\n";
+	$skipped++;
+	unset($check_results);
+	continue;
+      }
+    }
+
+    if ('Paid' == $row->Status)
+    {
+      $sql  = 'SELECT PaymentNote FROM StoreOrders';
+      $sql .= " WHERE UserId=$row->UserId";
+      $sql .= '   AND Status="Paid"';
+
+      $check_result = mysql_query($sql);
+      if (! $check_result)
+	return display_mysql_error("Check for user $row->UserId failed", $sql);
+
+      $paid_order_found = false;
+      while ($check_row = mysql_fetch_object($check_result))
+      {
+	if ($check_row->PaymentNote == $row->PaymentNote)
+	{
+	  $paid_order_found = true;
+	  break;
+	}
+      }
+      unset($check_row);
+      unset($check_result);
+      if ($paid_order_found)
+      {
+	user_id_to_name ($row->UserId, $name, true);
+	echo "<p>Skipping order for $name since there's already a Paid\n";
+	echo "order for them with the same transaction note.</p>\n";
+	$skipped++;
+	continue;
+      }
+    }
+
+    $recs++;
+
+    $sql = 'INSERT StoreOrders SET ';
+    $sql .= build_sql_string('UserId', $row->UserId, false);
+    $sql .= build_sql_string('Status', $row->Status);
+    $sql .= build_sql_string('PaymentCents', $row->PaymentAmount);
+    $sql .= build_sql_string('PaymentNote', $row->PaymentNote);
+    $sql .= build_sql_string('UpdatedById', $_SESSION[SESSION_LOGIN_USER_ID]);
+
+    $order_result = mysql_query($sql);
+    if (! $order_result)
+      return display_mysql_error('Failure to INSERT StoreOrders record', $sql);
+
+    $OrderId = mysql_insert_id();
+
+    $row_as_array = (array)$row;
+
+    add_nonzero_entry($row_as_array, 'Small', $OrderId, $shirts);
+    add_nonzero_entry($row_as_array, 'Medium', $OrderId, $shirts);
+    add_nonzero_entry($row_as_array, 'Large', $OrderId, $shirts);
+    add_nonzero_entry($row_as_array, 'XLarge', $OrderId, $shirts);
+    add_nonzero_entry($row_as_array, 'XXLarge', $OrderId, $shirts);
+    add_nonzero_entry($row_as_array, 'X3Large', $OrderId, $shirts);
+
+    add_nonzero_entry($row_as_array, 'Small_2', $OrderId, $shirts);
+    add_nonzero_entry($row_as_array, 'Medium_2', $OrderId, $shirts);
+    add_nonzero_entry($row_as_array, 'Large_2', $OrderId, $shirts);
+    add_nonzero_entry($row_as_array, 'XLarge_2', $OrderId, $shirts);
+    add_nonzero_entry($row_as_array, 'XXLarge_2', $OrderId, $shirts);
+    add_nonzero_entry($row_as_array, 'X3Large_2', $OrderId, $shirts);
+  }
+
+  echo "<p>Converted $recs TShirt records, containing $shirts shirts.</p>\n";
+  echo "<p>$skipped records skipped.</p>";
+}
+
+function process_conversion_form()
+{
+  $OrderId = 0;
+  if (array_key_exists('OrderId', $_POST))
+    $OrderId = intval(trim($_POST['OrderId']));
+
+  if (0 == $OrderId)
+    return display_error("Invalid OrderId");
+
+  if ('Cancel' == $_POST['BtnAction'])
+  {
+    $sql = "UPDATE StoreOrders SET Status='Cancelled',";
+    $sql .= '       UpdatedById=' . $_SESSION[SESSION_LOGIN_USER_ID];
+    $sql .= " WHERE OrderId=$OrderId";
+
+    $result = mysql_query($sql);
+    if (! $result)
+      return display_mysql_error("Failed to cancel order", $sql);
+    return true;
+  }
+
+  foreach ($_POST as $k => $v)
+  {
+    if ('' == $v)
+      continue;
+
+    $components = explode('-', $k);
+    if (3 != count($components))
+      continue;
+
+    if ('entry' != $components[0])
+      continue;
+
+    $size = $components[1];
+    $entry_id = $v;
+
+    $key = "entry_id-$entry_id";
+    $new_item_id = 0;
+    if (array_key_exists($key, $_POST))
+      $new_item_id = intval(trim($_POST[$key]));
+
+    if (0 == $new_item_id)
+      return display_error("Failed to find key $key");
+
+    $sql  = "UPDATE StoreOrderEntries SET ItemId=$new_item_id,";
+    $sql .= '       UpdatedById=' . $_SESSION[SESSION_LOGIN_USER_ID];
+    $sql .= " WHERE OrderEntryId=$entry_id";
+
+    $result = mysql_query($sql);
+    if (! $result)
+      return display_mysql_error('StoreOrderEntries update failed', $sql);
+  }
+
+  $sql  = 'UPDATE StoreOrders SET  UpdatedById=' .
+              $_SESSION[SESSION_LOGIN_USER_ID];
+  $sql .= " WHERE OrderId=$OrderId";
+
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('StoreOrders update failed', $sql);
+
+  return true;
 }
 
 ?>
