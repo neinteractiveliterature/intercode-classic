@@ -21,6 +21,8 @@ class StoreOrder
 
   public function order_id() { return $this->order_id; }
 
+  public function status() { return $this->status; }
+
   public function load_from_POST()
   {
     /*
@@ -45,7 +47,7 @@ class StoreOrder
 	continue;
 
       $components = explode('-', $k);
-      if (3 != count($components) > 1)
+      if (3 != count($components))
 	continue;
 
       if ('size' != $components[0])
@@ -166,7 +168,7 @@ class StoreOrder
     $sql .= " WHERE OrderId=$this->order_id";
     $result = mysql_query($sql);
     if (! $result)
-      return display_mysql_error('StoreOrders deletion failed', $sql);
+      return display_mysql_error('StoreOrders cancellation failed', $sql);
 
     // Now clean out the _POST entries
     unset($_POST['OrderId']);
@@ -278,7 +280,10 @@ class StoreOrder
 	$first_line = false;
       else
 	echo "<br />\n";
-      printf("%d %s\n", $entry->quantity(), $entry->description());
+      printf("%d %s %s\n",
+	     $entry->quantity(),
+	     $entry->size(),
+	     $entry->description());
     }
   }
 
@@ -369,7 +374,7 @@ class StoreOrder
     echo "<!-- render_conversion_form -->\n";
     echo "<form method=post action=Shirts.php>\n";
     form_add_sequence();
-    form_hidden_value('action', PROCESS_SHIRT_FORM);
+    form_hidden_value('action', PROCESS_CONVERSION_FORM);
     form_hidden_value('OrderId', $this->order_id());
 
     $this->render_hidden_entry_ids();
@@ -387,10 +392,10 @@ class StoreOrder
 	continue;
 
       echo "  <tr valign=\"top\">\n";
-      printf("    <td>%d %s - select available style\n",
-	     $quantity, $entry->noun());
+      printf("    <td>%d %s %s - select available style\n",
+	     $quantity, $entry->size(), $entry->noun());
 
-      $key = 'entry-id:' . $entry->entry_id();
+      $key = 'entry_id-' . $entry->entry_id();
       if (! array_key_exists($key, $_POST))
       {
 	$selected_choice = $catelog->first_choice(true, $entry->gender());
