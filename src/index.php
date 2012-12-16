@@ -1,5 +1,6 @@
 <?
-include ("intercon_db.inc");
+include "intercon_db.inc";
+include "StoreOrder.inc";
 
 // Connect to the database
 
@@ -734,86 +735,6 @@ function show_user_homepage_thursday ($UserId)
 	  CON_NAME);
 }
 
-function show_shirts($status, $desc)
-{
-  // Count up the number of shirts the user has paid for
-  $sql  = 'SELECT StoreOrderEntries.Size, StoreOrderEntries.Quantity,';
-  $sql .= '       StoreItems.Gender, StoreItems.Style,';
-  $sql .= '       StoreItems.Singular, StoreItems.Plural, StoreItems.Color,';
-  $sql .= '       StoreItems.ThumbnailFilename, StoreItems.ImageFilename,';
-  $sql .= '       StoreItems.Available';
-  $sql .= '  FROM StoreOrders,StoreOrderEntries,StoreItems';
-  $sql .= " WHERE StoreOrders.Status='$status'";
-  $sql .= '   AND StoreOrders.UserId=' . $_SESSION[SESSION_LOGIN_USER_ID];
-  $sql .= '   AND StoreOrderEntries.OrderId=StoreOrders.OrderId';
-  $sql .= '   AND StoreItems.ItemId=StoreOrderEntries.ItemId';
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Query for paid shirts failed', $sql);
-
-  $count = array();
-  $thumbnail = array();
-  $fullimage = array();
-  $singular = array();
-  $plural = array();
-  $unavailable_count = 0;
-
-  while ($row = mysql_fetch_object ($result))
-  {
-    if (0 == $row->Quantity)
-      continue;
-
-    $key = "$row->Size $row->Color $row->Gender $row->Style";
-    if (array_key_exists($key, $count))
-      $count[$key] += $row->Quantity;
-    else
-    {
-      $count[$key] = $row->Quantity;
-      $thumbnail[$key] = $row->ThumbnailFilename;
-      $fullimage[$key] = $row->ImageFilename;
-    }
-    $singular[$key] = $row->Singular;
-    $plural[$key] = $row->Plural;
-
-    if ('N' == $row->Available)
-      $unavailable_count += $row->Quantity;
-  }
-
-  // If we didn't find any shirts, we're done
-  if (0 == count($count))
-    return false;
-
-  // Show what we found
-  echo "<p>$desc:</p>\n";
-  echo "<table>\n";
-  foreach ($count as $k=>$v)
-  {
-    if (1 == $v)
-      $noun = $singular[$k];
-    else
-      $noun = $plural[$k];
-
-    echo "<tr>\n";
-    printf("<td><a href=\"img/%s\" target=\"_blank\">" .
-	   "<img src=\"img/%s\" alt=\"Click for larger image\" title=\"Click for larger image\"></a>" .
-	   "</td>\n", $fullimage[$k], $thumbnail[$k]);
-    echo "<td>$v</td>\n";
-    echo "<td>$k $noun</td>\n";
-    echo "</tr>\n";
-  }
-  echo "</table>\n";
-
-  if ($unavailable_count > 0)
-  {
-    echo "<p>You have ordered $unavailable_count shirt(s) that are no\n";
-    echo "longer available.  You must select one of the available shirts\n";
-    echo "using the <a href='Shirts.php'>Shirt Order Form</a>.</p>\n";
-  }
-
-  return true;
-}
-
 /*
  * show_user_homepage_shirts
  *
@@ -826,39 +747,7 @@ function show_user_homepage_shirts ($UserId)
 
   display_header ('<p>' . CON_NAME . ' Shirts Ordered');
 
-  // Show any shirts the user has paid for
-  $paid_displayed = show_shirts('Paid',
-				'You have paid for the following shirts');
-
-  // Show any shirts the user hasn't paid for
-  $unpaid_displayed = show_shirts('Unpaid',
-				  'Payment is still due for the following shirts');
-  if ($unpaid_displayed)
-  {
-    $shirts_displayed = true;
-    echo "<p>You can modify or pay for the pending order using the ";
-    echo "<a href='Shirts.php'>Shirt Order Form</a>.</p>\n";
-  }
-  else if ($paid_displayed)
-  {
-    echo "<p>You can order more shirts using the <a href='Shirts.php'>Shirt\n";
-    echo "Order Form</a>.</p>\n";
-  }
-  else
-  {
-    echo '<p>You have not ordered any ' . CON_NAME . " Shirts.\n";
-    if (! past_shirt_deadline())
-      echo "Visit the <a href='Shirts.php'>Shirt Order Form</a> to order " .
-	   "shirts.<p>\n";
-    else
-    {
-      echo "A limited number of shirts will be available at the con.\n";
-      echo "If you want a shirt, check at the registration desk to see\n";
-      echo "if any are available in your size.\n";
-    }
-    echo "</p>\n";
-  }
-
+  StoreOrder::show_shirts_for_homepage();
   return true;
 }
 
