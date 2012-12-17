@@ -30,6 +30,14 @@ class StoreOrderEntry
     return $this->available;
   }
 
+  public function color()
+  {
+    if (! isset($this->color))
+      $this->fill_in_from_StoreItem();
+
+    return $this->color;
+  }
+
   public function cost()
   {
     if (! isset($this->price_per_item))
@@ -56,6 +64,8 @@ class StoreOrderEntry
   }
 
   public function quantity() { return $this->quantity; }
+
+  public function size() { return $this->size; }
 
   public function fill_from_db_row($row)
   {

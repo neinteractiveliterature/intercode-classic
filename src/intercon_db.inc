@@ -322,6 +322,7 @@ define ('SESSION_ATTENDENCE_SHOWN', 'AttendenceShown_' . CON_ID);
 define ('SESSION_CON_LAST_UPDATED', 'ConLastUpdated_' . CON_ID);
 define ('SESSION_SEQUENCE_NUMBER', 'SequenceNumber_' . CON_ID);
 define ('SESSION_TIMEOUT', 'Timeout_' . CON_ID);
+define ('SESSION_CON_IS_FROZEN', 'Frozen_' . CON_ID);
 
 // Raise the level of error reporting
 
@@ -1598,6 +1599,10 @@ function can_show_schedule ()
   $_SESSION[SESSION_TIMEOUT] = $now + 180;
   $_SESSION[SESSION_CON_LAST_UPDATED] = $row->LastUpdated;
   $_SESSION[SESSION_CON_NEWS] = $row->News;
+  if ('NotNow' == $row->SignupsAllowed)
+    $_SESSION[SESSION_CON_IS_FROZEN] = 1;
+  else
+    $_SESSION[SESSION_CON_IS_FROZEN] = 0;
 
   switch ($row->ShowSchedule)
   {

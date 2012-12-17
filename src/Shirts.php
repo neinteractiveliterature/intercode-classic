@@ -78,8 +78,8 @@ switch ($action)
     break;
 
   case PROCESS_CONVERSION_FORM:
-    process_conversion_form();
-    show_shirt_form();
+    if (! process_conversion_form())  // Returns false for unpaid orders
+      show_shirt_form();
     break;
 
   default:
@@ -326,40 +326,46 @@ function no_new_shirt_orders()
   $order->list_entries();
 }
 
+function convert_unavailable_shirts($OrderId, &$shirts)
+{
+  $order = new StoreOrder();
+
+  $order->load_from_order_id($OrderId);
+
+  if ('Unpaid' == $order->status())
+  {
+    echo "<p>You have ordered one or more unavailable shirts and not yet\n";
+    echo "paid for them. Please do one of the following:</p>\n";
+    echo "<ul>";
+    echo "<li>You can cancel your order by clicking the \"Cancel\" ";
+    echo "button.</li>\n";
+    echo "<li>You can update your order by select from the available\n";
+    echo "shirts and then click \"Update\" button.</li>\n";
+    echo "</ul>\n";
+    echo "<p>You'll be able to pay for your shirts once you've selected\n";
+    echo "shirts from the list available for " . CON_NAME . " and updated\n";
+    echo "your order.</p>\n";
+  }
+  else
+  {
+    echo "<p>You have paid for one or more unavailable shirts.  Please\n";
+    echo "update your order by selecting from the available shirts in the\n";
+    echo "dropdown list(s) and click the \"Update\" button.</p>\n";
+  }
+  $order->render_conversion_form($shirts);
+}
+
 function show_shirt_form()
 {
+  display_header ('Don\'t Lose Your Shirt!');
+
   $shirt_close = strftime ('%d-%b-%Y', parse_date (SHIRT_CLOSE));
   $email = mailto_or_obfuscated_email_address (EMAIL_OPS);
-
-  // If it's past the shirt deadline, you can pay for existing orders
-  // but we're not accepting new orders
-  if (past_shirt_deadline())
-    return no_new_shirt_orders();
 
   // Load the available shirts from the database
   $shirts = new StoreShirts();
   if (! $shirts->load_from_db())
     return false;
-
-  // See if there are any unpaid orders in the database for this user?
-  $sql = 'SELECT * FROM StoreOrders';
-  $sql .= ' WHERE UserId=' . $_SESSION[SESSION_LOGIN_USER_ID];
-  $sql .= '   AND Status="Unpaid"';
-
-  $result = mysql_query($sql);
-  if (! $result)
-    return display_mysql_error('Query for StoreOrders record failed', $sql);
-
-  $order = new StoreOrder();
-
-  $row = mysql_fetch_object($result);
-  if ($row)
-  {
-    $order->load_from_row($row);
-    $order->populate_POST();
-  }
-
-  display_header ('Don\'t Lose Your Shirt!');
 
   echo "Only a small number of " . CON_NAME . " shirts will be available\n";
   echo "for sale at the convention.  The only way to guarantee that you get\n";
@@ -371,34 +377,50 @@ function show_shirt_form()
   echo "Click on a shirt image to see a larger image with details of the\n";
   echo CON_NAME . " logo.</p>\n";
 
-  $order->has_unavailable_shirt();
+  // See if there are any orders with shirts that need to be converted
+  $sql  = 'SELECT StoreOrders.OrderId';
+  $sql .= '  FROM StoreOrders, StoreOrderEntries, StoreItems';
+  $sql .= ' WHERE StoreOrders.UserId=' . $_SESSION[SESSION_LOGIN_USER_ID];
+  $sql .= '   AND StoreOrderEntries.OrderId=StoreOrders.OrderId';
+  $sql .= '   AND StoreItems.ItemId=StoreOrderEntries.ItemId';
+  $sql .= '   AND StoreItems.Available="N"';
 
-  if ($order->has_unavailable_shirt())
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Query for unavailable shirts failed', $sql);
+
+  $row = mysql_fetch_object($result);
+  if ($row)
   {
-    if ('Unpaid' == $order->status())
-    {
-      echo "<p>You have ordered one or more unavailable shirts and not yet\n";
-      echo "paid for them. Please do one of the following:</p>\n";
-      echo "<ul>";
-      echo "<li>You can cancel your order by clicking the \"Cancel\" ";
-      echo "button.</li>\n";
-      echo "<li>You can update your order by select from the available\n";
-      echo "shirts and then click \"Update\" button.</li>\n";
-      echo "</ul>\n";
-      echo "<p>You'll be able to pay for your shirts once you've selected\n";
-      echo "shirts from the list available for " . CON_NAME . " and updated\n";
-      echo "your order.</p>\n";
-    }
-    else
-    {
-      echo "<p>You have paid for one or more unavailable shirts.  Please\n";
-      echo "update your order by selecting from the available shirts in the\n";
-      echo "dropdown list(s) and click the \"Update\" button.</p>\n";
-    }
-    $order->render_conversion_form($shirts);
+    return convert_unavailable_shirts($row->OrderId, $shirts);
   }
-  else
-    $shirts->render_sales_form($order);
+
+  $order = new StoreOrder();
+
+  // See if there are any unpaid orders in the database for this user?
+  $sql = 'SELECT * FROM StoreOrders';
+  $sql .= ' WHERE UserId=' . $_SESSION[SESSION_LOGIN_USER_ID];
+  $sql .= '   AND Status="Unpaid"';
+
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Query for StoreOrders record failed', $sql);
+
+  $row = mysql_fetch_object($result);
+  if ($row)
+  {
+    $order->load_from_row($row);
+    $order->populate_POST();
+  }
+
+  /*
+  // If it's past the shirt deadline, you can pay for existing orders
+  // but we're not accepting new orders
+  if (past_shirt_deadline())
+    return no_new_shirt_orders();
+  */
+
+  $shirts->render_sales_form($order);
 
   echo "<p>If you want a size that's not listed on the website,\n";
   echo 'please contact ' . NAME_OPS . " at $email.<p>\n";
@@ -893,6 +915,12 @@ function process_conversion_form()
   if (0 == $OrderId)
     return display_error("Invalid OrderId");
 
+  $Status = '';
+  if (array_key_exists('Status', $_POST))
+    $Status = trim($_POST['Status']);
+  if (('Paid' != $Status) && ('Unpaid' != $Status))
+    return display_error("Invalid status $Status");
+
   if ('Cancel' == $_POST['BtnAction'])
   {
     $sql = "UPDATE StoreOrders SET Status='Cancelled',";
@@ -945,6 +973,10 @@ function process_conversion_form()
   if (! $result)
     return display_mysql_error('StoreOrders update failed', $sql);
 
+  if ('Unpaid' == $Status)
+    return false;
+
+  StoreOrder::show_shirts_for_homepage();
   return true;
 }
 

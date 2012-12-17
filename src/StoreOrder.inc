@@ -271,18 +271,17 @@ class StoreOrder
     $first_line = true;
     foreach($this->entries as $entry)
     {
-      /*
       echo "<!--\n";
       print_r($this);
       echo "-->\n";
-      */
       if ($first_line)
 	$first_line = false;
       else
 	echo "<br />\n";
-      printf("%d %s %s\n",
+      printf("%d %s %s %s\n",
 	     $entry->quantity(),
 	     $entry->size(),
+	     $entry->color(),
 	     $entry->description());
     }
   }
@@ -376,6 +375,7 @@ class StoreOrder
     form_add_sequence();
     form_hidden_value('action', PROCESS_CONVERSION_FORM);
     form_hidden_value('OrderId', $this->order_id());
+    form_hidden_value('Status', $this->status());
 
     $this->render_hidden_entry_ids();
 
@@ -421,7 +421,9 @@ class StoreOrder
     $catelog->render_conversion_thumbnails();
   }
 
-  private static function show_status_shirts($status, $desc)
+  private static function show_status_shirts($status, $desc,
+					     &$matched_status,
+					     &$unavailable)
   {
     // Count up the number of shirts the user has paid for
     $sql  = 'SELECT StoreOrderEntries.Size, StoreOrderEntries.Quantity,';
@@ -444,12 +446,15 @@ class StoreOrder
     $fullimage = array();
     $singular = array();
     $plural = array();
-    $unavailable_count = 0;
 
     while ($row = mysql_fetch_object ($result))
     {
       if (0 == $row->Quantity)
 	continue;
+
+      $matched_status += $row->Quantity;
+      if ('N' == $row->Available)
+	$unavailable += $row->Quantity;
 
       $key = "$row->Size $row->Color $row->Gender $row->Style";
       if (array_key_exists($key, $count))
@@ -462,9 +467,6 @@ class StoreOrder
       }
       $singular[$key] = $row->Singular;
       $plural[$key] = $row->Plural;
-
-      if ('N' == $row->Available)
-	$unavailable_count += $row->Quantity;
     }
 
     // If we didn't find any shirts, we're done
@@ -491,50 +493,75 @@ class StoreOrder
     }
     echo "</table>\n";
 
-    if ($unavailable_count > 0)
-    {
-      echo "<p>You have ordered $unavailable_count shirt(s) that are no\n";
-      echo "longer available.  You must select one of the available shirts\n";
-      echo "using the <a href='Shirts.php'>Shirt Order Form</a>.</p>\n";
-    }
-
-  return true;
+    return true;
   }
 
   public static function show_shirts_for_homepage()
   {
+    $paid_displayed = 0;
+    $unpaid_displayed = 0;
+    $unavailable = 0;
+
     // Show any shirts the user has paid for
-    $paid_displayed = StoreOrder::show_status_shirts('Paid',
-				  'You have paid for the following shirts');
+    StoreOrder::show_status_shirts('Paid',
+				   'You have paid for the following shirt(s)',
+				   $paid_displayed, $unavailable);
 
     // Show any shirts the user hasn't paid for
-    $unpaid_displayed = StoreOrder::show_status_shirts('Unpaid',
-				    'Payment is still due for the following shirts');
-    if ($unpaid_displayed)
+    StoreOrder::show_status_shirts('Unpaid',
+    			           'Payment is still due for the following ' .
+				       'shirt(s)',
+				   $unpaid_displayed, $unavailable);
+
+    if ($_SESSION[SESSION_CON_IS_FROZEN])
     {
-      $shirts_displayed = true;
+      echo "The " . CON_NAME . " database is frozen.  No modifications are\n";
+      echo "allowed at this time.\n";
+      return;
+    }      
+
+    // If any unavailable shirts are ordered, they must be converted to
+    // available shirts before anything else happens
+    if ($unavailable > 0)
+    {
+      echo "<p>You have ordered $unavailable shirt(s) that are no\n";
+      echo "longer available.  You must select one of the available shirts\n";
+      echo "using the <a href='Shirts.php'>Shirt Order Form</a>.</p>\n";
+      return;
+    }
+
+    // If there are any unpaid for orders (for available shirts), they must
+    // be paid for before any more orders are placed.
+    if ($unpaid_displayed > 0)
+    {
       echo "<p>You can modify or pay for the pending order using the ";
       echo "<a href='Shirts.php'>Shirt Order Form</a>.</p>\n";
+      return;
     }
-    else if ($paid_displayed)
+
+    // If there are any paid orders, they can order more shirts if it's not
+    // past the shirt ordering deadline
+    if ($paid_displayed > 0)
     {
-      echo "<p>You can order more shirts using the <a href='Shirts.php'>Shirt\n";
-      echo "Order Form</a>.</p>\n";
+      if (! past_shirt_deadline())
+      {
+	echo '<p>You can order more shirts using the ';
+	echo "<a href='Shirts.php'>Shirt Order Form</a>.</p>\n";
+      }
+      return;
     }
+
+    echo '<p>You have not ordered any ' . CON_NAME . " Shirts.\n";
+    if (! past_shirt_deadline())
+      echo "Visit the <a href='Shirts.php'>Shirt Order Form</a> to order " .
+	   "shirts.<p>\n";
     else
     {
-      echo '<p>You have not ordered any ' . CON_NAME . " Shirts.\n";
-      if (! past_shirt_deadline())
-	echo "Visit the <a href='Shirts.php'>Shirt Order Form</a> to order " .
-	     "shirts.<p>\n";
-      else
-      {
-	echo "A limited number of shirts will be available at the con.\n";
-	echo "If you want a shirt, check at the registration desk to see\n";
-	echo "if any are available in your size.\n";
-      }
-      echo "</p>\n";
+      echo "A limited number of shirts will be available at the con.\n";
+      echo "If you want a shirt, check at the registration desk to see\n";
+      echo "if any are available in your size.\n";
     }
+    echo "</p>\n";
   }
 }
 
