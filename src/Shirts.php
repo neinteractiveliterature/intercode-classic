@@ -69,8 +69,15 @@ switch ($action)
     show_shirt_report();
     break;
 
-  case SHOW_INDIV_SHIRT_FORM:
-    show_indiv_shirt_form();
+  case SHOW_ADMIN_SHIRT_FORM:
+    show_admin_shirt_form();
+    break;
+
+  case PROCESS_ADMIN_SHIRT_FORM:
+    if (! process_admin_shirt_form())
+      show_admin_shirt_form();
+    else
+      show_shirt_report();
     break;
 
   case IMPORT_TSHIRTS:
@@ -420,7 +427,7 @@ function show_shirt_form()
     return no_new_shirt_orders();
   */
 
-  $shirts->render_sales_form($order);
+  $shirts->render_sales_form($order, false, PROCESS_SHIRT_FORM);
 
   echo "<p>If you want a size that's not listed on the website,\n";
   echo 'please contact ' . NAME_OPS . " at $email.<p>\n";
@@ -511,6 +518,13 @@ function build_paypal_url($OrderId, $cost)
 
 function process_shirt_form()
 {
+  /*
+  echo "<!-- process_shirt_form -->\n";
+  echo "<pre>\n";
+  print_r($_POST);
+  echo "</pre>\n";
+  */
+
   // Make sure the user hasn't used the back key
   if (out_of_sequence ())
     return display_sequence_error (false);
@@ -546,7 +560,8 @@ function process_shirt_form()
     return false;
 
   // Add the order to the database
-  $order->write_to_db();
+  if (! $order->write_to_db(false))
+    return false;
 
   // Display it to the user
   $order->list_entries();
@@ -577,6 +592,33 @@ function process_shirt_form()
 	  ADDR_SEND_CHECKS);
   echo "  </tr>\n";
   echo "</table>\n";
+
+  return true;
+}
+
+function process_admin_shirt_form()
+{
+  // Make sure the user hasn't used the back key
+  if (out_of_sequence ())
+    return display_sequence_error (false);
+  /*
+  echo "<p>process_shirt_form</p>\n";
+  echo "<pre>\n";
+  print_r($_POST);
+  echo "</pre>\n";
+  */
+
+  // Load the order information from the $_POST array
+  $order = new StoreOrder();
+  if (! $order->load_from_POST())
+    return false;
+
+  // Add the order to the database
+  if (! $order->write_to_db(true))
+    return false;
+
+  // Display it to the user
+  //  $order->list_entries();
 
   return true;
 }
@@ -703,10 +745,14 @@ function show_shirt_report ()
   echo "</tr>\n";
   while ($row = mysql_fetch_object($result))
   {
+    $bgcolor = '';
+    $payment = '';
     if ('Unpaid' == $row->Status)
       $bgcolor = " style=\"background-color: #ffcccc;\"";
     else
-      $bgcolor = '';
+      $payment = sprintf(' $%d.%02d',
+			 $row->PaymentCents / 100,
+			 $row->PaymentCents % 100);
 
     echo "<tr valign=\"top\"$bgcolor>\n";
     if ($can_edit)
@@ -714,8 +760,8 @@ function show_shirt_report ()
       echo "<td><a href=mailto:$row->EMail>$row->LastName, " .
 	"$row->FirstName</a></td>\n";
       printf("<td align=\"center\">" .
-	     "<a href=\"Shirts.php?action=%d&OrderId=%d\">%s</a></td>\n",
-	     SHOW_INDIV_SHIRT_FORM, $row->OrderId, $row->Status);
+	     "<a href=\"Shirts.php?action=%d&OrderId=%d\">%s%s</a></td>\n",
+	     SHOW_ADMIN_SHIRT_FORM, $row->OrderId, $row->Status, $payment);
     }
     else
     {
@@ -733,7 +779,7 @@ function show_shirt_report ()
   echo "</table>\n";
 }
 
-function show_indiv_shirt_form()
+function show_admin_shirt_form()
 {
   // Load the available shirts from the database
   $shirts = new StoreShirts();
@@ -753,9 +799,10 @@ function show_indiv_shirt_form()
     return false;
   $order->populate_POST();
 
-  display_header ('Shirt Order for ' . $order->user_name());
+  display_header ('Shirt Order # ' . $order->order_id() .
+		  ' - ' . $order->user_name());
 
-  $shirts->render_sales_form($order);
+  $shirts->render_sales_form($order, true, PROCESS_ADMIN_SHIRT_FORM);
 }
 
 function add_nonzero_entry(&$row, $size, $OrderId, &$shirts)

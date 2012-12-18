@@ -19,9 +19,24 @@ class StoreOrder
     $this->order_id = -1;
   }
 
+  public function last_updated() { return $this->last_updated; }
+
   public function order_id() { return $this->order_id; }
 
+  public function payment()
+  {
+    return sprintf("%d.%02d", $this->payment / 100, $this->payment % 100);
+  }
+
   public function status() { return $this->status; }
+
+  public function updated_by_name()
+  {
+    $name = 'Unknown';
+    user_id_to_name($this->updated_by_id, $name, true);
+
+    return $name;
+  }
 
   public function load_from_POST()
   {
@@ -40,6 +55,59 @@ class StoreOrder
 
     if (0 == $this->order_id)
       $ok = display_error("Failed to find OrderId in _POST data");
+
+    $this->status = '';
+    if (array_key_exists('Status', $_POST))
+    {
+      $this->status = trim($_POST['Status']);
+      if (('Unpaid' != $this->status) &&
+	  ('Paid' != $this->status) &&
+	  ('Cancelled' != $this->status))
+	$ok = display_error("Invalid status: $this->status");
+    }
+
+    if (array_key_exists('PaymentNote', $_POST))
+      $this->payment_note = trim($_POST['PaymentNote']);
+
+    $payment_ok = false;
+    if (array_key_exists('Payment', $_POST))
+    {
+      $Payment = $_POST['Payment'];
+      $dollars = 0;
+      $cents = 0;
+      $parts = explode('.', $Payment);
+      switch(count($parts))
+      {
+        case 1:
+	  if (! is_numeric($parts[0]))
+	    $ok = display_error("Invalid payment value: $Payment");
+	  else
+	  {
+	    $dollars = intval($parts[0]);
+	    $payment_ok = true;
+	  }  
+	  break;
+
+        case 2:
+	  if (! (is_numeric($parts[0]) && is_numeric($parts[1])))
+	    $ok = display_error("Invalid payment value: $Payment");
+	  else
+	  {
+	    $dollars = intval($parts[0]);
+	    $cents = intval($parts[1]);
+	    if (($cents > 99) || ($cents < 0))
+	      $ok = display_error("Invalid payment value: $Payment");
+	    else
+	      $payment_ok = true;
+	  }
+	  break;
+
+        default:
+	  $ok = display_error("Invalid payment value: $Payment");
+      }
+      if ($payment_ok)
+	$this->payment = ($dollars * 100) + $cents;
+    }
 
     foreach($_POST as $k => $v)
     {
@@ -136,6 +204,12 @@ class StoreOrder
   public function populate_POST()
   {
     $_POST['OrderId'] = $this->order_id;
+    $_POST['Status'] = $this->status;
+    $_POST['PaymentNote'] = $this->payment_note;
+    $_POST['Payment'] = sprintf("%d.%02d",
+				$this->payment / 100,
+				$this->payment % 100);
+
     foreach($this->entries as $entry)
     {
       $entry->populate_POST();
@@ -271,9 +345,8 @@ class StoreOrder
     $first_line = true;
     foreach($this->entries as $entry)
     {
-      echo "<!--\n";
-      print_r($this);
-      echo "-->\n";
+      if (0 == $entry->quantity())
+	continue;
       if ($first_line)
 	$first_line = false;
       else
@@ -286,7 +359,7 @@ class StoreOrder
     }
   }
 
-  public function write_to_db()
+  public function write_to_db($admin_form)
   {
     /*
     echo "<p>StoreOrder::write_to_db</n>\n";
@@ -301,16 +374,32 @@ class StoreOrder
     if (0 == $OrderId)
       return display_error('Invalid OrderId');
 
+    if ((-1 == $OrderId) && $admin_form)
+      return display_error('Admin interface not allowed to create new order');
+
     if (-1 == $OrderId)
       $cmd = 'INSERT';
     else
       $cmd = 'UPDATE';
 
     $sql = "$cmd StoreOrders SET ";
-    $sql .= build_sql_string('Status', 'Unpaid', false);
-    $sql .= build_sql_string('UserId', $_SESSION[SESSION_LOGIN_USER_ID]);
-    $sql .= build_sql_string('UpdatedById', $_SESSION[SESSION_LOGIN_USER_ID]);
-    if (-1 != $OrderId)
+    $sql .= build_sql_string('UpdatedById', $_SESSION[SESSION_LOGIN_USER_ID],
+			     false);
+    if (! $admin_form)
+      $sql .= build_sql_string('Status', 'Unpaid');
+    else
+    {
+      $sql .= build_sql_string('Status');
+      $sql .= build_sql_string('PaymentCents', $this->payment);
+      $sql .= build_sql_string('PaymentNote');
+    }
+
+    if (-1 == $OrderId)
+    {
+      // Only set the UserId when creating a new order
+      $sql .= build_sql_string('UserId', $_SESSION[SESSION_LOGIN_USER_ID]);
+    }
+    else
       $sql .= " WHERE OrderId=$OrderId";
 
     //    echo "<p>$sql</p>\n";
@@ -484,8 +573,9 @@ class StoreOrder
 	$noun = $plural[$k];
 
       echo "<tr>\n";
-      printf("<td><a href=\"img/%s\" target=\"_blank\">" .
-	     "<img src=\"img/%s\" alt=\"Click for larger image\" title=\"Click for larger image\"></a>" .
+      printf('<td><a href="img/%s" target="_blank">' .
+	     '<img src="img/%s" alt="Click for larger image"' .
+	           'title="Click for larger image"></a>' .
 	     "</td>\n", $fullimage[$k], $thumbnail[$k]);
       echo "<td>$v</td>\n";
       echo "<td>$k $noun</td>\n";

@@ -66,7 +66,7 @@ class StoreShirts
     return -1;
   }
 
-  public function render_sales_form($order)
+  public function render_sales_form($order, $admin_form, $action)
   {
     $OrderId = $order->order_id();
 
@@ -74,12 +74,14 @@ class StoreShirts
     /*
     echo "<pre>\n";
     print_r($order);
+    echo "\n\n_POST\n";
+    print_r($_POST);
     echo "</pre>\n";
     */
 
     echo "<form method=post action=Shirts.php>\n";
     form_add_sequence();
-    form_hidden_value('action', PROCESS_SHIRT_FORM);
+    form_hidden_value('action', $action);
     form_hidden_value('OrderId', $OrderId);
 
     if (-1 != $OrderId)
@@ -88,33 +90,64 @@ class StoreShirts
     echo "<table>\n";
     foreach ($this->catalog as $shirt)
     {
-      if ($shirt->for_sale())
+      $for_sale = $shirt->for_sale();
+
+      // Only include shirts that aren't for sale if this is the admin version
+      // of the form
+      if ($for_sale || $admin_form)
       {
-	echo "  <tr valign=\"top\">\n";
+	if (! $for_sale)
+	  $style = 'style="background-color: #cccccc; color: #777777;"';
+	else
+	  $style = '';
+
+	echo "  <tr valign=\"top\" $style>\n";
 	$shirt->render_thumbnail('td', 'align=\"center\" valign=\"middle\"');
-	echo '<td align="center">';
+	echo '<td align="center" style="padding:0px 5px;">';
 	$shirt->render_name(1);
 	echo '<br>';
 	$shirt->render_price();
-	echo " each <td>\n";
+	echo " each </td>\n";
 	$shirt->render_sizes_for_sale($this->available_sizes,
-				      'td', 'align="center" style="padding-left:10px;"');
+				      'td', 'align="center" style="padding:0px 5px;"');
 	echo "  </tr>\n";
       }
     }
+    echo "</table>\n";
+
+    if ($admin_form)
+    {
+      $status_options = array('Unpaid' => 'Unpaid',
+			      'Paid' => 'Paid',
+			      'Cancelled' => 'Cancelled');
+      echo "<table>\n";
+      form_dropdown_list($status_options, 'Status');
+      form_text(5, 'Payment');
+      form_text(60, 'Payment Note', 'PaymentNote', 120);
+      echo "<tr>\n";
+      echo "<td align=\"right\">Last Updated By:</td>\n";
+      printf("<td>%s</td>\n", $order->updated_by_name());
+      echo "</tr>\n";
+      echo "<tr>\n";
+      echo "<td align=\"right\">Last Updated:</td>\n";
+      printf("<td>%s</td>\n", $order->last_updated());
+      echo "</tr>\n";
+      echo "</table>\n";
+    }
 
     // Include Update (and optionally Cancel) button(s)
-    echo "<tr>\n";
-    printf ("<td colspan=\"%d\" align=\"center\">\n", 3 + $this->num_sizes());
+    echo "<p align=\"center\">\n";
+
     if (-1 == $OrderId)
       echo "<input type=\"submit\" name=\"BtnAction\" value=\"Submit\">\n";
     else
     {
       echo "<input type=\"submit\"  name=\"BtnAction\" value=\"Update\">\n";
-      echo "<input type=\"submit\"  name=\"BtnAction\" value=\"Cancel\">\n";
+      if (! $admin_form)
+	echo "<input type=\"submit\"  name=\"BtnAction\" value=\"Cancel\">\n";
     }
-    echo "</td>\n</tr>\n";
-    echo "</table>\n";
+
+    echo "</p>\n";
 
     echo "</form>\n";
   }

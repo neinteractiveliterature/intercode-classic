@@ -227,9 +227,10 @@ define('SHOW_SHIRT_FORM', 274);
 define('PROCESS_SHIRT_FORM', 275);
 define('SHOW_SHIRT_SUMMARY', 276);
 define('SHOW_SHIRT_REPORT', 277);
-define('SHOW_INDIV_SHIRT_FORM', 278);
+define('SHOW_ADMIN_SHIRT_FORM', 278);
 define('IMPORT_TSHIRTS', 279);
 define('PROCESS_CONVERSION_FORM', 280);
+define('PROCESS_ADMIN_SHIRT_FORM', 281);
 
 // Action values for SignupSpy
 
