@@ -304,35 +304,6 @@ function delete_store_item()
   StoreItem::delete_from_db();
 }
 
-function no_new_shirt_orders()
-{
-  $shirt_close = strftime ('%d-%b-%Y', parse_date (SHIRT_CLOSE));
-
-  // See if there are any unpaid orders in the database for this user?
-  $sql = 'SELECT * FROM StoreOrders';
-  $sql .= ' WHERE UserId=' . $_SESSION[SESSION_LOGIN_USER_ID];
-  $sql .= '   AND Status="Unpaid"';
-
-  $result = mysql_query($sql);
-  if (! $result)
-    return display_mysql_error('Query for StoreOrders record failed', $sql);
-
-  $row = mysql_fetch_object($result);
-  if (! $row)
-  {
-    // If you don't have an order pending and it's past the deadline you
-    // are SOL.  Try to buy one at the Con.
-    echo "The order deadline for shirts was $shirt_close.  When you\n";
-    echo "checking at registration at the con ask if there are any shirts\n";
-    echo "in your size.<p>\n";
-    return true;
-  }
-
-  $order = new StoreOrder();
-  $order->load_from_row($row);
-  $order->list_entries();
-}
-
 function convert_unavailable_shirts($OrderId, &$shirts)
 {
   $order = new StoreOrder();
@@ -373,16 +344,7 @@ function show_shirt_form()
   $shirts = new StoreShirts();
   if (! $shirts->load_from_db())
     return false;
-
-  echo "Only a small number of " . CON_NAME . " shirts will be available\n";
-  echo "for sale at the convention.  The only way to guarantee that you get\n";
-  echo "the shirt you want is to order and pay for it now.<p>\n";
-
-  // Display what's for sale
   $num_shirts = $shirts->num_available_shirts();
-  echo "<p>This year there are $num_shirts 100% cotton shirts available.\n";
-  echo "Click on a shirt image to see a larger image with details of the\n";
-  echo CON_NAME . " logo.</p>\n";
 
   // See if there are any orders with shirts that need to be converted
   $sql  = 'SELECT StoreOrders.OrderId';
@@ -399,6 +361,15 @@ function show_shirt_form()
   $row = mysql_fetch_object($result);
   if ($row)
   {
+    // Display what's for sale
+    echo "Only a small number of " . CON_NAME . " shirts will be available\n";
+    echo "for sale at the convention.  The only way to guarantee that you\n";
+    echo "get the shirt you want is to order and pay for it now.<p>\n";
+
+    echo "<p>This year there are $num_shirts 100% cotton shirts available.\n";
+    echo "Click on a shirt image to see a larger image with details of the\n";
+    echo CON_NAME . " logo.</p>\n";
+
     return convert_unavailable_shirts($row->OrderId, $shirts);
   }
 
@@ -419,13 +390,30 @@ function show_shirt_form()
     $order->load_from_row($row);
     $order->populate_POST();
   }
+  else
+  {
+    // If it's past the shirt deadline, you can pay for existing orders
+    // but we're not accepting new orders
+    if (past_shirt_deadline())
+    {
+      echo "<p>The deadline for ordering shirts was $shirt_close and no more\n";
+      echo "orders are being accepted online.</p>\n";
+      echo "A small number of " . CON_NAME . " shirts will be available for\n";
+      echo "for sale at the convention. Ask at the con registration desk\n";
+      echo "when you checkin if there are any shirts available in your size.\n";
+      echo "</p>\n";
+      return true;
+    }
+  }
 
-  /*
-  // If it's past the shirt deadline, you can pay for existing orders
-  // but we're not accepting new orders
-  if (past_shirt_deadline())
-    return no_new_shirt_orders();
-  */
+  // Display what's for sale
+  echo "Only a small number of " . CON_NAME . " shirts will be available\n";
+  echo "for sale at the convention.  The only way to guarantee that you get\n";
+  echo "the shirt you want is to order and pay for it now.<p>\n";
+
+  echo "<p>This year there are $num_shirts 100% cotton shirts available.\n";
+  echo "Click on a shirt image to see a larger image with details of the\n";
+  echo CON_NAME . " logo.</p>\n";
 
   $shirts->render_sales_form($order, false, PROCESS_SHIRT_FORM);
 
