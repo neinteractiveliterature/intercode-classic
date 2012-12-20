@@ -501,7 +501,8 @@ class StoreOrder
     echo "<tr>\n";
     echo "<td colspan=\"3\" align=\"center\">\n";
     echo "<input type=\"submit\"  name=\"BtnAction\" value=\"Update\">\n";
-    echo "<input type=\"submit\"  name=\"BtnAction\" value=\"Cancel\">\n";
+    if ('Paid' != $this->status)
+      echo "<input type=\"submit\"  name=\"BtnAction\" value=\"Cancel\">\n";
     echo "</td>\n</tr>\n";
     echo "</table>\n";
 
