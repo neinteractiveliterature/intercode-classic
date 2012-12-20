@@ -229,7 +229,58 @@ function ampm_time($h)
  * Write per-room entry for the specified day
  */
 
-function write_room_report($room, $day, $day_title)
+function write_room_report($RoomId, $day, $day_title)
+{
+  $sql  = 'SELECT Events.Title, Events.Hours,';
+  $sql .= '       Runs.TitleSuffix, Runs.Day, Runs.StartHour';
+  $sql .= '  FROM RunsRooms,Runs,Events';
+  $sql .= " WHERE RunsRooms.RoomId=$RoomId";
+  $sql .= '   AND Runs.RunId=RunsRooms.RunId';
+  $sql .= '   AND Events.EventId=Runs.EventId';
+  $sql .= "   AND Runs.Day='$day'";
+
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Query for room report failed', $sql);
+
+  echo "  <tr>\n";
+  echo "    <th colspan=\"2\" align=\"left\">$day_title</th>\n";
+  echo "  </tr>\n";
+
+  while ($row = mysql_fetch_object($result))
+  {
+    echo "  <tr valign=\"top\">\n";
+    /*
+    printf ("    <td align=\"right\">&nbsp;%s - %s&nbsp;</th>\n",
+	    ampm_time($row->StartHour),
+	    ampm_time($row->StartHour + $row->Hours));
+    */
+    printf ("    <td>&nbsp;%02d:00 - %02d:00&nbsp;</th>\n",
+	    $row->StartHour, $row->StartHour + $row->Hours);
+    echo "    <td>$row->Title $row->TitleSuffix";
+    /*
+    $rooms_array = explode(',', $row->Rooms);
+    if (count($rooms_array) > 1)
+    {
+      $a = array();
+      foreach($rooms_array as $r)
+      {
+	if ($r != $room)
+	  array_push($a, $r);
+      }
+
+      $other_rooms = pretty_rooms(implode(',', $a));
+      echo "<br><small>Also in: $other_rooms</small>";
+    }
+    */
+    echo "</td>\n";
+    echo "  </tr>\n";
+  }
+
+  echo "  <tr><td colspan=\"2\">&nbsp;</td></tr>\n";
+}
+
+function old_write_room_report($RoomId, $day, $day_title)
 {
   $sql = 'SELECT Runs.StartHour, Events.Title, Events.Hours,';
   $sql .= " room_names(Runs.RunId) Rooms";
@@ -284,6 +335,41 @@ function write_room_report($room, $day, $day_title)
  */
 
 function report_per_room ()
+{
+  // We'll need the year
+  $y = date ('Y');
+
+  // Fetch the set of rooms
+  $sql = 'SELECT RoomId,RoomName FROM Rooms ORDER BY RoomName';
+
+  $result = mysql_query ($sql);
+  if (! $result)
+    return display_mysql_error ('Query for list of Con rooms failed', $sql);
+
+  while ($row = mysql_fetch_object ($result))
+  {
+    echo "<div class=print_logo_break_before><img src=PageBanner.png></div>\n";
+
+    echo "<font size=\"+3\"><b>$row->RoomName</b></font><p>\n";
+
+    echo "<table>\n";
+    write_room_report ($row->RoomId, 'Fri', FRI_TEXT);
+    write_room_report ($row->RoomId, 'Sat', SAT_TEXT);
+    write_room_report ($row->RoomId, 'Sun', SUN_TEXT);
+    echo "</table>\n";
+  }
+
+  // Suppress the copyright display
+  return true;
+}
+
+/*
+ * report_per_room
+ *
+ * Dump a per-room report for all the rooms at the Con
+ */
+
+function old_report_per_room ()
 {
   // We'll need the year
   $y = date ('Y');
