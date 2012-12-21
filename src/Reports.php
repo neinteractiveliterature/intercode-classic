@@ -223,6 +223,31 @@ function ampm_time($h)
   return "$hour $suffix";
 }
 
+function also_in_rooms($RoomId, $RunId)
+{
+  $sql  = 'SELECT RoomName';
+  $sql .= '  FROM Rooms,RunsRooms';
+  $sql .= " WHERE RunsRooms.RunId=$RunId";
+  $sql .= "   AND RunsRooms.RoomId!=$RoomId";
+  $sql .= '   AND Rooms.RoomId=RunsRooms.RoomId';
+
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error('Query for other rooms failed', $sql);
+
+  // If there are no additional rooms, we're done
+  if (0 == mysql_num_rows($result))
+    return true;
+
+  // Gather the additional rooms together and print them out
+  $a = array();
+  while($row = mysql_fetch_object($result))
+    $a[] = $row->RoomName;
+
+  $other_rooms = pretty_rooms(implode(',', $a));
+  echo "<br /><small>Also in $other_rooms</small>";
+}
+
 /*
  * write_room_report
  *
@@ -232,7 +257,7 @@ function ampm_time($h)
 function write_room_report($RoomId, $day, $day_title)
 {
   $sql  = 'SELECT Events.Title, Events.Hours,';
-  $sql .= '       Runs.TitleSuffix, Runs.Day, Runs.StartHour';
+  $sql .= '       Runs.TitleSuffix, Runs.Day, Runs.StartHour, Runs.RunId';
   $sql .= '  FROM RunsRooms,Runs,Events';
   $sql .= " WHERE RunsRooms.RoomId=$RoomId";
   $sql .= '   AND Runs.RunId=RunsRooms.RunId';
@@ -258,69 +283,7 @@ function write_room_report($RoomId, $day, $day_title)
     printf ("    <td>&nbsp;%02d:00 - %02d:00&nbsp;</th>\n",
 	    $row->StartHour, $row->StartHour + $row->Hours);
     echo "    <td>$row->Title $row->TitleSuffix";
-    /*
-    $rooms_array = explode(',', $row->Rooms);
-    if (count($rooms_array) > 1)
-    {
-      $a = array();
-      foreach($rooms_array as $r)
-      {
-	if ($r != $room)
-	  array_push($a, $r);
-      }
-
-      $other_rooms = pretty_rooms(implode(',', $a));
-      echo "<br><small>Also in: $other_rooms</small>";
-    }
-    */
-    echo "</td>\n";
-    echo "  </tr>\n";
-  }
-
-  echo "  <tr><td colspan=\"2\">&nbsp;</td></tr>\n";
-}
-
-function old_write_room_report($RoomId, $day, $day_title)
-{
-  $sql = 'SELECT Runs.StartHour, Events.Title, Events.Hours,';
-  $sql .= " room_names(Runs.RunId) Rooms";
-  $sql .= ' FROM Events';
-  $sql .= ' INNER JOIN Runs ON Runs.EventId = Events.EventId';
-  $sql .= " WHERE Runs.Day='$day'";
-  $sql .= "   AND FIND_IN_SET('$room', Runs.Rooms) > 0";
-  $sql .= ' ORDER BY Runs.StartHour';
-  $result = mysql_query($sql);
-  if (! $result)
-    return display_mysql_error('Query for room report failed', $sql);
-
-  echo "  <tr>\n";
-  echo "    <th colspan=\"2\" align=\"left\">$day_title</th>\n";
-  echo "  </tr>\n";
-
-  while ($row = mysql_fetch_object($result))
-  {
-    echo "  <tr valign=\"top\">\n";
-    /*
-    printf ("    <td align=\"right\">&nbsp;%s - %s&nbsp;</th>\n",
-	    ampm_time($row->StartHour),
-	    ampm_time($row->StartHour + $row->Hours));
-    */
-    printf ("    <td>&nbsp;%02d:00 - %02d:00&nbsp;</th>\n",
-	    $row->StartHour, $row->StartHour + $row->Hours);
-    echo "    <td>$row->Title";
-    $rooms_array = explode(',', $row->Rooms);
-    if (count($rooms_array) > 1)
-    {
-      $a = array();
-      foreach($rooms_array as $r)
-      {
-	if ($r != $room)
-	  array_push($a, $r);
-      }
-
-      $other_rooms = pretty_rooms(implode(',', $a));
-      echo "<br><small>Also in: $other_rooms</small>";
-    }
+    also_in_rooms($RoomId, $row->RunId);
     echo "</td>\n";
     echo "  </tr>\n";
   }
