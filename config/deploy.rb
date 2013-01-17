@@ -1,4 +1,4 @@
-set :application, "intercon-m"
+set :application, "intercon-n"
 set :user, "neiladmin"
 set :domain, "#{user}@apocalypse.dreamhost.com"
 set :repository, "file:///home/#{user}/svn/intercon/trunk/src"
