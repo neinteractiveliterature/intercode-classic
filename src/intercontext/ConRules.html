@@ -1,3 +1,10 @@
+<?php
+function withdrawal_mail($display, $email)
+{
+   $url = "mailto:$email?subject=" . urlencode('['.CON_NAME.'] Withdrawal');
+   echo "<a href=\"$url\">$display</a>";
+}
+?>
 <h1>New England Intercon Convention Rules</h1>
 
 <h2>The Most Important Rule of All</h2>
@@ -43,6 +50,10 @@ If you know in advance that you cannot make a game, please let the GMs or Operat
 
 <h2>Violations</h2>
 <p>Anyone found violating any of the above policies may be subject to ejection from Intercon without refund.  Intercon reserves the right to expel anyone for any reason, with or without warning.</p>
+
+<h2>Withdrawing from the Con</h2>
+<p>To withdraw from the Con, email the <?php withdrawal_mail('ConChair', EMAIL_CON_CHAIR); ?> and <?php withdrawal_mail('Registrar', EMAIL_REGISTRAR); ?>.</p>
+<p>If you withdraw from the Con more than 30 days before the Convention you are eligible for a full refund.  Withdrawals within 30 days of the Convention are eligible for a refund or membership in next year's Con at the discretion of the ConChair.</p>
 
 <h1>Hotel Rules</h1>
 
