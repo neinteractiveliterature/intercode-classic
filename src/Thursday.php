@@ -1002,6 +1002,7 @@ function process_precon_event_form()
   $sql .= build_sql_string('Title', $_REQUEST['Title'], false);
   $sql .= build_sql_string('Hours');
   $sql .= build_sql_string('SpecialRequests');
+  $sql .= build_sql_string('Thursday20');
   $sql .= build_sql_string('Thursday21');
   $sql .= build_sql_string('Thursday22');
   $sql .= build_sql_string('Thursday23');
@@ -1302,6 +1303,7 @@ function show_status_form()
   echo "    <td>\n";
   echo "      <select name=\"StartTime\">\n";
   echo "        <option value=\"None\" $none_selected>None</option>\n";
+  scheduling_start_option('Thursday', 20, '');
   scheduling_start_option('Thursday', 21, '');
   scheduling_start_option('Thursday', 22, '');
   scheduling_start_option('Thursday', 23, '');
@@ -1324,8 +1326,8 @@ function show_status_form()
   echo "  <tr>\n";
   echo "    <td colspan=\"2\">\n";
   echo "      <table border=\"1\">\n";
-  
-  scheduling_preference_row('Thursday', 21, $ary, 3);
+  scheduling_preference_row('Thursday', 20, $ary, 4);  
+  scheduling_preference_row('Thursday', 21, $ary);
   scheduling_preference_row('Thursday', 22, $ary);
   scheduling_preference_row('Thursday', 23, $ary);
   scheduling_preference_row('Friday', 9, $ary, 9);
