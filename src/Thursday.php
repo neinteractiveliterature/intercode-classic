@@ -1488,6 +1488,11 @@ function process_status_form()
     case 'None':
       return true;  // We're done!
 
+    case 'Thursday20':
+      $day = 'Thu';
+      $hour = 20;
+      break;
+
     case 'Thursday21':
       $day = 'Thu';
       $hour = 21;
