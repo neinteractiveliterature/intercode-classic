@@ -1651,6 +1651,7 @@ function show_run_form()
   echo "    <td>\n";
   echo "      <select name=\"StartTime\">\n";
   echo "        <option value=\"None\" $none_selected>None</option>\n";
+  scheduling_start_option('Thursday', 20, $start_time_selection);
   scheduling_start_option('Thursday', 21, $start_time_selection);
   scheduling_start_option('Thursday', 22, $start_time_selection);
   scheduling_start_option('Thursday', 23, $start_time_selection);
