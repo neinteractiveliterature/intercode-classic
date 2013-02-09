@@ -1,7 +1,7 @@
 set :application, "intercon-m"
 set :user, "neiladmin"
 set :domain, "#{user}@apocalypse.dreamhost.com"
-set :repository, "file:///home/#{user}/svn/intercon/trunk/src"
+set :repository, "file:///home/#{user}/svn/intercon/branches/M/src"
 set :skip_scm, false
 
 task :sandbox do
