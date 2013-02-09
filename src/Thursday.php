@@ -258,6 +258,7 @@ function thursday_thing()
 //  echo "#precon_top td h3 { background-color: black; color: white; font-size: 100%; padding: 0; text-align: center; }\n";
   echo "</style>\n";
 
+  /*
   echo "<table id=\"precon_top\"><tr>";
   $paid = false;
   $url = '';
@@ -271,6 +272,7 @@ function thursday_thing()
   echo "</td>\n";
   
   echo "</tr></table>\n\n";
+  */
 
   echo "<p>If you have any questions about the Pre-Convention, we'd be happy to";
   echo " help.  Email the Pre-Convention coordinator, ".NAME_THURSDAY.", at ";
