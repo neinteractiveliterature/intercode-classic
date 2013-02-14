@@ -1296,7 +1296,7 @@ function report_users_csv ()
   $sql = 'SELECT Users.UserId UserId, FirstName, Nickname, LastName, EMail, CanSignup, LastLogin, ';
   $sql .= ' (SELECT Status FROM Thursday WHERE Thursday.UserId = Users.UserId AND Status = "Paid") ThursdayStatus,';
   $sql .= ' (SELECT SUM(Quantity) FROM DeadDog WHERE DeadDog.UserId = Users.UserId AND Status = "Paid") DeadDogTickets,';
-  $sql .= " (SELECT GROUP_CONCAT(CONCAT(Quantity, ' ', Size, ' ', Color, ' ', Style, ' ', IF(Quantity = 1, Singular, Plural), ' (', StoreOrders.Status, ')') SEPARATOR ', ') ShirtOrders FROM StoreOrders LEFT JOIN StoreOrderEntries ON StoreOrders.OrderId = StoreOrderEntries.OrderId LEFT JOIN StoreItems ON StoreOrderEntries.ItemId = StoreItems.ItemId WHERE StoreOrders.Status != 'Cancelled' AND StoreOrders.UserId = Users.UserId) ShirtOrders";
+  $sql .= " (SELECT GROUP_CONCAT(CONCAT(Quantity, ' ', Size, ' ', Color, ' ', Style, ' ', IF(Quantity = 1, Singular, Plural), ' (', StoreOrders.Status, ')') SEPARATOR ', ') ShirtOrders FROM StoreOrders LEFT JOIN StoreOrderEntries ON StoreOrders.OrderId = StoreOrderEntries.OrderId LEFT JOIN StoreItems ON StoreOrderEntries.ItemId = StoreItems.ItemId WHERE StoreOrders.Status != 'Cancelled' AND Quantity > 0 AND StoreOrders.UserId = Users.UserId) ShirtOrders";
   $sql .= ' FROM Users';
 //  $sql .= ' WHERE CanSignup<>"Alumni"';
 //  $sql .= '   AND LastName<>"Admin"';
