@@ -1295,17 +1295,18 @@ function report_users_csv ()
 
   $sql = 'SELECT Users.UserId UserId, FirstName, Nickname, LastName, EMail, CanSignup, LastLogin, ';
   $sql .= ' (SELECT Status FROM Thursday WHERE Thursday.UserId = Users.UserId AND Status = "Paid") ThursdayStatus,';
-  $sql .= ' (SELECT SUM(Quantity) FROM DeadDog WHERE DeadDog.UserId = Users.UserId AND Status = "Paid") DeadDogTickets';
+  $sql .= ' (SELECT SUM(Quantity) FROM DeadDog WHERE DeadDog.UserId = Users.UserId AND Status = "Paid") DeadDogTickets,';
+  $sql .= " (SELECT GROUP_CONCAT(CONCAT(Quantity, ' ', Size, ' ', Color, ' ', Style, ' ', IF(Quantity = 1, Singular, Plural), ' (', StoreOrders.Status, ')') SEPARATOR ', ') ShirtOrders FROM StoreOrders LEFT JOIN StoreOrderEntries ON StoreOrders.OrderId = StoreOrderEntries.OrderId LEFT JOIN StoreItems ON StoreOrderEntries.ItemId = StoreItems.ItemId WHERE StoreOrders.Status != 'Cancelled' AND StoreOrders.UserId = Users.UserId) ShirtOrders";
   $sql .= ' FROM Users';
 //  $sql .= ' WHERE CanSignup<>"Alumni"';
 //  $sql .= '   AND LastName<>"Admin"';
   $sql .= ' ORDER BY LastName, FirstName';
+  
+//  SELECT Users.UserId UserId, GROUP_CONCAT(CONCAT(Quantity, ' ', Size, ' ', Color, ' ', Style, ' ', Singular, ' (', StoreOrders.Status, ')') SEPARATOR ', ') ShirtOrders FROM Users LEFT JOIN StoreOrders ON StoreOrders.UserId = Users.UserId LEFT JOIN StoreOrderEntries ON StoreOrders.OrderId = StoreOrderEntries.OrderId LEFT JOIN StoreItems ON StoreOrderEntries.ItemId = StoreItems.ItemId WHERE StoreOrders.Status != 'Cancelled'
 
   $result = mysql_query ($sql);
   if (! $result)
     return display_mysql_error ('Query for users failed');
-
-  $userShirts = count_tshirts_by_user();
 
   echo "\"LastName\",\"FirstName\",\"Nickname\",\"EMail\",\"Status\",\"LastLogin\",\"ShirtOrder\",\"PreCon\",\"DeadDogTickets\"\n";
 
@@ -1316,55 +1317,12 @@ function report_users_csv ()
     echo "\"$row->Nickname\",";
     echo "\"$row->EMail\",";
     echo "\"$row->CanSignup\",";
-    echo "\"$row->LastLogin\",";
-    
-    echo "\"";
-    if (array_key_exists($row->UserId, $userShirts)) {
-        $paidShirts = $userShirts[$row->UserId]["Paid"];
-        if (count($paidShirts) > 0)
-            report_users_csv_tshirts ($row->UserId, $paidShirts, "Paid");
-        $unpaidShirts = $userShirts[$row->UserId]["Unpaid"];
-        if (count($unpaidShirts) > 0)
-            report_users_csv_tshirts ($row->UserId, $unpaidShirts, "Unpaid");
-    }
-    echo "\",";
+    echo "\"$row->LastLogin\",";    
+    echo "\"$row->ShirtOrders\",";
     echo "\"$row->ThursdayStatus\",";
     echo "\"$row->DeadDogTickets\"";
     echo "\n";
   }
-}
-
-function report_users_csv_tshirts ($user_id, $shirtCount, $status)
-{
-  $order = '';
-  $count = 0;
-
-  $shirtShortName = "(P)";
-  $shirt2ShortName = "(B)";
-
-  build_order_string ($shirtCount["Small"],   'S',   $order, $count, $shirtShortName);
-  build_order_string ($shirtCount["Medium"],  'M',   $order, $count, $shirtShortName);
-  build_order_string ($shirtCount["Large"],   'L',   $order, $count, $shirtShortName);
-  build_order_string ($shirtCount["XLarge"],  'XL',  $order, $count, $shirtShortName);
-  build_order_string ($shirtCount["XXLarge"], 'XXL', $order, $count, $shirtShortName);
-  build_order_string ($shirtCount["X3Large"], '3XL', $order, $count, $shirtShortName);
-  build_order_string ($shirtCount["X4Large"], '4XL', $order, $count, $shirtShortName);
-  build_order_string ($shirtCount["X5Large"], '5XL', $order, $count, $shirtShortName);
-
-  build_order_string ($shirtCount["Small_2"],   'S',   $order, $count, $shirt2ShortName);
-  build_order_string ($shirtCount["Medium_2"],  'M',   $order, $count, $shirt2ShortName);
-  build_order_string ($shirtCount["Large_2"],   'L',   $order, $count, $shirt2ShortName);
-  build_order_string ($shirtCount["XLarge_2"],  'XL',  $order, $count, $shirt2ShortName);
-  build_order_string ($shirtCount["XXLarge_2"], 'XXL', $order, $count, $shirt2ShortName);
-  build_order_string ($shirtCount["X3Large_2"], '3XL', $order, $count, $shirt2ShortName);
-  build_order_string ($shirtCount["X4Large_2"], '4XL', $order, $count, $shirt2ShortName);
-  build_order_string ($shirtCount["X5Large_2"], '5XL', $order, $count, $shirt2ShortName);
-
-  if ("Unpaid" == $status) {
-      $order .= " - UNPAID";
-  }
-  
-  echo $order;
 }
 
 /*
