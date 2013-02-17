@@ -484,7 +484,7 @@ function write_user_report ($name, $user_id)
   $sql .= ' INNER JOIN Events ON Events.EventId=Runs.EventId';
   $sql .= ' WHERE Signup.State!="Withdrawn"';
   $sql .= "   AND Signup.UserId=$user_id";
-  $sql .= ' ORDER BY Day, StartHour';
+  $sql .= ' ORDER BY Day, CAST(Runs.StartHour AS SIGNED)';
 
   $result = mysql_query ($sql);
   if (! $result)
@@ -818,7 +818,7 @@ function report_volunteer_track ($is_ops)
   $sql .= ' WHERE Events.EventId=Runs.EventId';
   $sql .= '   AND SpecialEvent=0';
   $sql .= '   AND ' . $Where;
-  $sql .= ' ORDER BY Runs.Day, Runs.StartHour';
+  $sql .= ' ORDER BY Runs.Day, CAST(Runs.StartHour AS SIGNED)';
 
   $result = mysql_query ($sql);
   if (! $result)
@@ -1206,7 +1206,7 @@ function report_games_by_time ($day)
   $sql .= " WHERE Day='$day'";
   $sql .= '   AND Events.SpecialEvent=0';
   $sql .= '   AND IsOps="N"';
-  $sql .= ' ORDER BY StartHour, Title';
+  $sql .= ' ORDER BY CAST(Runs.StartHour AS SIGNED), Title';
 
   $result = mysql_query ($sql);
   if (! $result)
