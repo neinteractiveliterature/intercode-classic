@@ -263,6 +263,7 @@ function write_room_report($RoomId, $day, $day_title)
   $sql .= '   AND Runs.RunId=RunsRooms.RunId';
   $sql .= '   AND Events.EventId=Runs.EventId';
   $sql .= "   AND Runs.Day='$day'";
+  $sql .= ' ORDER BY CAST(Runs.StartHour AS SIGNED)';
 
   $result = mysql_query($sql);
   if (! $result)
