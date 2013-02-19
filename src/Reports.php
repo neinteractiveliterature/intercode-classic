@@ -312,7 +312,7 @@ function report_per_room ()
 
   while ($row = mysql_fetch_object ($result))
   {
-    echo "<div class=print_logo_break_before><img src=PageBanner.png></div>\n";
+    echo "<div class=print_logo_break_before style=\"page-break-before: always\"><img src=PageBanner.png></div>\n";
 
     echo "<font size=\"+3\"><b>$row->RoomName</b></font><p>\n";
 
@@ -323,7 +323,7 @@ function report_per_room ()
     echo "</table>\n";
   }
 
-  // Suppress the copyright display
+  // Suppress the copyright displayt
   return true;
 }
 
