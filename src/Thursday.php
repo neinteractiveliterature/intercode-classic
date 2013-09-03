@@ -132,7 +132,10 @@ function list_accepted_events()
   }
   
   mysql_free_result($result);
-  
+
+  if (0 == sizeof($runs))
+    return;
+
   $thursday->computeRunDimensions();
   $friday->computeRunDimensions();
   
