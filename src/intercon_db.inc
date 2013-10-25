@@ -153,6 +153,7 @@ define ('BID_FEEDBACK_BY_ENTRY', 200);
 define ('BID_FEEDBACK_PROCESS_ENTRY', 201);
 define ('BID_FEEDBACK_BY_CONCOM', 202);
 define ('BID_FEEDBACK_PROCESS_BY_CONCOM', 203);
+define ('BID_CHOOSE_GAME_TYPE', 204);
 
 // Action values in ListGames.php
 

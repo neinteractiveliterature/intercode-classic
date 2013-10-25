@@ -668,7 +668,7 @@ function display_choose_form ()
  
   form_hidden_value ('action', BID_GAME);
  
-  form_game_type ('What is your event?', 'GameType');
+  //  form_game_type ('What is your event?', 'GameType');
   
   echo "<tr><td>&nbsp;</td></tr>\n";
   
@@ -1286,7 +1286,7 @@ function process_bid_form ()
 
   if ($EditGameInfo)
   {
-    $form_ok &= validate_string ('GameType');
+    //    $form_ok &= validate_string ('GameType');
     $form_ok &= validate_string ('Title');
     $form_ok &= validate_string ('Author');
     $form_ok &= validate_string ('GameEMail', 'EMail for game inquiries');
