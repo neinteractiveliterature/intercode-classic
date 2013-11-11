@@ -2703,6 +2703,7 @@ function notify_about_event_changes ($EventId, $row)
 	      'MinPlayersFemale', 'PrefPlayersFemale', 'MaxPlayersFemale',
 	      'MinPlayersNeutral', 'PrefPlayersNeutral', 'MaxPlayersNeutral',
 	      'Hours');
+  $b = array ('Title', 'Description', 'ShortBlurb');
 
   $changes = '';
   foreach ($a as $key)
@@ -2710,6 +2711,17 @@ function notify_about_event_changes ($EventId, $row)
     if ($_REQUEST[$key] != $row[$key])
     {
       $changes .= sprintf ("%s changed from %d to %d\n",
+			   $key,
+			   $row[$key],
+			   $_REQUEST[$key]);
+    }
+  }
+
+  foreach ($b as $key)
+  {
+    if ($_REQUEST[$key] != $row[$key])
+    {
+      $changes .= sprintf ("%s changed from\n\n\"%s\"\n\n-- to --\n\n\"%s\"\n",
 			   $key,
 			   $row[$key],
 			   $_REQUEST[$key]);
@@ -2802,7 +2814,7 @@ function add_game ()
     $sql = 'SELECT MaxPlayersMale, MaxPlayersFemale, MaxPlayersNeutral,';
     $sql .= '  MinPlayersMale, MinPlayersFemale, MinPlayersNeutral,';
     $sql .= '  PrefPlayersMale, PrefPlayersFemale, PrefPlayersNeutral,';
-    $sql .= '  Hours';
+    $sql .= '  Hours, Title, Description, ShortBlurb';
     $sql .= '  FROM Events';
     $sql .= "  WHERE EventId=$EventId";
 
