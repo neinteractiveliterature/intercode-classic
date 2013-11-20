@@ -654,11 +654,11 @@ function display_choose_form ()
   // Make sure that the user is logged in
 
   if (! isset ($_SESSION[SESSION_LOGIN_USER_ID]))
-    return display_error ('You must login before submitting a bid');
+    return display_error ('You must login before submitting a game proposal');
   
-  display_header ('Bid an event for ' . CON_NAME);
+  display_header ('Propose an event for ' . CON_NAME);
 
-  echo ("<p>Before you can bid an event for ". CON_NAME );
+  echo ("<p>Before you can propose an event for ". CON_NAME );
   echo (", we need to know what type of event it is.</p>\n");
   
   echo "<form method=\"POST\" action=\"Bids.php\">\n";
@@ -693,7 +693,7 @@ function display_bid_form ($first_try)
   // Make sure that the user is logged in
 
   if (! isset ($_SESSION[SESSION_LOGIN_USER_ID]))
-    return display_error ('You must login before submitting a bid');
+    return display_error ('You must login before submitting a game proposal');
 
   // If we're updating a bid, grab the bid ID
 
@@ -732,9 +732,9 @@ function display_bid_form ($first_try)
   if (0 == $BidId)
   {
     if ($gametype == 'Other')
-        display_header ("Bid an event for " . CON_NAME);
+        display_header ("Propose an event for " . CON_NAME);
     else
-        display_header ("Bid a {$gametype} for " . CON_NAME);
+        display_header ("Propose a {$gametype} for " . CON_NAME);
   }
   else
   {
@@ -973,7 +973,7 @@ function display_bid_form ($first_try)
   if ($gametype == 'LARP' || $gametype == 'Tabletop RPG')
   {
       $text = "<b>GMs for your game.</b>  Note that the GMs listed here are only for\n";
-      $text .= "the purpose of evaluating your bid.  If your bid is accepted,\n";
+      $text .= "the purpose of evaluating your proposal.  If your proposal is accepted,\n";
       $text .= "you'll be able to select GMs from the users registered for\n";
       $text .= CON_NAME . ".\n";
       /*$text .= "Each accepted bid is allowed two comp'd attendees\n";
@@ -1066,7 +1066,7 @@ function display_bid_form ($first_try)
   echo "     opposing requirements, please answer the following questions.\n";
   echo "     <p>\n";
   echo "     Note that answering yes to any or all of these questions\n";
-  echo "     does not disqualify your bid.  ";
+  echo "     does not disqualify your proposal.  ";
   /*echo CON_NAME." has run several great\n";
   echo "     games that push these boundries and will continue to do so.\n";*/
   echo "    </TD>\n";
@@ -1155,7 +1155,7 @@ function display_bid_form ($first_try)
 
   $text = "Are there any other scheduling constraints on your {$thingstring}?  For\n";
   //$text .= "example, are you a GM for another game?  Any times your game\n";
-  $text .= "example, are bidding another event?  Any times your {$thingstring}\n";
+  $text .= "example, are you proposing another event?  Any times your {$thingstring}\n";
   $text .= "cannot be scheduled?";
   form_textarea ($text, 'SchedulingConstraints', 5);
 
@@ -1267,7 +1267,7 @@ function process_bid_form ()
   // Make sure that the user is logged in
 
   if (! isset ($_SESSION[SESSION_LOGIN_USER_ID]))
-    return display_error ('You must login before submitting a bid');
+    return display_error ('You must login before submitting a game proposal');
 
   $BidId = intval (trim ($_REQUEST['BidId']));
   $EditGameInfo = intval (trim ($_REQUEST['EditGameInfo']));
@@ -1776,14 +1776,26 @@ function display_bids_for_review ()
     echo "    <TD>$row->Max</TD>\n";
     echo "    <TD>$row->Hours</TD>\n";
 
-	global $CON_DAYS;
-	global $BID_SLOTS;
+    global $CON_DAYS;
+    global $BID_SLOTS;
 
-  	foreach ($CON_DAYS as $day)
-  		foreach ($BID_SLOTS[$day] as $slot) {
-  			$key = $day.'_'.$slot;
-  			echo "    <TD>" . table_value ($bidtimes[$key]) . "</TD>\n";
-  	    }
+    echo "<!-- \n";
+    echo "CON_DAYS:\n";
+    print_r($CON_DAYS);
+    echo "BID_SLOTS:\n";
+    print_r($BID_SLOTS);
+    echo "bidtimes:\n";
+    print_r($bidtimes);
+    echo "-->\n";
+
+    foreach ($CON_DAYS as $day)
+    {
+      foreach ($BID_SLOTS[$day] as $slot)
+      {
+	$key = $day.'_'.$slot;
+	echo "    <TD>" . table_value ($bidtimes[$key]) . "</TD>\n";
+      }
+    }
 
     if (user_has_priv (PRIV_BID_CHAIR))
       printf ("    <TD><A HREF=Bids.php?action=%d&BidId=%d>$row->Status</A></TD>\n",

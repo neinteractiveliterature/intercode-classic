@@ -72,13 +72,13 @@ function display_bid_intro ()
   echo "<table cellspacing=\"2\" cellPadding=\"2\" width=\"100%\" border=\"0\">\n";
   echo "  <tr>\n";
   echo "    <td width=\"60%\" valign=\"top\">\n";
-  echo "      <h3>Bidding an Event for ".(USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME)."</h3>\n";
+  echo "      <h3>Proposing an Event for ".(USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME)."</h3>\n";
     if (file_exists(TEXT_DIR.'/bidding1.html'))
 	include(TEXT_DIR.'/bidding1.html');	
-  echo "      <h3><a name=\"deadlines\">Bid Deadlines</a></h3>\n";
+  echo "      <h3><a name=\"deadlines\">Proposal Deadlines</a></h3>\n";
   if (user_has_priv (PRIV_SCHEDULING))
   {
-    printf ("<p>[<a href=\"biddingAGame.php?action=%d\">Edit Bid Deadline Info</a>]</p>\n",
+    printf ("<p>[<a href=\"biddingAGame.php?action=%d\">Edit Proposal Deadline Info</a>]</p>\n",
 	    BAG_SHOW_FORM);
   }
 
@@ -90,7 +90,7 @@ function display_bid_intro ()
     echo "<table cellspacing=\"2\" cellpadding=\"2\" bgcolor=\"#4B067A\">\n";
     echo "<tr bgcolor=\"#cc99ff\" align=\"center\">\n";
     echo "<th>Round</th>\n";
-    echo "<th>Bid Deadline</th>\n";
+    echo "<th>Proposal Deadline</th>\n";
     echo "<th>Decision Date</th></tr>\n";
     echo "<tr bgColor=\"white\" vAlign=\"bottom\" align=\"center\">\n";
     echo "<th>First</th>\n";
@@ -118,9 +118,9 @@ function display_bid_intro ()
     if (('' != $row->ThirdBid) && ('' != $row->ThirdDecision))
     {
       echo "<p>\n";
-      echo CON_NAME . "actively solicits bids in the months leading up to the\n";
+      echo CON_NAME . " actively solicits proposals in the months leading up to the\n";
       echo "convention. As the convention attendance grows, based on\n";
-      echo "registration numbers, we may need a third round of bids to fill\n";
+      echo "registration numbers, we may need a third round of proposals to fill\n";
       echo "in the slate of games already accepted for the convention.\n";
     }
   }
@@ -136,9 +136,9 @@ function display_bid_intro ()
   echo "</div>\n";
 
   echo "<p>\n";
-  echo "Please fill out the bid form with <i>as much information as\n";
+  echo "Please fill out the proposal form with <i>as much information as\n";
   echo "possible</i>. This is the <i>best</i> way to help us evaluate your\n";
-  echo "bid quickly!</p>\n";
+  echo "proposal quickly!</p>\n";
   echo "<p>\n";
   printf ("If you have <i>any</i> questions, please contact %s, our\n",
 	  NAME_BID_CHAIR);
@@ -154,9 +154,9 @@ function display_bid_intro ()
   echo "<h3>Questions?</h3>\n";
   bidfaq_link ('gamekind', 'What kind of events are you looking for?');
   bidfaq_link ('audience', "What kind of players come to ".CON_NAME."?");
-  echo "<p><A href=\"#deadlines\">When do I have to get my bid in?</a></p>\n";
-  static_link ('bidFollowup', 'What happens when I submit my bid?');
-  bidfaq_link ('', 'Other Frequently Asked Questions About Bidding');
+  echo "<p><A href=\"#deadlines\">When do I have to get my proposal in?</a></p>\n";
+  static_link ('bidFollowup', 'What happens when I submit my proposal?');
+  bidfaq_link ('', 'Other Frequently Asked Questions About Proposals');
 
   echo "<h3>What do I have to know if I become a GM at the con?</h3>\n";
   static_link ('GMPolicies', 'Con GM Policies and Services');
@@ -207,13 +207,13 @@ function show_bidinfo_form()
     $_POST['ThirdDecision'] = '';
     $_POST['BidInfo'] =
       "<p>\n" .
-      CON_NAME . "solicits bids for games in rounds, as needed, based on the\n" .
+      CON_NAME . "solicits proposals for games in rounds, as needed, based on the\n" .
       "number of registrants we get. It's our goal to have a great schedule\n".
       "of games up as  early as possible!</p>\n" .
       "<p>\n" .
-      "Game bids received before the deadline will be evaluated in a timely\n".
+      "Game proposals received before the deadline will be evaluated in a timely\n".
       "manner.\n" .
-      "<i>Early bids will get an early decision!</i></p>";
+      "<i>Early proposals will get an early decision!</i></p>";
     $_POST['UpdatedById'] = 0;
   }
 
@@ -227,7 +227,7 @@ function show_bidinfo_form()
 
   echo "<table>\n";
 
-  form_section ('Bid Dates', FALSE);
+  form_section ('Proposal Dates', FALSE);
   echo "  <tr>\n";
   echo "    <td colspan=\"2\">\n";
   echo "      <table width=\"100%\">\n";
@@ -244,7 +244,7 @@ function show_bidinfo_form()
   echo "    </td>\n";
   echo "  </tr>\n";
 
-  form_section ('Bid News');
+  form_section ('Proposal News');
   form_textarea ('Use HTML to format', 'BidInfo', 10);
 
   form_submit ('Update now');

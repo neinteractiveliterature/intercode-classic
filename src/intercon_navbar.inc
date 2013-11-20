@@ -288,9 +288,9 @@ function build_shirts_subnavbar() {
 }
 
 function build_bids_subnavbar() {
-  $bidsSection = new SubNavBar("Bids", true);
+  $bidsSection = new SubNavBar("Proposals", true);
   if (user_has_priv(PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON))
-    $bidsSection->push(NavBarItem::newAction("Status of Bids", "Bids.php", BID_REVIEW_BIDS));
+    $bidsSection->push(NavBarItem::newAction("Status of Proposals", "Bids.php", BID_REVIEW_BIDS));
   
   if (user_has_priv (PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON)) {  
     $bidsSection->push(NavBarItem::newAction("BidCom Feedback Summary", "Bids.php", BID_FEEDBACK_SUMMARY));
@@ -299,9 +299,9 @@ function build_bids_subnavbar() {
   }
   
   if (user_has_priv (PRIV_SCHEDULING))
-    $bidsSection->push(NavBarItem::newAction('Manage Bid Page Info', 'biddingAGame.php', BAG_SHOW_FORM));
+    $bidsSection->push(NavBarItem::newAction('Manage Proposal Page Info', 'biddingAGame.php', BAG_SHOW_FORM));
 
-  $bidsSection->push(NavBarItem::newAction("Bid an Event!", "biddingAGame.php"));
+  $bidsSection->push(NavBarItem::newAction("Propose a Game!", "biddingAGame.php"));
     
   return $bidsSection;
 }

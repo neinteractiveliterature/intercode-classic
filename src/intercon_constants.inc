@@ -26,13 +26,13 @@ define (DB_NAME,   'itest');
 // credit card numbers or other sensative stuff in here anyway...
 
 define (DB_ADMIN_USR, 'root');
-define (DB_ADMIN_PWD, '');
+define (DB_ADMIN_PWD, 'Thebrows');
 
 define (DB_STAFF_USR, 'root');
-define (DB_STAFF_PWD, '');
+define (DB_STAFF_PWD, 'Thebrows');
 
 define (DB_USER_USR, 'root');
-define (DB_USER_PWD, '');
+define (DB_USER_PWD, 'Thebrows');
 
 
 // When DEVELOPMENT_VERSION is set to 1, all mail will be diverted to this
@@ -206,15 +206,16 @@ define (PAGE_BANNER, 'PageBanner.png');
   
 //Items for Bids/Schedule
 global $CON_DAYS;
-$CON_DAYS = array('Friday', 'Saturday', 'Sunday', 'Monday');
+$CON_DAYS = array('Friday', 'Saturday', 'Sunday');
 
 //These must match the text values in the BidTimes table slot field.
 global $BID_SLOTS;
 $BID_SLOTS = array();
 $BID_SLOTS['Friday'] = array('Afternoon', 'Evening', 'After Midnight');
 $BID_SLOTS['Saturday'] = array('Morning', 'Afternoon', 'Evening', 'After Midnight');
-$BID_SLOTS['Sunday'] = array('Morning', 'Afternoon', 'Evening', 'After Midnight');
-$BID_SLOTS['Monday'] = array('Morning', 'Afternoon');
+$BID_SLOTS['Sunday'] = array('Morning');
+//$BID_SLOTS['Sunday'] = array('Morning', 'Afternoon', 'Evening', 'After Midnight');
+//$BID_SLOTS['Monday'] = array('Morning', 'Afternoon');
 $BID_SLOTS['All'] = array('Morning', 'Afternoon', 'Evening', 'After Midnight'); //all possible bid slots.
 
 global $BID_SLOT_ABBREV;
