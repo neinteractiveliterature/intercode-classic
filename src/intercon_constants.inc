@@ -196,8 +196,9 @@ define (RECAPTCHA_PRIVATE_KEY, "6Ld3_70SAAAAAPLq2uF5DdkW4DBF5g46svK7IH1o");
 define(MAIL_BACKEND, "sendmail");
 
 // Define these if you specified "smtp" above.
-// Must be an SSL-enabled SMTP server listening on port 485
+// Must be an SSL-enabled SMTP server
 define(SMTP_HOST, "smtp.gmail.com");
+define(SMTP_PORT, 587);
 define(SMTP_USERNAME, "web@" . CON_DOMAIN);
 define(SMTP_PASSWORD, "");
 

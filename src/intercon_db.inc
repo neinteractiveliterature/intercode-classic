@@ -2871,7 +2871,7 @@ function intercon_mail ($to, $subject, $msg, $reply_to='')
   if (MAIL_BACKEND == "smtp") {
       $mail = Mail::factory('smtp', array(
           'host' => 'ssl://' . SMTP_HOST,
-          'port' => 465,
+          'port' => SMTP_PORT,
           'auth' => true,
           'username' => SMTP_USERNAME,
           'password' => SMTP_PASSWORD
