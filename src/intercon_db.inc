@@ -2880,6 +2880,9 @@ function intercon_mail ($to, $subject, $msg, $reply_to='')
       $mail = Mail::factory(MAIL_BACKEND);
   }
   $result = $mail->send($to, $headers, $msg);
+  if (PEAR::isError($result)) {
+    display_error($result->getMessage());
+  }
   return !(PEAR::isError($result));
 }
 
