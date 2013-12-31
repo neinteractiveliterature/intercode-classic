@@ -107,29 +107,72 @@ function display_all_signups ()
   echo "</table>\n";
   echo "<p>\n";
 
-  // Now gather the list of users who've signed up for games
-
-  $sql = 'SELECT Users.UserId, Users.FirstName, Users.LastName';
-  $sql .= ', Users.Nickname, Users.CanSignup, Users.EMail';
-  $sql .= ', Events.Title, Events.Hours, Events.CanPlayConcurrently';
-  $sql .= ', Events.EventId';
-  $sql .= ', Runs.Day, Runs.StartHour, Runs.TitleSuffix';
-  $sql .= ', Signup.State, Signup.RunId, Signup.SignupId, Signup.RunId';
-  $sql .= ' FROM Signup, Runs, Users, Events';
-  $sql .= ' WHERE Signup.State!="Withdrawn"';
-  $sql .= '   AND Users.UserId=Signup.UserId';
-  $sql .= '   AND Runs.RunId=Signup.RunId';
-  $sql .= '   AND Events.EventId=Runs.EventId';
-  $sql .= ' ORDER BY LastName, FirstName, Nickname, Day, StartHour';
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Query for users games failed', $sql);
-
-  // Go through each of the signup records and display them by user
-
   $cur_letter = '';
 
+  // Dump information about each user who can signup
+  foreach ($users as $Name => $UserId)
+  {
+    $sql = 'SELECT Events.Title, Events.Hours, Events.CanPlayConcurrently';
+    $sql .= ', Events.EventId';
+    $sql .= ', Runs.Day, CONVERT(Runs.StartHour, UNSIGNED Integer) AS StartHour';
+    $sql .= ', Runs.TitleSuffix, Runs.RunId, Signup.State, Signup.SignupId';
+    $sql .= ' FROM Signup, Runs, Users, Events';
+    $sql .= " WHERE Signup.UserId=$UserId";
+    $sql .= '   AND Signup.State!="Withdrawn"';
+    $sql .= '   AND Users.UserId=Signup.UserId';
+    $sql .= '   AND Runs.RunId=Signup.RunId';
+    $sql .= '   AND Events.EventId=Runs.EventId';
+    $sql .= ' ORDER BY Day, StartHour';
+
+    $result = mysql_query ($sql);
+    if (! $result)
+      return display_mysql_error ('Query for users games failed', $sql);
+
+    // Go through each of the signup records and display them by user
+
+    echo "<b><font size=\"+1\">$Name</font></b><br />\n";
+    echo "<!-- sql: $sql -->\n";
+
+    if (0 == mysql_num_rows($result))
+      echo "<font color=\"red\">Not signed up for any games</font><br />\n";
+    else
+    {
+      echo "<table>\n";
+      while ($row = mysql_fetch_object($result))
+      {
+	$game = trim ("$row->Title $row->TitleSuffix");
+	$start_hour = $row->StartHour;
+	$end_hour = $start_hour + $row->Hours;
+
+	$game_time = start_hour_to_24_hour ($start_hour) . ' - ' .
+	             start_hour_to_24_hour ($start_hour + $row->Hours);
+
+	$game = sprintf ('<a href="Schedule.php?action=%d&EventId=%d&RunId=%d" target="_blank">%s</a>',
+			 SCHEDULE_SHOW_SIGNUPS,
+			 $row->EventId,
+			 $row->RunId,
+			 $game);
+
+	$state = $row->State;
+	if ('Waitlisted' == $state)
+	{
+	  $wait = get_waitlist_number ($row->RunId, $row->SignupId);
+	  if (0 != $wait)
+	    $state .= ' #' . $wait;
+	}
+
+	echo "  <tr valign=\"top\">\n";
+	echo "    <td>$row->Day&nbsp;&nbsp;&nbsp;</td>\n";
+	echo "    <td nowrap>$game_time&nbsp;&nbsp;&nbsp;</td>\n";
+	echo "    <td nowrap>$state&nbsp;&nbsp;&nbsp;</td>\n";
+	echo "    <td>$game</td>\n";
+	echo "  </tr>\n";
+      }
+      echo "</table>\n";
+    }
+    echo "<br />\n";
+  }
+/*
   while ($row = mysql_fetch_object ($result))
   {
     $name = "$row->LastName, $row->FirstName";
@@ -286,6 +329,7 @@ function display_all_signups ()
 	  $signedup_users,
 	  $users_count,
 	  100.0 * $percent);
+*/
 /*
   foreach ($users as $k => $v)
     echo "'$k' -> '$v'<BR>\n";

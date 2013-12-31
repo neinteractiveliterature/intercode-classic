@@ -242,7 +242,10 @@ function show_edit_item_form()
     $item->load_POST();
   }
 
-  display_header("Edit item $ItemId: " . $item->name());
+  if (array_key_exists('name', $item))
+    display_header("Edit item $ItemId: " . $item->name());
+  else
+    display_header('Add new shirt');
   echo "<form method=post action=Shirts.php>\n";
   form_add_sequence();
   form_hidden_value('action', PROCESS_ITEM_FORM);
