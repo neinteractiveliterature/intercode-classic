@@ -105,6 +105,16 @@ switch ($action)
     report_how_heard();
     break;
 
+  case REPORT_USER_ON_DEMAND_SELECT:
+    html_begin(true);
+    report_user_on_demand_select();
+    break;
+
+  case REPORT_USER_ON_DEMAND:
+    html_begin(true);
+    report_user_on_demand();
+    break;
+
   default:
     html_begin (true);
     display_error ("Unknown action code: $action");
@@ -186,14 +196,14 @@ function report_per_user ()
     if ('Admin' == $row->LastName)
       continue;
 
-    echo "<div class=print_logo_break_before><img src=PageBanner.png></div>\n";
+    echo "<div class=\"print_logo\"><img src=\"PageBanner.png\"></div>\n";
 
     write_user_report (trim ("$row->LastName, $row->FirstName"),
 		       $row->UserId);
 
-    echo "\n<div class=print_copyright>\n";
-    echo "<HR WIDTH=\"50%\" ALIGN=CENTER>\n";
-    echo "Copyright &copy; $y, New England Interactive Literature<BR>\n";
+    echo "\n<div class=\"print_copyright print_page_break\">\n";
+    echo "<hr width=\"50%\" align=\"center\">\n";
+    echo "Copyright &copy; $y, New England Interactive Literature<br>\n";
     echo "All Rights Reserved\n";
     echo "</div> <!-- copyright-->\n";
   }
@@ -311,7 +321,7 @@ function report_per_room ()
 
   while ($row = mysql_fetch_object ($result))
   {
-    echo "<div class=print_logo_break_before><img src=PageBanner.png></div>\n";
+    echo "<div class=\"print_logo\"><img src=\"PageBanner.png\"></div>\n";
 
     echo "<font size=\"+3\"><b>$row->RoomName</b></font><p>\n";
 
@@ -320,6 +330,12 @@ function report_per_room ()
     write_room_report ($row->RoomId, 'Sat', SAT_TEXT);
     write_room_report ($row->RoomId, 'Sun', SUN_TEXT);
     echo "</table>\n";
+
+    echo "\n<div class=\"print_copyright print_page_break\">\n";
+    echo "<hr width=\"50%\" align=\"center\">\n";
+    echo "Copyright &copy; $y, New England Interactive Literature<br>\n";
+    echo "All Rights Reserved\n";
+    echo "</div> <!-- copyright-->\n";
   }
 
   // Suppress the copyright display
@@ -376,7 +392,7 @@ function old_report_per_room ()
     if (0 == mysql_num_rows($room_result))
       continue;
 
-    echo "<div class=print_logo_break_before><img src=PageBanner.png></div>\n";
+    echo "<div class=\"print_logo\"><img src=\"PageBanner.png\"></div>\n";
 
     echo "<font size=\"+3\"><b>$room_name</b></font><p>\n";
 
@@ -389,6 +405,34 @@ function old_report_per_room ()
 
   // Suppress the copyright display
   return true;
+}
+
+/*
+ * run_id_to_rooms
+ *
+ * Get the rooms associated with a run
+ */
+function run_id_to_rooms($RunId)
+{
+  $sql = 'SELECT RoomName';
+  $sql .= ' FROM Rooms, RunsRooms';
+  $sql .= " WHERE RunsRooms.RunId=$RunId";
+  $sql .= '   AND Rooms.RoomId=RunsRooms.RoomId';
+  $sql .= '   ORDER BY RoomName';
+
+  $result = mysql_query($sql);
+  if (! $result)
+    return '';
+
+  $rooms = '';
+  while ($row = mysql_fetch_object($result))
+  {
+    if (0 != strlen($rooms))
+      $rooms .= ',';
+    $rooms .= $row->RoomName;
+  }
+
+  return $rooms;
 }
 
 /*
@@ -476,7 +520,8 @@ function write_user_report ($name, $user_id)
   $sql = 'SELECT Events.Title, Events.Hours, Events.EventId,';
   $sql .= ' Runs.Day, Runs.StartHour, Runs.TitleSuffix,';
   $sql .= ' Signup.State,';
-  $sql .= " room_names(Runs.RunId) Rooms";
+  //  $sql .= " room_names(Runs.RunId) Rooms";
+  $sql .= ' Runs.RunId';
   $sql .= ' FROM Signup';
   $sql .= ' INNER JOIN Users ON Users.UserId=Signup.UserId';
   $sql .= ' INNER JOIN Runs ON Runs.RunId=Signup.RunId';
@@ -506,7 +551,7 @@ function write_user_report ($name, $user_id)
     printf ("    <td align=right>%s&nbsp;&nbsp;</td>\n",
 	    start_hour_to_24_hour ($row->StartHour + $row->Hours));
 
-    $rooms = pretty_rooms($row->Rooms);
+    $rooms = pretty_rooms(run_id_to_rooms($row->RunId));
     echo "    <td>$rooms</td>\n";
 
     echo "    <td>&nbsp;</td>\n";
@@ -541,7 +586,7 @@ function report_per_game ()
   $sql .= ' Events.MinPlayersFemale, Events.MaxPlayersFemale,';
   $sql .= ' Events.MinPlayersNeutral, Events.MaxPlayersNeutral,';
   $sql .= ' Runs.TitleSuffix, Runs.RunId, Runs.Day, Runs.StartHour,';
-  $sql .= " room_names(Runs.RunId) Rooms";
+  $sql .= " Runs.RunId";
   $sql .= ' FROM Events';
   $sql .= ' INNER JOIN Runs on Events.EventId=Runs.EventId';
   $sql .= ' WHERE SpecialEvent=0';
@@ -558,12 +603,12 @@ function report_per_game ()
 
   while ($row = mysql_fetch_object ($result))
   {
-    echo "<div class=print_logo_break_before><img src=PageBanner.png></div>\n";
+    echo "<div class=\"print_logo\"><img src=\"PageBanner.png\"></div>\n";
 
     write_game_report ($row->RunId,
 		       $row->Title,
 		       $row->TitleSuffix,
-		       pretty_rooms($row->Rooms),
+		       pretty_rooms(run_id_to_rooms($row->RunId)),
 		       $row->Day,
 		       start_hour_to_24_hour ($row->StartHour),
 		       $row->MinPlayersMale,
@@ -573,12 +618,14 @@ function report_per_game ()
 		       $row->MinPlayersNeutral,
 		       $row->MaxPlayersNeutral);
 
-    echo "\n<div class=print_copyright>\n";
+    echo "\n<div class=\"print_copyright print_page_break\">\n";
     echo "<HR WIDTH=\"50%\" ALIGN=CENTER>\n";
     echo "Copyright &copy; $y, New England Interactive Literature<BR>\n";
     echo "All Rights Reserved\n";
     echo "</div> <!-- copyright-->\n";
-  }  
+  }
+
+  return true;
 }
 
 /*
@@ -600,7 +647,7 @@ function write_game_report ($run_id, $title, $title_suffix,
   echo "<table width=\"100%\">";
   echo "  <tr valign=top>\n";
   echo "    <td><font size=\"+3\"><b>$title</b></font></td>\n";
-  echo "    <td align=right><font size=\"+1\"><b>$day&nbsp;$start_time<br>$room</b></font></td>\n";
+  echo "    <td align='right'><font size=\"+1\"><b>$day&nbsp;$start_time<br>$room</b></font></td>\n";
   echo "  </tr>\n";
   echo "</table>";
 
@@ -1188,7 +1235,7 @@ function whos_not_playing_when ()
 
 function report_games_by_time ($day)
 {
-  echo "<div class=print_logo_break_before><img src=PageBanner.png></div>\n";
+  echo "<div class=\"print_logo\"><img src=\"PageBanner.png\"></div>\n";
   printf ("<font size=\"+3\"><b>%s Schedule for %s</b></font><p>\n",
 	  CON_NAME,
 	  $day);
@@ -1197,7 +1244,7 @@ function report_games_by_time ($day)
 
   $sql = 'SELECT Events.Title, Events.Hours,';
   $sql .= ' Runs.Day, Runs.StartHour, Runs.TitleSuffix,';
-  $sql .= " room_names(Runs.RunId) Rooms";
+  $sql .= " Runs.RunId";
   $sql .= ' FROM Events';
   $sql .= ' INNER JOIN Runs ON Events.Eventid=Runs.EventId';
   $sql .= ' LEFT JOIN RunsRooms on RunsRooms.RunId = Runs.RunId';
@@ -1227,15 +1274,15 @@ function report_games_by_time ($day)
       $hour = $row->StartHour;
     }
 
-    $rooms = pretty_rooms($row->Rooms);
-    echo "    $row->Title $row->TitleSuffix $rooms<br>\n";
+    $rooms = pretty_rooms(run_id_to_rooms($row->RunId));
+    echo "    $row->Title $row->TitleSuffix - $rooms<br>\n";
   }
   echo "    </td>\n";
   echo "  </tr>\n";
   echo "</table>\n";
 
   $y = date ('Y');
-  echo "\n<div class=print_copyright>\n";
+  echo "\n<div class=\"print_copyright print_page_break\">\n";
   echo "<HR WIDTH=\"50%\" ALIGN=CENTER>\n";
   echo "Copyright &copy; $y, New England Interactive Literature<BR>\n";
   echo "All Rights Reserved\n";
@@ -1554,6 +1601,82 @@ function report_by_age ()
     echo "  </td>\n";
   }
   echo "</table>\n";
+}
+
+/*
+ * report_user_on_demand_select
+ *
+ * Select user to display information on so they can be printed on-demand
+ * when the user checks in
+ */
+function report_user_on_demand_select()
+{
+  $link = sprintf('Reports.php?action=%d&Seq=%d',
+		  REPORT_USER_ON_DEMAND,
+		  increment_sequence_number());
+  $highlignt = array();
+
+  select_user('Select User to Display Registration Info for',
+	      $link,
+	      false,
+	      false,
+	      $highlight,
+	      true);
+}
+
+/*
+ * report_user_on_demand
+ *
+ * Display registration checkin report for the specified user
+ */
+function report_user_on_demand()
+{
+  $UserId = intval(trim($_REQUEST['UserId']));
+  user_id_to_name($UserId, $name, true);
+
+  // Write the per-user report for this user
+  echo "<div class=\"print_logo\"><img src=\"PageBanner.png\"></div>\n";
+  write_user_report ($name, $UserId);
+
+  // Generate a GM report for any games this user is a GM for
+  $sql = 'SELECT Events.Title, Events.MinPlayersMale, Events.MaxPlayersMale,';
+  $sql .= ' Events.MinPlayersFemale, Events.MaxPlayersFemale,';
+  $sql .= ' Events.MinPlayersNeutral, Events.MaxPlayersNeutral,';
+  $sql .= ' Runs.TitleSuffix, Runs.RunId, Runs.Day, Runs.StartHour,';
+  $sql .= " Runs.RunId";
+  $sql .= ' FROM GMs, Runs, Events';
+  $sql .= " WHERE GMs.UserId=$UserId";
+  $sql .= '   AND Runs.EventId=GMs.EventId';
+  $sql .= '   AND Events.EventId=Runs.EventId';
+  $sql .= ' ORDER BY Events.Title, Runs.Day, Runs.StartHour';
+
+  $result = mysql_query ($sql);
+  if (! $result)
+    return display_mysql_error ('Query for GMs failed', $sql);
+
+  while ($row = mysql_fetch_object ($result))
+  {
+    echo "\n<div class=\"print_copyright print_page_break\">\n";
+    echo "<hr width=\"50%\" align=\"center\">\n";
+    echo "Copyright &copy; $y, New England Interactive Literature<br />\n";
+    echo "All Rights Reserved\n";
+    echo "</div> <!-- copyright-->\n";
+
+    echo "<div class=\"print_logo\"><img src=\"PageBanner.png\"></div>\n";
+
+    write_game_report ($row->RunId,
+		       $row->Title,
+		       $row->TitleSuffix,
+		       pretty_rooms(run_id_to_rooms($row->RunId)),
+		       $row->Day,
+		       start_hour_to_24_hour ($row->StartHour),
+		       $row->MinPlayersMale,
+		       $row->MaxPlayersMale,
+		       $row->MinPlayersFemale,
+		       $row->MaxPlayersFemale,
+		       $row->MinPlayersNeutral,
+		       $row->MaxPlayersNeutral);
+  }  
 }
 
 ?>

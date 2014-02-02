@@ -14,8 +14,8 @@ require ('intercon_constants.inc');
 require ('intercon_navbar.inc');
 require ('Mail.php');
 
-define ('SHOW_TSHIRTS', 1);
-define ('TSHIRT_DOLLARS', 20);
+//define ('SHOW_TSHIRTS', 1);
+//define ('TSHIRT_DOLLARS', 20);
 define ('UNLIMITED_SIGNUPS', 100);
 
 // Orderings
@@ -199,7 +199,8 @@ define ('REPORT_BY_AGE', 108);
 define ('REPORT_HOW_HEARD', 109);
 define ('REPORT_CONSUITE_TRACK', 190);
 define ('REPORT_PER_ROOM', 191);
-
+define ('REPORT_USER_ON_DEMAND_SELECT', 192);
+define ('REPORT_USER_ON_DEMAND', 193);
 
 // Action values in Referrers.php
 
@@ -3267,30 +3268,60 @@ function pretty_rooms($str)
     return '&nbsp;';
 
   // Convert combined rooms into something 'pretty'
-  $str = str_replace('Cambridge East,Cambridge West', 'Cambridge', $str);
-  $str = str_replace('Lincoln East,Lincoln West', 'Lincoln', $str);
-  $str = str_replace('Eden Vale A1,Eden Vale A2,Eden Vale A3', 'Eden Vale A', $str);
-  $str = str_replace('Eden Vale A1,Eden Vale A2', 'Eden Vale A1 &amp; A2', $str);
-  $str = str_replace('Eden Vale A2,Eden Vale A3', 'Eden Vale A2 &amp; A3', $str);
-  $str = str_replace('Eden Vale A1,Eden Vale A3', 'Eden Vale A1 &amp; A3', $str);
-  $str = str_replace('Eden Vale C1,Eden Vale C2,Eden Vale C3', 'Eden Vale C', $str);
-  $str = str_replace('Eden Vale C1,Eden Vale C2', 'Eden Vale C1 &amp; C2', $str);
-  $str = str_replace('Eden Vale C2,Eden Vale C3', 'Eden Vale C2 &amp; C3', $str);
-  $str = str_replace('Eden Vale C1,Eden Vale C3', 'Eden Vale C1 &amp; C3', $str);
-  $str = str_replace('Eden Vale A,Eden Vale B,Eden Vale C', 'Eden Vale A, B &amp; C', $str);
-  $str = str_replace('Eden Vale A,Eden Vale B', 'Eden Vale A &amp; B', $str);
-  $str = str_replace('Eden Vale B,Eden Vale C', 'Eden Vale B &amp; C', $str);
-  $str = str_replace('Eden Vale A,Eden Vale C', 'Eden Vale A &amp; C', $str);
+  $str = str_replace('Heritage A,Heritage B',
+		     'Heritage A&nbsp;&amp;&nbsp;B',
+		     $str);
+
+  $str = str_replace('Salon A,Salon B,Salon C',
+		     'Salon A,&nbsp;B&nbsp;&amp;&nbsp;C',
+		     $str);
+  $str = str_replace('Salon A,Salon B', 'Salon A&nbsp;&amp;&nbsp;B', $str);
+  $str = str_replace('Salon B,Salon C', 'Salon B&nbsp;&amp;&nbsp;C', $str);
+  $str = str_replace('Salon A,Salon C', 'Salon A&nbsp;&amp;&nbsp;C', $str);
 
   // Check for single rooms
   $ary = explode(',', $str);
   if (1 == count($ary))
     return $ary[0];
 
-  // Make a pretty list
-  $Rooms = implode(', ', $ary);
+  // Check for Suites
+  $last_suite = -1;
+  $suites = array();
+  $ary_max = count($ary);
 
-  return $Rooms;
+  for($i = 0; $i < $ary_max; $i++)
+  {
+    $pos = stripos($ary[$i], 'suite');
+    if (0 === $pos)
+    {
+      $comp = explode(' ', $ary[$i]);
+      unset($ary[$i]);
+      $last_suite = $i;
+      array_push($suites, $comp[1]);
+    }
+  }
+
+  $suite_count = count($suites);
+
+  switch (count($suites))
+  {
+    case 0:
+      break;
+
+    case 1:
+      $ary[$last_suite] = 'Suite ' . $suites[0];
+      break;
+
+    default:
+      $last = array_pop($suites);
+      $ary[$last_suite] =
+	'Suites ' . implode(', ', $suites) . ' &amp; ' . $last;
+  }
+
+  // Make a pretty list
+  $rooms = implode(', ', $ary);
+
+  return $rooms;
 }
 
 function room_check($ary, $room)

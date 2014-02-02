@@ -26,6 +26,10 @@ body
 {
 	font-size: small;
 	text-align: center;
+}
+
+.print_page_break
+{
 	page-break-after: always;
 }
 
