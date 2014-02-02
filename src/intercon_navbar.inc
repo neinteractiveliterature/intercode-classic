@@ -344,7 +344,7 @@ function build_mail_subnavbar() {
 
 function build_print_materials_subnavbar() {
   $opsSection = new SubNavBar("Print Materials");
-  $opsSection->push(NavBarItem::newAction('Registration Checkin', 'Reports',
+  $opsSection->push(NavBarItem::newAction('Registration Checkin', 'Reports.php',
 					    REPORT_USER_ON_DEMAND_SELECT));
   $opsSection->push(NavBarItem::newAction('Per Game Report', 'Reports.php', REPORT_PER_GAME));
   $opsSection->push(NavBarItem::newAction('Per User Report', 'Reports.php', REPORT_PER_USER));
