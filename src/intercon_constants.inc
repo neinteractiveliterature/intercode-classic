@@ -175,10 +175,11 @@ define (BIO_DUE_DATE, "December&nbsp;25,&nbsp;2009");
 //define (COLOR_MENU_PRIV_FG, "#237723");
 //define (COLOR_MENU_PRIV_BG, "#bfb");
 
-define (COLOR_MENU_PUBLIC_FG, "#224099");
-define (COLOR_MENU_PUBLIC_BG, "#b9d1ec");
-define (COLOR_MENU_PRIV_FG, "#ca9a00");
-define (COLOR_MENU_PRIV_BG, "#FADB5E");
+define (COLOR_PAGE_BG, "#f0f0f0");
+define (COLOR_MENU_PUBLIC_FG, "#58a3a7");
+define (COLOR_MENU_PUBLIC_BG, "#b0d5d7");
+define (COLOR_MENU_PRIV_FG, "#3d2062");
+define (COLOR_MENU_PRIV_BG, "#d4b3ff");
 
 //These are for the NavMenu
 define (NAV_SHOW_COST, 0);
@@ -203,7 +204,8 @@ define(SMTP_USERNAME, "web@" . CON_DOMAIN);
 define(SMTP_PASSWORD, "");
 
 //Look and feel items
-define (PAGE_BANNER, 'PageBanner.png');
+define (MINI_LOGO, 'O_Banner_FNL_200x200.png');
+define (FULL_LOGO, 'O_Banner_FNL_400x400.png');
   
 //Items for Bids/Schedule
 global $CON_DAYS;
