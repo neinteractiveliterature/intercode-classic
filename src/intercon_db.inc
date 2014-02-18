@@ -2631,6 +2631,20 @@ function display_available_games ()
 }
 
 /*
+ * display_full_logo
+ *
+ * Display the large-format site logo, if it exists
+ */
+function display_full_logo () 
+{
+  if (defined("FULL_LOGO")) {
+    echo '<div style="text-align: center;">';
+    echo '<img class="full-logo" src="' . FULL_LOGO . '" alt="' . CON_NAME . ' logo">';
+    echo '</div>';
+  }
+}
+
+/*
  * display_login_form
  *
  * Display the login form for a user
@@ -2638,6 +2652,8 @@ function display_available_games ()
 
 function display_login_form ($error='', $dest='')
 {
+  display_full_logo();
+  
   if (('' == $dest) && (array_key_exists ('dest', $_REQUEST)))
     $dest = $_REQUEST['dest'];
 

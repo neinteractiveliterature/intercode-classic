@@ -4,13 +4,9 @@ header("Content-type: text/css");
 ?>
 body
 {
-	margin: 135px 0 0 0;
-	padding: 0 7% 0 180px;
-	background-image: url("PageBanner.png");
-	background-repeat: no-repeat;
+	padding: 0 7% 0 230px;
 	background-color: #ffffff;
-	background-position: 9px 5px;
-      	color: #000000;
+	color: #000000;
 	font-family: sans-serif;
 }
 
@@ -22,14 +18,14 @@ a img {
 {
 	position: absolute;
 	z-index: 5;
-	width: 150px;
-	top: 120px;
+	width: 200px;
+	top: 0px;
 	left: 9px;
 	margin: 0;
 	padding: 0;
 }
 
-.navbar ul.menu {
+.navbar ul.menu, .navbar .mini-logo {
   margin-top: 16px;
   margin-bottom: 16px;
 }

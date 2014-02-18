@@ -1548,6 +1548,8 @@ function show_user_homepage_bio_info ()
 
 function show_user_homepage ()
 {
+  display_full_logo();
+  
   // Show user status info
 
   if (! show_user_homepage_status ())

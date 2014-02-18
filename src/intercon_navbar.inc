@@ -491,8 +491,16 @@ function display_links_navbar() {
 	echo $links->render("menu links");
 }
 
+function display_mini_logo() {
+  if (defined("MINI_LOGO")) {
+    echo '<img class="mini-logo" src="' . MINI_LOGO . '" alt="' . CON_NAME .' logo">';
+  }
+}
+
 function display_navbar() {
   echo "<div class=navbar>\n";
+  
+  display_mini_logo();
   
   display_account_control_navbar();
   display_main_navbar();
