@@ -4,7 +4,7 @@ header("Content-type: text/css");
 ?>
 body
 {
-	padding: 0 7% 0 230px;
+	padding: 16px 7% 0 230px;
 	background-color: #ffffff;
 	color: #000000;
 	font-family: sans-serif;
