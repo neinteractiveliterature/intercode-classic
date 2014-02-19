@@ -56,7 +56,7 @@ switch ($action)
     // Log the referrer, if one's available
     log_referrer ();
     
-    if (!$_request['dest']) {
+    if (!$_REQUEST['dest']) {
       display_full_logo ();
     }
     display_login_form ();
