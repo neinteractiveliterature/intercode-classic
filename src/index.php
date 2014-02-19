@@ -56,7 +56,9 @@ switch ($action)
     // Log the referrer, if one's available
     log_referrer ();
     
-    display_full_logo ();
+    if (!$_request['dest']) {
+      display_full_logo ();
+    }
     display_login_form ();
     break;
 
@@ -77,7 +79,6 @@ switch ($action)
     if (! is_numeric ($result))
     {
       html_begin ();
-      display_full_logo ();
       display_login_form ($result);
       break;
     }
