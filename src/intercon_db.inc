@@ -2656,8 +2656,6 @@ function display_full_logo ()
 
 function display_login_form ($error='', $dest='')
 {
-  display_full_logo();
-  
   if (('' == $dest) && (array_key_exists ('dest', $_REQUEST)))
     $dest = $_REQUEST['dest'];
 
