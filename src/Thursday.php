@@ -260,20 +260,24 @@ function thursday_thing()
   echo "#precon_top td .title { text-align: center; font-size: 100%; margin-bottom: 0; }\n";
 //  echo "#precon_top td h3 { background-color: black; color: white; font-size: 100%; padding: 0; text-align: center; }\n";
   echo "</style>\n";
+  
+  echo "<h3>Event Schedule</h3>\n";
+  echo "<p>The Pre-Convention event schedule is now online!";
+  echo "<a href=\"http://precon.free-dissociation.com/schedule/\">View it here!</a></p>\n";
 
-  echo "<table id=\"precon_top\"><tr>";
-  $paid = false;
-  $url = '';
-  
-  echo "<td id=\"precon_bid\" class=\"menulike\">";
-  echo "<p class=\"title\">Bid a Pre-Convention Event!</p>\n";
-  echo "<p>If you'd like to propose a panel, discussion or workshop\n";
-  printf ("please contact %s at %s.</p>\n",
-      NAME_THURSDAY,
-      mailto_or_obfuscated_email_address (EMAIL_THURSDAY));
-  echo "</td>\n";
-  
-  echo "</tr></table>\n\n";
+  // echo "<table id=\"precon_top\"><tr>";
+  // $paid = false;
+  // $url = '';
+  // 
+  // echo "<td id=\"precon_bid\" class=\"menulike\">";
+  // echo "<p class=\"title\">Bid a Pre-Convention Event!</p>\n";
+  // echo "<p>If you'd like to propose a panel, discussion or workshop\n";
+  // printf ("please contact %s at %s.</p>\n",
+  //     NAME_THURSDAY,
+  //     mailto_or_obfuscated_email_address (EMAIL_THURSDAY));
+  // echo "</td>\n";
+  // 
+  // echo "</tr></table>\n\n";
 
   echo "<p>If you have any questions about the Pre-Convention, we'd be happy to";
   echo " help.  Email the Pre-Convention coordinator, ".NAME_THURSDAY.", at ";
