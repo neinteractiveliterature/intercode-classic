@@ -263,7 +263,7 @@ function thursday_thing()
   
   echo "<h3>Event Schedule</h3>\n";
   echo "<p>The Pre-Convention event schedule is now online! ";
-  echo "<a href=\"http://precon.free-dissociation.com/schedule/\">You can view it here.</a></p>\n";
+  echo "<a href=\"http://precon-n.interactiveliterature.org/schedule/\">You can view it here.</a></p>\n";
 
   // echo "<table id=\"precon_top\"><tr>";
   // $paid = false;
