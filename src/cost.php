@@ -110,6 +110,10 @@ function show_cost ()
   }
 
   $reg_close = strftime ('%d-%b-%Y', parse_date (REGISTRATION_CLOSE));
-  echo "Online registration will close $reg_close<p>\n";
+  echo "<p>Online registration will close $reg_close</p>\n";
+  echo "<p><font color=red>WARNING!</font> Games fill quickly once signups\n";
+  echo "are opened. Be sure that there is space in the games you are\n";
+  printf ("interested in before you register for %s.</p>\n",
+	  CON_NAME);
 }
 ?>
