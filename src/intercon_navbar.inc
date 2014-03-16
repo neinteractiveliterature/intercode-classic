@@ -397,6 +397,8 @@ function build_about_subnavbar() {
   $aboutSection->push(NavBarItem::newAction("ConCom Schedule", "ConComSchedule.php"));
   if (NAV_SHOW_FLYER)
     $aboutSection->push(NavBarItem::newAction((USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME).' Flyer', 'InterconFlyer.pdf'));
+  if (NAV_SHOW_PROGRAM)
+    $aboutSection->push(NavBarItem::newAction((USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME).' Program', 'program-page-order.pdf'));
   
   return $aboutSection;
 }
