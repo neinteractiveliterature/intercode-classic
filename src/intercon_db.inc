@@ -925,7 +925,7 @@ function form_birth_year_and_gender ($year_key, $gender_key)
 	    $y - $i);
   }
   echo "      </select>\n";
-  echo "      &nbsp;&nbsp;&nbsp;Gender:\n";
+  echo "      &nbsp;&nbsp;&nbsp;Preferred Character Gender:\n";
   echo "      <INPUT TYPE=RADIO NAME=$gender_key $MaleChecked VALUE=\"Male\"> Male\n";
   echo "      <INPUT TYPE=RADIO NAME=$gender_key $FemaleChecked VALUE=\"Female\"> Female\n";
   echo "      <br>\n";

@@ -1159,9 +1159,9 @@ function display_one_col ($head, $subject)
 
 function display_players ($head, $min, $max, $preferred)
 {
-    echo "  <TR>\n";
-    echo "    <TH>$head:</TH><TD>Min: $min / Max: $max</TD>\n";
-    echo "  </TR>\n";
+    echo "  <tr>\n";
+    echo "    <th>$head&nbsp;Characters:</th><td>Min: $min / Max: $max</td>\n";
+    echo "  </tr>\n";
 }
 
 /*
@@ -1732,7 +1732,7 @@ function show_game ()
 	if ($can_edit_game) {
     echo "<TD>";
     if ($gm_row->CompEventId == $EventId) {
-      echo "&nbsp;&nbsp;&nbsp;(Comp for this game)";
+      echo "&nbsp;&nbsp;&nbsp;(Comp'd for this game)";
     }
     echo "</TD>";
 	}
@@ -1777,15 +1777,15 @@ function show_game ()
   {
     if (! $volunteer_event)
     {
-      display_players ('Male Players',
+      display_players ('Male',
 		       $game_row->MinPlayersMale,
 		       $game_row->MaxPlayersMale,
 		       $game_row->PrefPlayersMale);
-      display_players ('Female Players',
+      display_players ('Female',
 		       $game_row->MinPlayersFemale,
 		       $game_row->MaxPlayersFemale,
 		       $game_row->PrefPlayersFemale);
-      display_players ('Neutral Players',
+      display_players ('Neutral',
 		       $game_row->MinPlayersNeutral,
 		       $game_row->MaxPlayersNeutral,
 		       $game_row->PrefPlayersNeutral);
@@ -1794,7 +1794,7 @@ function show_game ()
     if ($volunteer_event)
       echo "    <th>Volunteers Needed:</th>\n";
     else
-      echo "    <th>Total Players:</th>\n";
+      echo "    <th>Total Characters:</th>\n";
     printf ("    <td>Min: %d / Max: %d</td>\n",
 	    $game_row->MinPlayersMale +
 	    $game_row->MinPlayersFemale +

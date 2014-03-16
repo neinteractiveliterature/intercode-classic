@@ -109,7 +109,7 @@ html_end ();
  * form_players_entry
  *
  * Display an entry that lets the user select the min, max and preferred
- * numbers of players
+ * numbers of characters
  */
 
 function form_players_entry ($gender, $showword)
@@ -133,12 +133,12 @@ function form_players_entry ($gender, $showword)
   else
     $pref_value = '0';
 
-  print ("  <TR>\n");
+  print ("  <tr>\n");
   if ($showword)
-    print ("    <TD ALIGN=RIGHT>$gender Players:</TD>\n");
+    print ("    <td align=\"right\">$gender Characters:</td>\n");
   else
-    print ("    <TD ALIGN=RIGHT>Players:</TD>\n");   
-  print ("    <TD ALIGN=LEFT>\n");
+    print ("    <td align=\"right\">Characters:</td>\n");   
+  print ("    <td align=\"left\">\n");
   printf ("      Min:<INPUT TYPE=TEXT NAME=%s SIZE=3 MAXLENGTH=3 VALUE=\"%s\">&nbsp;&nbsp;&nbsp;\n",
 	  $min,
 	  $min_value);
@@ -877,35 +877,51 @@ function display_bid_form ($first_try)
     
     if ($gametype != 'Panel')
     {
-        form_section ('Player Counts');
+        form_section ('Character Counts');
         echo "  <tr>\n";
         echo "    <td colspan=2>\n";
-        echo "Enter the minimum, preferred and maximum number of players for\n";
-        echo "your {$thingstring}.<br>\n";
-        echo "<i>Minimum</i> - The minimum number of players required for your\n";
-        echo "{$thingstring}.  If there are fewer than the minimum number of players\n";
-        echo "signed up, you should talk with the GM Liaison about\n";
-        echo "lowering the minimum number of players or cancelling the {$thingstring}.<br>\n";
-        echo "<i>Preferred</i> - The number of players that you'd prefer to\n";
-        echo "have in your {$thingstring}.  If you're not sure, make this the same number\n";
-        echo "as the Maximum.<br>\n";
-        echo "<i>Maximum</i> - The maximum number of players that your {$thingstring} can\n";
-        echo "accomodate.<p>\n";
+        echo "Enter the minimum, preferred and maximum number of characters\n";
+        echo "for your {$thingstring}.<br>\n";
+        echo "<table>\n";
+	echo "  <tr>\n";
+	echo "    <td valign=\"top\"><i>Minimum&nbsp;-</i></td>\n";
+	echo "    <td>The minimum number of characters required for\n";
+        echo "your {$thingstring}.  If there are fewer than the minimum\n";
+        echo "number of characters signed up, you should talk with the GM\n";
+        echo "Liaison about lowering the minimum number of players or\n";
+	echo "cancelling the {$thingstring}.</td>\n";
+	echo "  </tr>\n";
+	echo "  <tr>\n";
+	echo "    <td valign=\"top\"><i>Preferred&nbsp;-</i></td>\n";
+        echo "    <td>The number of characters that you'd prefer\n";
+        echo "to have in your {$thingstring}.  If you're not sure, make this\n";
+	echo "the same number as the Maximum.</td>\n";
+	echo "  </tr>\n";
+	echo "  <tr>\n";
+	echo "    <td valign=\"top\"><i>Maximum&nbsp;-</i></td>\n";
+        echo "    <td>The maximum number of players that your {$thingstring}\n";
+        echo "can accomodate.</td>\n";
+        echo "  </tr>\n";
+        echo "</table>\n";
         if ($gametype != 'Board Game')
         {
             echo "Each of your characters can be male, female or neutral.  A\n";
-            echo "<i>male</i> or <i>female</i> character is one which must be a\n";
-            echo "specific gender.  A <i>neutral</i> character is one which\n";
-            echo "can be cast as either male or female, depending on who signs up\n";
-            echo "for the game.  The website will enforce your gender limits, so if\n";
-            echo "only female roles are available, any male players who signup will\n";
-            echo "be put on the waitlist.  Once you've cast the game, you'll be\n";
-            echo "able to &quot;freeze&quot; the gender balance of the game;\n";
-            echo "essentially converting all of your neutral characters to male or\n";
-            echo "female to match the players who are signed up.  This way, if a\n";
-            echo "male player drops out, the website will pick the first male on\n";
-            echo "the waitlist so you don't have to rewrite the character sheet\n";
-            echo "to match the player's gender.<br>&nbsp;\n";
+            echo "<i>male</i> or <i>female</i> character is one which must\n";
+            echo "be a specific gender.  A <i>neutral</i> character is one\n";
+            echo "which can be cast as either male or female, depending on\n";
+            echo "who signs up for the game.  The website will enforce your\n";
+            echo "gender limits, so if only female roles are available, any\n";
+	    echo "players that signup who have specified that they prefer\n";
+	    echo "to play male characters will be put on the waitlist.  Once\n";
+	    echo "you've cast the game, you'll be able to &quot;freeze&quot;\n";
+	    echo "the gender balance of the game; essentially converting all\n";
+	    echo "of your neutral characters to male or female to match the\n";
+	    echo "preferred character gender of the players who are signed\n";
+	    echo "up.  This way, if a player drops out, the website will\n";
+	    echo "pick the first player on the waitlist with a matching\n";
+	    echo "preferred character gender so you don't have to\n";
+	    echo "frantically rewrite the character sheet to match the\n";
+	    echo "preferred character gender of the new player.<br>&nbsp;\n";
             echo "    </td>\n";
             echo "  </tr>\n";
 
