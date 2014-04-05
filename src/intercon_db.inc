@@ -130,6 +130,7 @@ define ('SCHEDULE_SHOW_IRON_GM_TEAM_FORM', 162);
 define ('SCHEDULE_PROCESS_IRON_GM_TEAM_FORM', 163);
 define ('SCHEDULE_SELECT_USER_FOR_IRON_GM', 164);
 define ('SCHEDULE_ADD_IRON_GM', 165);
+define ('SCHEDULE_SHOW_USER_SIGNUPS', 166);
 
 // Action values in SpecialEvents.php
 

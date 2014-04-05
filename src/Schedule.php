@@ -92,6 +92,10 @@ switch ($action)
       display_access_error ();
     break;
 
+  case SCHEDULE_SHOW_USER_SIGNUPS:
+      show_user_signups ();
+    break;
+
   case SCHEDULE_SHOW_ALL_SIGNUPS:
     if (can_edit_game_info () || user_has_priv (PRIV_CON_COM))
       show_all_signups ();
@@ -1971,11 +1975,18 @@ function show_game ()
 	    // If the user can edit the GM (he/she is a GM) or if they
 	    // have Outreach privilege, let them view the signups
 
-	    if ($can_edit_game || user_has_priv (PRIV_OUTREACH))
+	    $show_signups = 0;
+	    if (-1 != $SignupId)
+	      $show_signups = SCHEDULE_SHOW_USER_SIGNUPS;
+	    if ($can_edit_game ||
+		user_has_priv (PRIV_OUTREACH))
+	      $show_signups = SCHEDULE_SHOW_SIGNUPS;
+
+	    if (0 != $show_signups)
 	    {
 	      $count_text = sprintf ('<A HREF=Schedule.php?action=%d&RunId=%d' .
 				     '&EventId=%d&FirstTime=1>%s</A>',
-				     SCHEDULE_SHOW_SIGNUPS,
+				     $show_signups,
 				     $run_row->RunId,
 				     $EventId,
 				     $count_text);
@@ -3934,6 +3945,124 @@ function show_signups ()
 	  $EventId,
 	  $Title);
   echo "<P>\n";
+}
+
+function show_user_signups_list($sql, $confirmed)
+{
+  if ($confirmed)
+  {
+    $class = 'Confirmed';
+    $sql .= " AND Signup.State='Confirmed' ORDER BY LastName, FirstName";
+    $order = 'alphabetically';
+  }
+  else
+  {
+    $class = 'Waitlisted';
+    $sql .= " AND Signup.State='Waitlisted' ORDER BY SignupId";
+    $order = 'by signup Id';
+  }
+
+  $result = mysql_query ($sql);
+  if (! $result)
+    return display_mysql_error ("Query for list of $class players failed",
+				$sql);
+
+  if (0 == mysql_num_rows($result))
+    return true;
+
+  echo "<p>\n";
+  echo "<big><b>$class Players ordered $order</b></big>\n";
+  echo "</p>\n";
+  echo "<p>\n";
+
+  while ($row = mysql_fetch_object ($result))
+  {
+    $name = "$row->LastName, $row->FirstName";
+    echo "$name<br />\n";
+  }
+  echo "</p>\n";
+  return true;
+}
+
+/*
+ * show_user_signups
+ *
+ * Show the users that are signed up for this game
+ */
+
+function show_user_signups ()
+{
+  $RunId = intval (trim ($_REQUEST['RunId']));
+  $EventId = intval (trim ($_REQUEST['EventId']));
+
+  // Fetch the game title and suffix (if any)
+  $sql = 'SELECT Events.Title, Events.Hours,';
+  $sql .= ' Events.MinPlayersMale, Events.MaxPlayersMale, Events.PrefPlayersMale,';
+  $sql .= ' Events.MinPlayersFemale, Events.MaxPlayersFemale, Events.PrefPlayersFemale,';
+  $sql .= ' Events.MinPlayersNeutral, Events.MaxPlayersNeutral, Events.PrefPlayersNeutral,';
+  $sql .= ' Runs.TitleSuffix, Runs.StartHour, Runs.Day';
+  $sql .= ' FROM Runs, Events';
+  $sql .= " WHERE Runs.RunId=$RunId AND Events.EventId=Runs.EventId";
+
+  //  echo "$sql<P>\n";
+
+  $result = mysql_query ($sql);
+  if (! $result)
+    return display_mysql_error ("Query for game title and suffix failed for RunID $RunId");
+
+  if (0 == mysql_num_rows ($result))
+    return display_error ("Failed to find game title and suffix for RunId $RunId");
+
+  if (1 != mysql_num_rows ($result))
+    return display_error ("RunId $RunId matched multiple games!");
+
+  $row = mysql_fetch_object ($result);
+
+  $Title = $row->Title;
+  if ('' != $row->TitleSuffix)
+    $Title .= " - $row->TitleSuffix";
+
+  $start_time = start_hour_to_24_hour ($row->StartHour);
+  $end_time = start_hour_to_24_hour ($row->StartHour + $row->Hours);
+
+  $Day = $row->Day;
+  $Date = day_to_date ($Day);
+
+  $max_male = $row->MaxPlayersMale;
+  $max_female = $row->MaxPlayersFemale;
+  $max_neutral = $row->MaxPlayersNeutral;
+  $total = $row->MaxPlayersMale + $row->MaxPlayersFemale + $row->MaxPlayersNeutral;
+
+  echo "<i><b><font size='+2'>$Title</font></b></i><br>\n";
+  echo "<b><big>$Date&nbsp;&nbsp;&nbsp;$start_time - $end_time</big></b><p>\n";
+
+  echo "Max: $total&nbsp;&nbsp;&nbsp;(";
+  echo "Male: $row->MaxPlayersMale,&nbsp;&nbsp;&nbsp;&nbsp;";
+  echo "Female: $row->MaxPlayersFemale,&nbsp;&nbsp;&nbsp;&nbsp;";
+  echo "Neutral: $row->MaxPlayersNeutral)\n";
+
+  // Fetch the list of players signed up
+
+  $sql = 'SELECT Users.UserId, Users.FirstName, Users.LastName,';
+  $sql .= ' Signup.SignupId, Signup.Counted, Signup.State, Signup.Gender';
+  $sql .= ' FROM Signup, Users';
+  $sql .= " WHERE Signup.RunId=$RunId";
+  $sql .= '   AND Users.UserId=Signup.UserId';
+  $sql .= '   AND Signup.State<>"Withdrawn"';
+
+  $conf_sql = $sql . "   AND Signup.State='Confirmed'";
+  $wait_sql = $sql . "   AND Signup.State='Waitlisted'";
+
+  
+  show_user_signups_list($sql, true);
+  show_user_signups_list($sql, false);
+
+  echo "<p>\n";
+  printf ("Return to <a href=\"Schedule.php?action=%d&EventId=%d\"><i>%s</i></a>\n",
+	  SCHEDULE_SHOW_GAME,
+	  $EventId,
+	  $Title);
+  echo "</p>\n";
 }
 
 /*
