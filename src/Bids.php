@@ -579,7 +579,7 @@ function show_bid ()
   show_text ('Multiple Runs', $bid_row['MultipleRuns']);
   show_text ('Can Play Concurrently', $bid_row['CanPlayConcurrently']);
   show_text ('Other Constraints', $bid_row['SchedulingConstraints']);
-  show_text ('Other Game Details', $bid_row['OtherDetails']);
+  //  show_text ('Other Game Details', $bid_row['OtherDetails']);
 
   show_section ('Advertising Information');
 
@@ -813,9 +813,10 @@ function display_bid_form ($first_try)
   echo "<p><font color=red>*</font> indicates a required field\n";
   echo "<TABLE BORDER=0>\n";
 
-    $thingstring = strtolower($gametype);
-    if ($gametype == 'Other')
-        $thingstring = 'event';
+  //  $thingstring = strtolower($gametype);
+  $thingstring = $gametype;
+  if ($gametype == 'Other')
+    $thingstring = 'event';
     
   if ($gametype == 'Other')
     form_section ('Event Information');
@@ -878,103 +879,101 @@ function display_bid_form ($first_try)
     
     if ($gametype != 'Panel')
     {
-        form_section ('Character Counts');
-        echo "  <tr>\n";
-        echo "    <td colspan=2>\n";
-        echo "Enter the minimum, preferred and maximum number of characters\n";
-        echo "for your {$thingstring}.<br>\n";
-        echo "<table>\n";
-	echo "  <tr>\n";
-	echo "    <td valign=\"top\"><i>Minimum&nbsp;-</i></td>\n";
-	echo "    <td>The minimum number of characters required for\n";
-        echo "your {$thingstring}.  If there are fewer than the minimum\n";
-        echo "number of characters signed up, you should talk with the GM\n";
-        echo "Liaison about lowering the minimum number of players or\n";
-	echo "cancelling the {$thingstring}.</td>\n";
+      form_section ('Character Counts');
+      echo "  <tr>\n";
+      echo "    <td colspan=2>\n";
+      echo "Enter the minimum, preferred and maximum number of characters\n";
+      echo "for your $thingstring. The character counts will be visible\n";
+      echo "to users signing up to your $thingstring<br>\n";
+      echo "<table>\n";
+      echo "  <tr>\n";
+      echo "    <td valign=\"top\"><i>Minimum&nbsp;-</i></td>\n";
+      echo "    <td>The minimum number of characters required for\n";
+      echo "your {$thingstring}.  If there are fewer than the minimum\n";
+      echo "number of characters signed up, you should talk with the GM\n";
+      echo "Liaison about lowering the minimum number of players or\n";
+      echo "cancelling the {$thingstring}.</td>\n";
+      echo "  </tr>\n";
+      echo "  <tr>\n";
+      echo "    <td valign=\"top\"><i>Preferred&nbsp;-</i></td>\n";
+      echo "    <td>The number of characters that you'd prefer\n";
+      echo "to have in your {$thingstring}.  If you're not sure, make this\n";
+      echo "the same number as the Maximum.</td>\n";
+      echo "  </tr>\n";
+      echo "  <tr>\n";
+      echo "    <td valign=\"top\"><i>Maximum&nbsp;-</i></td>\n";
+      echo "    <td>The maximum number of players that your {$thingstring}\n";
+      echo "can accomodate.</td>\n";
+      echo "  </tr>\n";
+      echo "</table>\n";
+      if ($gametype != 'Board Game')
+      {
+	echo "Each of your characters can be male, female or neutral.  A\n";
+	echo "<i>male</i> or <i>female</i> character is one which must\n";
+	echo "be a specific gender.  A <i>neutral</i> character is one\n";
+	echo "which can be cast as either male or female, depending on\n";
+	echo "who signs up for the game.  The website will enforce your\n";
+	echo "gender limits, so if only female roles are available, any\n";
+	echo "players that signup who have specified that they prefer\n";
+	echo "to play male characters will be put on the waitlist.  Once\n";
+	echo "you've cast the game, you'll be able to &quot;freeze&quot;\n";
+	echo "the gender balance of the game; essentially converting all\n";
+	echo "of your neutral characters to male or female to match the\n";
+	echo "preferred character gender of the players who are signed\n";
+	echo "up.  This way, if a player drops out, the website will\n";
+	echo "pick the first player on the waitlist with a matching\n";
+	echo "preferred character gender so you don't have to\n";
+	echo "frantically rewrite the character sheet to match the\n";
+	echo "preferred character gender of the new player.<br>&nbsp;\n";
+	echo "    </td>\n";
 	echo "  </tr>\n";
-	echo "  <tr>\n";
-	echo "    <td valign=\"top\"><i>Preferred&nbsp;-</i></td>\n";
-        echo "    <td>The number of characters that you'd prefer\n";
-        echo "to have in your {$thingstring}.  If you're not sure, make this\n";
-	echo "the same number as the Maximum.</td>\n";
-	echo "  </tr>\n";
-	echo "  <tr>\n";
-	echo "    <td valign=\"top\"><i>Maximum&nbsp;-</i></td>\n";
-        echo "    <td>The maximum number of players that your {$thingstring}\n";
-        echo "can accomodate.</td>\n";
-        echo "  </tr>\n";
-        echo "</table>\n";
-        if ($gametype != 'Board Game')
-        {
-            echo "Each of your characters can be male, female or neutral.  A\n";
-            echo "<i>male</i> or <i>female</i> character is one which must\n";
-            echo "be a specific gender.  A <i>neutral</i> character is one\n";
-            echo "which can be cast as either male or female, depending on\n";
-            echo "who signs up for the game.  The website will enforce your\n";
-            echo "gender limits, so if only female roles are available, any\n";
-	    echo "players that signup who have specified that they prefer\n";
-	    echo "to play male characters will be put on the waitlist.  Once\n";
-	    echo "you've cast the game, you'll be able to &quot;freeze&quot;\n";
-	    echo "the gender balance of the game; essentially converting all\n";
-	    echo "of your neutral characters to male or female to match the\n";
-	    echo "preferred character gender of the players who are signed\n";
-	    echo "up.  This way, if a player drops out, the website will\n";
-	    echo "pick the first player on the waitlist with a matching\n";
-	    echo "preferred character gender so you don't have to\n";
-	    echo "frantically rewrite the character sheet to match the\n";
-	    echo "preferred character gender of the new player.<br>&nbsp;\n";
-            echo "    </td>\n";
-            echo "  </tr>\n";
 
-            form_players_entry ('Male', true);
-            form_players_entry ('Female', true);
-            form_players_entry ('Neutral',true);
-        }
-        else
-        {
-            form_hidden_value ('MinPlayersMale', 0);            
-            form_hidden_value ('MaxPlayersMale', 0);            
-            form_hidden_value ('PrefPlayersMale', 0);
-            form_hidden_value ('MinPlayersFemale', 0);            
-            form_hidden_value ('MaxPlayersFemale', 0);            
-            form_hidden_value ('PrefPlayersFemale', 0);
-            form_players_entry ('Neutral',false);
-        }
-        
+	form_players_entry ('Male', true);
+	form_players_entry ('Female', true);
+	form_players_entry ('Neutral',true);
+      }
+      else
+      {
+	form_hidden_value ('MinPlayersMale', 0);            
+	form_hidden_value ('MaxPlayersMale', 0);            
+	form_hidden_value ('PrefPlayersMale', 0);
+	form_hidden_value ('MinPlayersFemale', 0);            
+	form_hidden_value ('MaxPlayersFemale', 0);            
+	form_hidden_value ('PrefPlayersFemale', 0);
+	form_players_entry ('Neutral',false);
+      }
     }
     else
     {
-        form_hidden_value ('MinPlayersMale', 0);            
-        form_hidden_value ('MaxPlayersMale', 0);            
-        form_hidden_value ('PrefPlayersMale', 0);
-        form_hidden_value ('MinPlayersFemale', 0);            
-        form_hidden_value ('MaxPlayersFemale', 0);            
-        form_hidden_value ('PrefPlayersFemale', 0);
-        form_hidden_value ('MinPlayersNeutral', 0);            
-        form_hidden_value ('MaxPlayersNeutral', 0);            
-        form_hidden_value ('PrefPlayersNeutral', 0);
+      form_hidden_value ('MinPlayersMale', 0);            
+      form_hidden_value ('MaxPlayersMale', 0);            
+      form_hidden_value ('PrefPlayersMale', 0);
+      form_hidden_value ('MinPlayersFemale', 0);            
+      form_hidden_value ('MaxPlayersFemale', 0);            
+      form_hidden_value ('PrefPlayersFemale', 0);
+      form_hidden_value ('MinPlayersNeutral', 0);            
+      form_hidden_value ('MaxPlayersNeutral', 0);            
+      form_hidden_value ('PrefPlayersNeutral', 0);
     }
   }
 
-    if ($gametype == 'Other')
-        form_section ('Other Event Information');
-    else if ($gametype == 'Panel')
-        form_section ('Other Panel Information');
-    else
-        form_section ('Other Game Information');
-
+  if ($gametype == 'Other')
+    form_section ('Other Event Information');
+  else if ($gametype == 'Panel')
+    form_section ('Other Panel Information');
+  else
+    form_section ('Other Game Information');
 
   if ($gametype == 'LARP' || $gametype == 'Tabletop RPG')
   {
-        form_text (64, 'Genre', '', 0, TRUE);
-        form_yn ('Is this game part of an ongoing campaign?', 'N');
+    form_text (64, 'Genre', '', 0, TRUE);
+    form_yn ('Is this game part of an ongoing campaign?', 'N');
   }
   else
   {
-        form_hidden_value ('Genre', 'X');
-        form_hidden_value ('OngoingCampaign', 'N');
+    form_hidden_value ('Genre', 'X');
+    form_hidden_value ('OngoingCampaign', 'N');
   }
-  
 
   echo "  <tr>\n";
   echo "    <td colspan=2>\n";
@@ -989,87 +988,88 @@ function display_bid_form ($first_try)
 */
   if ($gametype == 'LARP' || $gametype == 'Tabletop RPG')
   {
-      $text = "<b>GMs for your game.</b>  Note that the GMs listed here are only for\n";
-      $text .= "the purpose of evaluating your proposal.  If your proposal is accepted,\n";
-      $text .= "you'll be able to select GMs from the users registered for\n";
-      $text .= CON_NAME . ".\n";
-      /*$text .= "Each accepted bid is allowed two comp'd attendees\n";
-      $text .= "for the con.  You will be responsible for determing which of\n";
-      $text .= "your GMs will be comp'd.\n";*/
-      form_textarea ($text, 'GMs', 2);
+    $text = CON_NAME ." is looking for games that are new and games that\n";
+    $text .= "have run before, either at a convention, or elsewhere.\n";
+    $text .= "If this game has run before, where was that?";
+    form_text_one_col (80, $text, 'RunBefore', 128);
   }
   else
   {
-      $text = "<b>Event runners.</b>  Note that the people listed here are only for\n";
-      $text .= "the purpose of evaluating your bid.  If your bid is accepted,\n";
-      $text .= "you'll be able to select event runners from the users registered for\n";
-      $text .= CON_NAME . ".\n";
-      /*$text .= "Each accepted bid is allowed two comp'd attendees\n";
-      $text .= "for the con.  You will be responsible for determing which of\n";
-      $text .= "your runners will be comp'd.\n";*/
-      form_textarea ($text, 'GMs', 2);
-  }
-
-  if ($gametype != 'Board Game')
-  {
-      form_textarea ('Please enter any additional background information here.  This information will be shown only to the Bid Committee.', 'Premise', 3, TRUE, TRUE);
-  }
-  else
-  {
-      form_hidden_value ('Premise', 'X');
-  }
-
-  if ($gametype == 'LARP' || $gametype == 'Tabletop RPG')
-  {
-      $text = CON_NAME ." is looking for games that are new and games that\n";
-      $text .= "have run before, either at a convention, or elsewhere.\n";
-      $text .= "If this game has run before, where was that?";
-      form_text_one_col (80, $text, 'RunBefore', 128);
-  }
-  else
-  {
-      form_hidden_value ('RunBefore', '');
+    form_hidden_value ('RunBefore', '');
   }
   
   if ($gametype == 'LARP' || $gametype == 'Tabletop RPG')
   {
-      form_text (64, 'Game System', 'GameSystem', 128);
+    form_text (64, 'Game System', 'GameSystem', 128);
   }
   else if ($gametype == 'Board Game')
   {
-      form_text (64, 'Game Name', 'GameSystem', 128);
+    form_text (64, 'Game Name', 'GameSystem', 128);
   }
   else
   {
-      form_hidden_value ('GameSystem', '');
+    form_hidden_value ('GameSystem', '');
   }
   
   if ($gametype == 'LARP')
   {
-      form_combat ('CombatResolution', 'How combat will be resolved');
+    form_combat ('CombatResolution', 'How combat will be resolved');
+  }
+  else
+  {
+    form_hidden_value ('CombatResolution', 'NoCombat');
+  }
+  
+  if ($gametype != 'Board Game')
+  {
+      form_textarea ('Please enter any additional background information here, or any other information you wish to tell the Bid Committee.  This information will be shown only to the Bid Committee.', 'Premise', 5, TRUE, TRUE);
+  }
+  else
+  {
+    form_hidden_value ('Premise', 'X');
+  }
 
+  //  form_textarea ('Other Event Details', 'OtherDetails', 5);
+  
+  form_section ('GMs/Author Information');
+
+  if ($gametype == 'LARP' || $gametype == 'Tabletop RPG')
+  {
+    $text = "<b>GMs for your game.</b>  Note that the GMs listed here are\n";
+    $text .= "only for the purpose of evaluating your proposal. If your\n";
+    $text .= "proposal is accepted, you'll be able to select GMs from the\n";
+    $text .= "users registered for" . CON_NAME . ".\n";
+    /*$text .= "Each accepted bid is allowed two comp'd attendees\n";
+     $text .= "for the con.  You will be responsible for determing which of\n";
+     $text .= "your GMs will be comp'd.\n";*/
+    form_textarea ($text, 'GMs', 2);
   }
   else
   {
-      form_hidden_value ('CombatResolution', 'NoCombat');
+    $text = "<b>Event runners.</b>  Note that the people listed here are only for\n";
+    $text .= "the purpose of evaluating your bid.  If your bid is accepted,\n";
+    $text .= "you'll be able to select event runners from the users registered for\n";
+    $text .= CON_NAME . ".\n";
+      /*$text .= "Each accepted bid is allowed two comp'd attendees\n";
+      $text .= "for the con.  You will be responsible for determing which of\n";
+      $text .= "your runners will be comp'd.\n";*/
+    form_textarea ($text, 'GMs', 2);
   }
-  
+
   if ($gametype == 'LARP')
   {
-      form_textarea ('What other LARPs have your written or run?  Where and when were they run?',
-                     'OtherGames', 5);
+    form_textarea ('What other LARPs have your written or run?  Where and when were they run? This information will only be shown to the Bid Committee.',
+		   'OtherGames', 5);
   }
   else if ($gametype == 'Panel')
   {
-       form_textarea ('What other panels have you organized?  What is your basis of expertise in this area?',
-                     'OtherGames', 5);
+    form_textarea ('What other panels have you organized?  What is your basis of expertise in this area?',
+		   'OtherGames', 5);
   }
   else
   {
       form_hidden_value ('OtherGames', '');
   }
-  
-  form_textarea ('Other Event Details', 'OtherDetails', 5);
   
   form_section ('Restrictions');
 
@@ -1422,7 +1422,7 @@ function process_bid_form ()
   $sql .= build_sql_string ('Fee');
   $sql .= build_sql_string ('GameSystem');
   $sql .= build_sql_string ('CombatResolution');
-  $sql .= build_sql_string ('OtherDetails', '', true, true);
+  //  $sql .= build_sql_string ('OtherDetails', '', true, true);
   $sql .= build_sql_string ('OtherGMs');
   $sql .= build_sql_string ('OtherGames', '', true, true);
 
