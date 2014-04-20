@@ -851,11 +851,11 @@ function display_bid_form ($first_try)
     form_text (64, 'EMail for event inquiries', 'GameEMail', 0, TRUE);
     form_text (2, 'Event Length', 'Hours', 0, TRUE, '(Hours)');
 
-    $text = "<b>Description</b> for use on the " . CON_NAME . " website.  This\n";
-    $text .= "information will also be used for advertising and some\n";
-    $text .= "flyers.  The description should be a couple of paragraphs,\n";
-    $text .= "but can be as long as you like.</p>\n";
-    $text .= "<P>The description will be displayed in the user's browser.\n";
+    $text = "<b>Description</b> for use on the " . CON_NAME . " website.\n";
+    $text .= "This information will displayed \n";
+    $text .= "on the page users see for the game.  The description should be\n";
+    $text .= "a couple of paragraphs, but can be as long as you like.</p>\n";
+    $text .= "<p>The description will be displayed in the user's browser.\n";
     $text .= "You must use HTML tags for formatting.  A quick primer on\n";
     $text .= "a couple of useful HTML tags is available\n";
     if (file_exists('HtmlPrimer.html'))
@@ -864,9 +864,10 @@ function display_bid_form ($first_try)
         $text .= "<A HREF=".TEXT_DIR."/HtmlPrimer.html TARGET=_blank>here</A>.\n";
     form_textarea ($text, 'Description', 15, TRUE, TRUE);
 
-    $text = "A <b>short blurb</b> (50 words or less) for the game to be used for\n";
-    $text .= "the List of Events page and on con flyers.\n";
-    $text .= "<P>The short blurb will be displayed in the user's browser.\n";
+    $text = "A <b>Short Blurb</b> (50 words or less) for the game to be\n";
+    $text .= "used for the List of Events page and the convention\n";
+    $text .= "program.</p>\n";
+    $text .= "<p>The short blurb will be displayed in the user's browser.\n";
     $text .= "You must use HTML tags for formatting.  A quick primer on\n";
     $text .= "a couple of useful HTML tags is available\n";
     if (file_exists('HtmlPrimer.html'))
