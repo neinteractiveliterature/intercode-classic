@@ -581,15 +581,10 @@ function show_bid ()
   show_text ('Other Constraints', $bid_row['SchedulingConstraints']);
   //  show_text ('Other Game Details', $bid_row['OtherDetails']);
 
-  show_section ('Advertising Information');
-
-  show_text ('Short Sentence', $bid_row['ShortSentence']);
+  show_section ('Game Descriptions');
+  //  show_text ('Tweetable Blurb', $bid_row['ShortSentence']);
   show_text ('Short Blurb', $bid_row['ShortBlurb']);
   show_text ('Description', $bid_row['Description']);
-  show_text ('Shameless Plugs', $bid_row['ShamelessPlugs']);
-  show_text ('GM Advertise Game', $bid_row['GMGameAdvertising']);
-  show_text ('GM Advertise Intercon', $bid_row['GMInterconAdvertising']);
-  show_text ('Send Flyers', $bid_row['SendFlyers']);
 
   echo "</TABLE>\n";
   echo "<P>\n";
@@ -1170,6 +1165,9 @@ function display_bid_form ($first_try)
                'CanPlayConcurrently');
   }
 
+  form_yn ("Are you willing to hold this {$thingstring} more than once at this convention?",
+	   'MultipleRuns');
+
   $text = "Are there any other scheduling constraints on your {$thingstring}?  For\n";
   //$text .= "example, are you a GM for another game?  Any times your game\n";
   $text .= "example, are you proposing another event?  Any times your {$thingstring}\n";
@@ -1178,48 +1176,14 @@ function display_bid_form ($first_try)
 
   form_textarea ('Space Requirements', 'SpaceRequirements', 2);
   
-  form_yn ("Are you willing to hold this {$thingstring} more than once at this convention?",
-	   'MultipleRuns');
-
-  form_section ('Advertising Information');
-
+  /* Tweetable Blurb
   $text = "A short sentence for the {$thingstring} to be used to sell the {$thingstring} to the\n";
   $text .= "general public.  Include information about the genre.  For\n";
   $text .= "example, &quot;Members of a Vampire Cabal battle for control of\n";
   $text .= "Chelmsford&quot; is better than &quot;The Prince of\n";
   $text .= "Chelmsford is dead.  Who will take his place?&quot;";
   form_textarea ($text, 'ShortSentence', 2, TRUE, TRUE);
-
-  if ($gametype == 'LARP' || $gametype == 'Tabletop RPG')
-  {
-      $text = "Without giving away any secrets for the game (because we want to\n";
-      $text .= "play it too), are there any additional interesting things that\n";
-      $text .= "we can use when we do Shameless Plugs for the con?  Do you\n";
-      $text .= "have a Shameless Plug or advertising spiel you use when you\n";
-      $text .= "talk about the game that you can send or describe to us?";
-  }
-  else
-  {
-      $text = "Are there any additional interesting things that\n";
-      $text .= "we can use when we do Shameless Plugs for the con?  Do you\n";
-      $text .= "have a plug or advertising spiel you use when you\n";
-      $text .= "talk about the {$thingstring} that you can send or describe to us?";
-  }
-  form_textarea ($text, 'ShamelessPlugs', 4);
-
-  $text = "Are you going to any games, events or other conventions where\n";
-  $text .= "you will advertise your {$thingstring} for ".CON_NAME."?  If so, which ones?";
-  form_textarea ($text, 'GMGameAdvertising', 4);
-
-  $text = "Would you be willing to advertise ".CON_NAME." at these events, by\n";
-  $text .= "taking flyers, doing plugs for ".CON_NAME.", or doing plugs for\n";
-  $text .= "other events at ".CON_NAME."?  If so, what are you willing to do,\n";
-  $text .= "and when?";
-  form_textarea ($text, 'GMInterconAdvertising', 4);
-
-  form_yn ('Do you want us to send you flyers to distribute?',
-	   'SendFlyers');
-
+  */
   if (0 == $BidId)
     $text = 'Submit Bid';
   else
@@ -1480,10 +1444,6 @@ function process_bid_form ()
   $sql = 'UPDATE Bids SET ';
 
   $sql .= build_sql_string ('ShortSentence', '', FALSE);
-  $sql .= build_sql_string ('ShamelessPlugs', '', TRUE, TRUE);
-  $sql .= build_sql_string ('GMGameAdvertising', '', TRUE, TRUE);
-  $sql .= build_sql_string ('GMInterconAdvertising', '', TRUE, TRUE);
-  $sql .= build_sql_string ('SendFlyers');
   $sql .= " WHERE BidId=$BidId";
 
   //echo "Advertising info: $sql <P>\n";
