@@ -541,7 +541,6 @@ function show_bid ()
 
   show_text ('Offensive', $bid_row['Offensive']);
   show_text ('Physical Restrictions', $bid_row['PhysicalRestrictions']);
-  show_text ('Age Restrictions', $bid_row['AgeRestrictions']);
   show_text ('Age Appropriate', $bid_row['AgeAppropriate']);
 
   show_section ('Scheduling Information');
@@ -1084,29 +1083,31 @@ function display_bid_form ($first_try)
   echo "    </TD>\n";
   echo "  </tr>\n";
 
-  $text = "Are there any components of your {$thingstring} that might offend or upset\n";
-  $text .= "some group of attendees?  For example, adult themes, potentially\n";
-  $text .= "offensive story arcs, etc.  If so, please explain.";
+  $text = "Are there any components of your {$thingstring} that\n";
+  $text .= "might offend or upset some group of attendees? For\n";
+  $text .= "example, adult themes, potentially offensive story arcs,\n";
+  $text .= "etc.  If so, please explain and consider if this needs to\n";
+  $text .= "be mentioned in the game descriptions.\n";
   form_textarea ($text, 'Offensive', 5);
 
   if ($gametype == 'LARP' || $gametype == 'Other')
   {
-      $text = "Are there any physical restrictions imposed by your {$thingstring}?  For\n";
-      $text .= "example, live boffer combat, confined sets, etc.  If so, please\n";
-      $text .= "explain.";
-      form_textarea ($text, 'PhysicalRestrictions', 5);
+    $text = "Are there any physical restrictions imposed by your\n";
+    $text .= "{$thingstring}?  For example, live boffer combat,\n";
+    $text .= "confined sets, etc.  If so, please explain and consider\n";
+    $text .= "if this needs to be mentioned in the game descriptions.";
+    form_textarea ($text, 'PhysicalRestrictions', 5);
   }
   else
       form_hidden_value ('PhysicalRestrictions', '');
-  
-  $text = "Are there any components of your {$thingstring} that might be illegal for\n";
-  $text .= "attendees under the age of 18?  For example, props or items that\n";
-  $text .= "are illegal for a minor to possess, alcohol, etc.  If so, please\n";
-  $text .= "explain.";
-  form_textarea ($text, 'AgeRestrictions', 5);
-  
-  $text = "Is your game appropriate for players under the age of 18? Please discuss any\n";
-  $text .= "age restrictions here.";
+
+  $text = "Is your game appropriate for players under the age of 18?\n";
+  $text .= "Please discuss any age restrictions here. If there are\n";
+  $text .= "any components of your {$thingstring} that might be\n";
+  $text .= "illegal for attendees under the age of 18 (props or\n";
+  $text .= "items that are illegal for a minor to possess, alcohol,\n";
+  $text .= "etc.) please explain. If your game has age restrictions,\n";
+  $text .= "please be sure to mention this in the game descriptions.\n";
   form_textarea ($text, 'AgeAppropriate', 5);
   
  if (ALLOW_EVENT_FEES)
@@ -1403,7 +1404,7 @@ function process_bid_form ()
 
   $sql .= build_sql_string ('Offensive', '', FALSE, TRUE);
   $sql .= build_sql_string ('PhysicalRestrictions', '', TRUE, TRUE);
-  $sql .= build_sql_string ('AgeRestrictions', '', TRUE, TRUE);
+  //  $sql .= build_sql_string ('AgeRestrictions', '', TRUE, TRUE);
   $sql .= build_sql_string ('AgeAppropriate', '', TRUE, TRUE);
   $sql .= build_sql_string ('SchedulingConstraints', '', TRUE, TRUE);
   $sql .= build_sql_string ('SpaceRequirements', '', TRUE, TRUE);
