@@ -531,7 +531,7 @@ function show_bid ()
   show_text ('Ongoing Campaign', $bid_row['OngoingCampaign']);
 /*  show_text ('LARPA Small Game<br>Contest Entry',
 	     $bid_row['IsSmallGameContestEntry']); */
-  show_text ('Additional Background Info', $bid_row['Premise']);
+  show_text ('Additional<br />Background Info', $bid_row['Premise']);
   show_text ('Run Before', $bid_row['RunBefore']);
   show_text ('Game System', $bid_row['GameSystem']);
   show_text ('Combat Resolution', $bid_row['CombatResolution']);
@@ -579,7 +579,7 @@ function show_bid ()
   show_text ('Multiple Runs', $bid_row['MultipleRuns']);
   show_text ('Can Play Concurrently', $bid_row['CanPlayConcurrently']);
   show_text ('Other Constraints', $bid_row['SchedulingConstraints']);
-  //  show_text ('Other Game Details', $bid_row['OtherDetails']);
+  show_text ('Setup/Teardown<br />Requirements', $bid_row['SetupTeardown']);
 
   show_section ('Game Descriptions');
   //  show_text ('Tweetable Blurb', $bid_row['ShortSentence']);
@@ -804,7 +804,6 @@ function display_bid_form ($first_try)
   form_hidden_value ('BidId', $BidId);
   form_hidden_value ('EditGameInfo', $EditGameInfo);
 
-
   echo "<p><font color=red>*</font> indicates a required field\n";
   echo "<TABLE BORDER=0>\n";
 
@@ -1018,15 +1017,15 @@ function display_bid_form ($first_try)
   
   if ($gametype != 'Board Game')
   {
-      form_textarea ('Please enter any additional background information here, or any other information you wish to tell the Bid Committee.  This information will be shown only to the Bid Committee.', 'Premise', 5, TRUE, TRUE);
+      form_textarea ('Please enter any additional background information here, or any other information you wish to tell the Bid Committee. This information will be shown only to the Bid Committee.', 'Premise', 5, TRUE, TRUE);
+      form_textarea ("Are there any special setup or teardown requirements for this $thingstring? This information will be shown only to the Bid Committee.", 'SetupTeardown', 5);
   }
   else
   {
     form_hidden_value ('Premise', 'X');
+    form_hidden_value ('SetupTeardown', 'X');
   }
 
-  //  form_textarea ('Other Event Details', 'OtherDetails', 5);
-  
   form_section ('GMs/Author Information');
 
   if ($gametype == 'LARP' || $gametype == 'Tabletop RPG')
@@ -1297,7 +1296,7 @@ function process_bid_form ()
 
   // Advertising Information
 
-  $form_ok &= validate_string ('ShortSentence', 'Short sentence');
+  //  $form_ok &= validate_string ('ShortSentence', 'Short sentence');
 
   // If any errors were found, abort now
 
@@ -1387,7 +1386,6 @@ function process_bid_form ()
   $sql .= build_sql_string ('Fee');
   $sql .= build_sql_string ('GameSystem');
   $sql .= build_sql_string ('CombatResolution');
-  //  $sql .= build_sql_string ('OtherDetails', '', true, true);
   $sql .= build_sql_string ('OtherGMs');
   $sql .= build_sql_string ('OtherGames', '', true, true);
 
@@ -1409,6 +1407,7 @@ function process_bid_form ()
   $sql .= build_sql_string ('AgeAppropriate', '', TRUE, TRUE);
   $sql .= build_sql_string ('SchedulingConstraints', '', TRUE, TRUE);
   $sql .= build_sql_string ('SpaceRequirements', '', TRUE, TRUE);
+  $sql .= build_sql_string ('SetupTeardown', '', true, true);
   $sql .= build_sql_string ('MultipleRuns');
   $sql .= " WHERE BidId=$BidId";
 
