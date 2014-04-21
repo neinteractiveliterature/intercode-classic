@@ -845,7 +845,8 @@ function display_bid_form ($first_try)
     form_text (64, 'Organization');
     form_text (64, 'Event or organization homepage', 'Homepage', 128);
     form_text (64, 'EMail for event inquiries', 'GameEMail', 0, TRUE);
-    form_text (2, 'Event Length', 'Hours', 0, TRUE, '(Hours)');
+    form_text (2, 'Event Length', 'Hours', 0, TRUE,
+	       '(Hours) - Note that this time includes game wrap.');
 
     $text = "<b>Description</b> for use on the " . CON_NAME . " website.\n";
     $text .= "This information will displayed \n";
