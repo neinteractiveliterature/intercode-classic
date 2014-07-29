@@ -209,11 +209,12 @@ define (FULL_LOGO, 'O_Banner_FNL_400x400.png');
   
 //Items for Bids/Schedule
 global $CON_DAYS;
-$CON_DAYS = array('Friday', 'Saturday', 'Sunday');
+$CON_DAYS = array('Thursday', 'Friday', 'Saturday', 'Sunday');
 
 //These must match the text values in the BidTimes table slot field.
 global $BID_SLOTS;
 $BID_SLOTS = array();
+$BID_SLOTS['Thursday'] = array('Evening', 'After Midnight');
 $BID_SLOTS['Friday'] = array('Afternoon', 'Evening', 'After Midnight');
 $BID_SLOTS['Saturday'] = array('Morning', 'Afternoon', 'Evening', 'After Midnight');
 $BID_SLOTS['Sunday'] = array('Morning');

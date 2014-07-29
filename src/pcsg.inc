@@ -205,6 +205,7 @@ class ScheduleBlock {
 
 function pcsg_get_default_blocks() {
   return array(
+        new ScheduleBlock(10, 24, "Thu"),
 	new ScheduleBlock(17, 24, "Fri"),
 	new ScheduleBlock(10, 24, "Sat"),
 	new ScheduleBlock(9, 13, "Sun")

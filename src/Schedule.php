@@ -327,6 +327,7 @@ function show_away_schedule_form ()
 {  
   // Arrays for times away for each day
 
+  $thu_hours = array ();
   $fri_hours = array ();
   $sat_hours = array ();
   $sun_hours = array ();
@@ -337,6 +338,7 @@ function show_away_schedule_form ()
   $game_max_female = array();
   $game_max_neutral = array();
 
+  $away_thu = '';
   $away_fri = '';
   $away_sat = '';
   $away_sun = '';
@@ -345,6 +347,9 @@ function show_away_schedule_form ()
   $logged_in = is_logged_in();
 
   // Initialize the daily hours away arrays
+
+  for ($h = THU_MIN; $h <= THU_MAX; $h++)
+    $thu_hours[$h] = '';
 
   for ($h = FRI_MIN; $h <= FRI_MAX; $h++)
     $fri_hours[$h] = '';
@@ -368,6 +373,8 @@ function show_away_schedule_form ()
     $row = mysql_fetch_array ($result);
     if ($row)
     {
+      if (1 == $row['Thu'])
+	$away_thu = 'CHECKED';
       if (1 == $row['Fri'])
 	$away_fri = 'CHECKED';
       if (1 == $row['Sat'])
@@ -376,6 +383,13 @@ function show_away_schedule_form ()
 	$away_sun = 'CHECKED';
 
       $AwayId = intval ($row['AwayId']);
+
+      for ($h = THU_MIN; $h <= THU_MAX; $h++)
+      {
+	$k = sprintf ('Thu%02d', $h);
+	if (1 == $row[$k])
+	  $thu_hours[$h] = 'CHECKED';
+      }
 
       for ($h = FRI_MIN; $h <= FRI_MAX; $h++)
       {
@@ -430,6 +444,7 @@ function show_away_schedule_form ()
       {
 	switch ($row->Day)
 	{
+          case 'Thu': $thu_hours[$h] = 'Hidden'; break;
           case 'Fri': $fri_hours[$h] = 'Hidden'; break;
           case 'Sat': $sat_hours[$h] = 'Hidden'; break;
           case 'Sun': $sun_hours[$h] = 'Hidden'; break;
@@ -437,6 +452,7 @@ function show_away_schedule_form ()
       }
       switch ($row->Day)
       {
+        case 'Thu': $away_thu = 'Hidden'; break;
         case 'Fri': $away_fri = 'Hidden'; break;
         case 'Sat': $away_sat = 'Hidden'; break;
         case 'Sun': $away_sun = 'Hidden'; break;
@@ -454,43 +470,46 @@ function show_away_schedule_form ()
 
   // Display the schedule for each day
 
+  schedule_day ('Thu', $away_thu, $thu_hours,
+		$signed_up_runs,
+		$logged_in, false);
   schedule_day ('Fri', $away_fri, $fri_hours,
-		     $signed_up_runs,
-			 $logged_in, false);
+		$signed_up_runs,
+		$logged_in, false);
   schedule_day ('Sat', $away_sat, $sat_hours,
-		     $signed_up_runs,
-			 $logged_in, false);
+		$signed_up_runs,
+		$logged_in, false);
   schedule_day ('Sun', $away_sun, $sun_hours,
-		     $signed_up_runs,
-			 $logged_in, false);
+		$signed_up_runs,
+		$logged_in, false);
 
   // Display the color key
 
   $spaces = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 
-  echo "<P>\n";
-  echo "<TABLE CELLSPACING=3>\n";
-  echo "  <TR>\n";
+  echo "<p>\n";
+  echo "<table cellspacing=\"3\">\n";
+  echo "  <tr>\n";
   if ($logged_in)
   {
-    echo "    <TD" . get_bgcolor ('Confirmed') . ">$spaces</TD>\n";
-    echo "    <TD>Scheduled for Game$spaces</TD>\n";
-    echo "    <TD" . get_bgcolor ('Waitlisted') . ">$spaces</TD>\n";
-    echo "    <TD>Waitlisted for Game$spaces</TD>\n";
+    echo "    <td" . get_bgcolor ('Confirmed') . ">$spaces</td>\n";
+    echo "    <td>Scheduled for Game$spaces</td>\n";
+    echo "    <td" . get_bgcolor ('Waitlisted') . ">$spaces</td>\n";
+    echo "    <td>Waitlisted for Game$spaces</td>\n";
   }
-  echo "    <TD" . get_bgcolor ('Full') . ">$spaces</TD>\n";
-  echo "    <TD>Game Full$spaces</TD>\n";
-  echo "    <TD" . get_bgcolor ('CanPlayConcurrently') . ">$spaces</TD>\n";
-  echo "    <TD>Can Play At Same Time As Other Games</TD>\n";
+  echo "    <td" . get_bgcolor ('Full') . ">$spaces</td>\n";
+  echo "    <td>Game Full$spaces</td>\n";
+  echo "    <td" . get_bgcolor ('CanPlayConcurrently') . ">$spaces</td>\n";
+  echo "    <td>Can Play At Same Time As Other Games</td>\n";
   if ($logged_in)
   {
-    echo "    <TD" . get_bgcolor ('Away') . ">$spaces</TD>\n";
-    echo "    <TD>Away</TD>\n";
+    echo "    <td" . get_bgcolor ('Away') . ">$spaces</td>\n";
+    echo "    <td>Away</td>\n";
   }
-  echo "  </TR>\n";
-  echo "</TABLE>\n";
+  echo "  </tr>\n";
+  echo "</table>\n";
 
-  echo "</FORM>\n";
+  echo "</form>\n";
 
   if ($logged_in)
   {
@@ -773,8 +792,8 @@ function get_signup_counts($run_ids) {
 }
 
 function schedule_day ($day, $away_all_day, $away_hours,
-			    $signed_up_runs,
-				$show_away_column, $show_counts)
+		       $signed_up_runs,
+		       $show_away_column, $show_counts)
 {
   $show_debug_info = user_has_priv (PRIV_SCHEDULING);
   
@@ -801,7 +820,7 @@ function schedule_day ($day, $away_all_day, $away_hours,
   if (0 == mysql_num_rows ($result))
   {
     echo "No games scheduled for $day<P>";
-    return TRUE;
+    return true;
   }
 
   // Display the result as a table.  Only the header row should specify
@@ -815,8 +834,8 @@ function schedule_day ($day, $away_all_day, $away_hours,
   $volunteerRuns = array();
   $eventRuns = array();
   
-  $mainBlock = new ScheduleBlock();
-  $volunteerBlock = new ScheduleBlock();
+  $mainBlock = new ScheduleBlock(36, 0);
+  $volunteerBlock = new ScheduleBlock(36, 0);
 
   while ($row = mysql_fetch_object ($result))
   {
@@ -838,7 +857,7 @@ function schedule_day ($day, $away_all_day, $away_hours,
   // expand both blocks to match start/end times
   $blockStart = min(array($mainBlock->startHour, $volunteerBlock->startHour));
   $blockEnd = max(array($mainBlock->endHour, $volunteerBlock->endHour));
-  
+
   $mainBlock->startHour = $blockStart;
   $mainBlock->endHour = $blockEnd;
   $volunteerBlock->startHour = $blockStart;
@@ -1102,6 +1121,8 @@ function display_schedule_with_counts ()
   echo "/<FONT COLOR=red>&lt;waitlisted&gt</FONT>/&lt;away&gt; players for this game or hour<P>\n";
   echo "The Totals column includes an extra entry for the number of players who\n";
   echo "have indicated that they will be away that hour<p>\n";
+
+  schedule_day ('Thu', array(), array(), array(), false, true);
   schedule_day ('Fri', array(), array(), array(), false, true);
   schedule_day ('Sat', array(), array(), array(), false, true);
   schedule_day ('Sun', array(), array(), array(), false, true);

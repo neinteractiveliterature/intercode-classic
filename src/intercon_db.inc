@@ -306,6 +306,8 @@ define ('MAX_TRACKS', 15);
 
 // Minimum and maximum times for con days
 
+define ('THU_MIN', 20);    // 8PM
+define ('THU_MAX', 24);    // 12 midnight
 define ('FRI_MIN', 12);    // 12 noon
 define ('FRI_MAX', 31);    // 7AM
 define ('SAT_MIN', 8);     // 8AM
@@ -448,6 +450,7 @@ function day_to_date ($day)
 {
   switch ($day)
   {
+    case 'Thu': return THU_TEXT;
     case 'Fri': return FRI_TEXT;
     case 'Sat': return SAT_TEXT;
     case 'Sun': return SUN_TEXT;
@@ -455,7 +458,7 @@ function day_to_date ($day)
 
   // Should never get here!
 
-  return "Invalid day \"$day\"";
+  return "day_to_date: Invalid day \"$day\"";
 }
 
 /*
@@ -1004,25 +1007,28 @@ function form_day ($display, $key=0)
   if (array_key_exists ($key, $_POST))
     $value = $_POST[$key];
 
+  $ThuChecked = '';
   $FriChecked = '';
   $SunChecked = '';
   $SatChecked = '';
 
   switch ($value)
   {
+    case 'Thu': $ThuChecked = 'CHECKED'; break;
     case 'Fri': $FriChecked = 'CHECKED'; break;
     case 'Sun': $SunChecked = 'CHECKED'; break;
     default:    $SatChecked = 'CHECKED'; break;
   }
 
-  echo "  <TR>\n";
-  echo "    <TD ALIGN=RIGHT>$display:</TD>\n";
-  echo "    <TD>\n";
-  echo "      <INPUT TYPE=RADIO NAME=Day VALUE=\"Fri\" $FriChecked> Friday\n";
-  echo "      <INPUT TYPE=RADIO NAME=Day VALUE=\"Sat\" $SatChecked> Saturday\n";
-  echo "      <INPUT TYPE=RADIO NAME=Day VALUE=\"Sun\" $SunChecked> Sunday\n";
-  echo "    </TD>\n";
-  echo "  </TR>\n";
+  echo "  <tr>\n";
+  echo "    <td align=\"right\">$display:</td>\n";
+  echo "    <td>\n";
+  echo "      <input type=\"radio\" name=\"Day\" value=\"Thu\" $ThuChecked> Thursday\n";
+  echo "      <input type=\"radio\" name=\"Day\" value=\"Fri\" $FriChecked> Friday\n";
+  echo "      <input type=\"radio\" name=\"Day\" value=\"Sat\" $SatChecked> Saturday\n";
+  echo "      <input type=\"radio\" name=\"Day\" value=\"Sun\" $SunChecked> Sunday\n";
+  echo "    </td>\n";
+  echo "  </tr>\n";
 }
 
 /*
@@ -1406,12 +1412,15 @@ function validate_day_time ($time_key, $day_key, $time_display=0, $day_display=0
 
   switch ($day)
   {
+    case 'Thu':
+      $min_hour = THU_MIN;
+      $max_hour = THU_MAX;
+      break;
+
     case 'Fri':
-    {
       $min_hour = FRI_MIN;
       $max_hour = FRI_MAX;
       break;
-    }
 
     case 'Sat':
     {
@@ -2790,9 +2799,10 @@ function display_sequence_error ($result)
 
 function display_valid_start_times ()
 {
-  echo "<P>\n";
-  echo "<TABLE>\n";
-  echo "  <TR><TD COLSPAN=2 ALIGN=CENTER><B>Valid Start Times</B></TD></TR>\n";
+  echo "<p>\n";
+  echo "<table>\n";
+  echo "  <tr><td colspan=\"2\" align=\"center\"><b>Valid Start Times</b></td></tr>\n";
+  start_time_table_row ('Thursday', THU_MIN, THU_MAX);
   start_time_table_row ('Friday',   FRI_MIN, FRI_MAX);
   start_time_table_row ('Saturday', SAT_MIN, SAT_MAX);
   start_time_table_row ('Sunday',   SUN_MIN, SUN_MAX);

@@ -1118,38 +1118,41 @@ function display_bid_form ($first_try)
  
   form_section ('Scheduling Information');
 
-  echo "  <TR>\n";
-  echo "    <TD COLSPAN=2>\n";
-  echo "      The con can schedule your game into one (or more) of the\n";
-  echo "      eight time slots available over the weekend.  The con has to\n";
-  echo "      put together a balanced schedule so we can satisfy the most\n";
-  echo "      players in the most time slots.  Your flexibility in\n";
-  echo "      scheduling your game is vital.<p>\n";
-  echo "      Please pick your top three preferences for when you'd like to\n";
-  echo "      run your game.\n";
-  echo "    </TD>\n";
-  echo "  </TR>\n";
+  echo "  <tr>\n";
+  echo "    <td colspan=\"2\">\n";
+  echo "      <p>The con can schedule your game into one (or more) of\n";
+  echo "      the time slots available over the weekend.  The con has\n";
+  echo "      to put together a balanced schedule so we can satisfy\n";
+  echo "      the most players in the most time slots.  Your\n";
+  echo "      flexibility in scheduling your game is vital.</p>\n";
+  echo "      <p>Please pick your top three preferences for when\n";
+  echo "      you'd like to run your game.</p>\n";
+  echo "    </td>\n";
+  echo "  </tr>\n";
 
   global $CON_DAYS;
   global $BID_SLOTS;
 
-  echo "  <TR>\n";
-  echo "    <TD COLSPAN=2>\n";
-  echo "      <TABLE BORDER=1>\n";
-  echo "        <TR VALIGN=BOTTOM>\n";
-  echo "          <TH></TH>\n";
+  echo "  <tr>\n";
+  echo "    <td colspan=\"2\">\n";
+  echo "      <table border=\"1\">\n";
+  echo "        <tr valign=\"bottom\">\n";
+  echo "          <th></th>\n";
   foreach ($CON_DAYS as $day)
-  	echo "          <TH>{$day}</TH>\n";
+    echo "          <th>{$day}</th>\n";
   echo "        </tr>\n";
-  foreach ($BID_SLOTS['All'] as $main_slot) {
-	  echo "        <TR ALIGN=CENTER>\n";
-	  echo "          <TH>{$main_slot}</TH>\n";
-	  foreach ($CON_DAYS as $day)
-	  	if (in_array($main_slot,$BID_SLOTS[$day]))
-	  		schedule_table_entry ("{$day}_{$main_slot}");
-		else
-	  		echo "          <TD>&nbsp;</TD>\n";
-	  echo "        </tr>\n";
+  foreach ($BID_SLOTS['All'] as $main_slot)
+  {
+    echo "        <tr align=\"center\">\n";
+    echo "          <th>{$main_slot}</th>\n";
+    foreach ($CON_DAYS as $day)
+    {
+     if (in_array($main_slot,$BID_SLOTS[$day]))
+	schedule_table_entry ("{$day}_{$main_slot}");
+      else
+	echo "          <td>&nbsp;</td>\n";
+    }
+    echo "        </tr>\n";
   }
   echo "      </TABLE>\n";
   echo "    </TD>\n";
