@@ -86,10 +86,13 @@ html_end();
 function list_games ($type = 0)
 {
   if (0 == $type)
+  {
+    if (! array_key_exists('ListType', $_SESSION))
+      $_SESSION['ListType'] = LIST_BY_GAME;
     $type = $_SESSION['ListType'];
+  }
   else
   {
-    session_register ('ListType');
     $_SESSION['ListType'] = $type;
   }
 
@@ -255,8 +258,10 @@ function list_games_by ($type)
 {
   $sql = 'SELECT Runs.RunId, Runs.Track, Runs.TitleSuffix, Runs.Span,';
   $sql .= ' Runs.StartHour, Runs.Day, Runs.EventId, Runs.ScheduleNote,';
-  $sql .= ' Events.Hours, Events.Title, Runs.Rooms';
+  $sql .= ' Events.Hours, Events.Title, room_names(Runs.RunId)';
   $sql .= ' FROM Events, Runs';
+  $sql .= ' LEFT JOIN RunsRooms ON RunsRooms.RunId = Runs.RunId';
+  $sql .= ' LEFT JOIN Rooms ON Rooms.RoomId = RunsRooms.RoomId';
   $sql .= ' WHERE Events.EventId=Runs.EventId AND Events.SpecialEvent=0';
 
   switch ($type)
