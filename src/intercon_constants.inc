@@ -116,6 +116,9 @@ define (EMAIL_GM_COORDINATOR, 'gmcoordinator@' . CON_DOMAIN);
 define (NAME_HOTEL_LIAISON, 'Alex Bradley');
 define (EMAIL_HOTEL_LIAISON, 'hotelliaison@' . CON_DOMAIN);
 
+define (NAME_IRON_GM, 'Viktoriya Fuzaylova');
+define (EMAIL_IRON_GM, 'iron-gm@' . CON_DOMAIN);
+
 define (NAME_OPS, 'Dave Kapell');
 define (EMAIL_OPS, 'operations@' . CON_DOMAIN);
 define (NAME_OPS2, '');

@@ -79,6 +79,7 @@ function DisplayContactsPage ()
   DisplayContact ('Game Bids',     NAME_BID_CHAIR,     EMAIL_BID_CHAIR);
   DisplayContact ('GM Coordinator',NAME_GM_COORDINATOR,EMAIL_GM_COORDINATOR);
   DisplayContact ('Hotel Liaison', NAME_HOTEL_LIAISON, EMAIL_HOTEL_LIAISON);
+  DisplayContact ('Iron GM',       NAME_IRON_GM,       EMAIL_IRON_GM);
 //  DisplayContact ('Operations',    NAME_OPS,           EMAIL_OPS);
   DisplayContact2 ('Operations', NAME_OPS, EMAIL_OPS, NAME_OPS2, EMAIL_OPS2);
   DisplayContact ('Outreach',      NAME_OUTREACH,      EMAIL_OUTREACH);
