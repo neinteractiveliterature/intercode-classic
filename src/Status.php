@@ -290,10 +290,9 @@ function update_status ()
 
   echo "Con settings updated<P>\n";
 
-  // Unregister the session copies so we'll fetch new values from the database
-
-  session_unregister (SESSION_CON_NEWS);
-  session_unregister (SESSION_CON_SHOW_SCHEDULE);
+  // Unset the session copies so we'll fetch new values from the database
+  unset($_SESSION[SESSION_CON_NEWS]);
+  unset($_SESSION[SESSION_CON_SHOW_SCHEDULE]);
 
   return TRUE;
 }

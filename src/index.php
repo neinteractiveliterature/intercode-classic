@@ -1796,7 +1796,7 @@ function add_user ()
       if (! $result)
 	display_mysql_error ('Attempt to update referrer record failed', $sql);
 
-      session_unregister (SESSION_REFERRER_ID);
+      unset($_SESSION[SESSION_REFERRER_ID]);
     }
     
   }
