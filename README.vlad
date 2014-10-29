@@ -1,0 +1,94 @@
+Deploying Intercode with Vlad the Deployer
+==========================================
+
+We use Vlad the Deployer to push revisions to the production web site.  We chose it mainly
+because it has the best name we've ever heard of for a piece of software. :-D
+
+Vlad's web site is at: http://rubyhitsquad.com/Vlad_the_Deployer.html
+
+Requirements to use Vlad:
+
+* You have to be using a Unix web hosting provider (running Linux, BSD, Solaris, or similar)
+* You have to have SSH access to your web host
+* You have to be keeping your copy of the Intercode source in a version control system
+  (we use Subversion, but Git would also work)
+
+Vlad is a Ruby library, so to use it, you'll need Ruby.  (On your computer, not on the web
+hosting provider's server.)  We've used 1.8 in the past and are now using 2.1, but any 
+version in between should be fine too.
+
+Once you've got Ruby installed, run the following commands from inside the Intercode
+folder (the one with the Gemfile and Rakefile in it):
+
+    gem install bundler
+		bundle install
+		
+This will install Vlad, Rake, and the other stuff they need to work.
+
+Next step is to edit the config/deploy.rb file.  This is currently set up for our particular
+server setup (at Dreamhost), but you can change it for whatever web hosting provider you're
+using (as long as that host gives you SSH access to a Unix command prompt).  Please read
+through all the settings at the top of the file and change them as necessary.  Also, you'll
+probably need to change the deploy_to settings in the sandbox and production sections.
+
+Speaking of which, we have two copies of the site we deploy with this: sandbox and
+production.  Sandbox is where we test out new features before we take them live.  You don't
+have to have a sandbox environment, but if you're planning to do feature development, we
+highly recommend it.
+
+OK, now that that's all set, run this:
+
+    bundle exec rake production vlad:setup
+		
+(Also, do "bundle exec rake sandbox vlad:setup" if you're using a sandbox environment too.)
+
+This will SSH into your server and set up the directories for your app instance.  In there,
+you'll find something like this:
+
++ intercode/
+|
+|--+ releases/
+|
+|--+ scm/
+|
+|--+ shared/
+   |
+   +--+ local/
+   |
+   +--+ log/
+   |
+   +--+ pids/
+   |
+   +--+ system/
+
+scm is where Vlad keeps a checkout of your source control tree.  It updates it every time
+you do a deploy, and then makes an export of it into the releases folder, timestamped.  It
+hasn't done so yet, but it will create a symlink under the main folder called "current"
+that points to the currently-used release of the app.  (current is where you should point
+your web server at, to serve files from.)
+
+shared is for files that persist between releases.  log, pids, and system are basically
+uninteresting to us, because they aren't used by PHP apps.  local, on the other hand, is
+for you to put locally-configured files in that you don't want to check into source
+control for one reason or another.
+
+That brings us to our next step.  On your web server, put a copy of intercon_constants.inc
+into the local folder, and configure it for your production (or sandbox) setup.  Vlad
+will overwrite whatever's in source control with this copy whenever you do a deploy, so
+you can configure each environment separately without having to check environment-specific
+stuff into source control.
+
+OK, now that that's all set, run this:
+
+    bundle exec rake production vlad:update
+		
+This will check out a copy of your source code from version control, create a timestamped
+folder inside releases, put the latest source code in it, overwrite files with whatever you
+put in shared/local, and point the "current" symlink at it.
+
+If you want to roll back a release for whatever reason, do:
+
+    bundle exec rake production vlad:rollback
+		
+Vlad will re-point current at the previous release, so whatever changes you deployed most
+recently will be undone.
