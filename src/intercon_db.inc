@@ -3328,6 +3328,8 @@ function form_con_rooms($display, $key)
   room_check($rooms, 'Suite B');
   room_check($rooms, 'Suite C');
   room_check($rooms, 'Suite D');
+  room_check($rooms, 'Suite E');
+  room_check($rooms, 'Suite F');
   echo "          </td>\n";
   echo "        </tr>\n";
   echo "      </table>\n";
