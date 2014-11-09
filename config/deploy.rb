@@ -1,6 +1,6 @@
 set :application, "intercon-l"
 set :user, "neiladmin"
-set :domain, "#{user}@apocalypse.dreamhost.com"
+set :domain, "#{user}@transit.dreamhost.com"
 set :repository, "file:///home/#{user}/svn/intercon/branches/L/src"
 set :skip_scm, false
 
