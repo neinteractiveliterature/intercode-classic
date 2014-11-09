@@ -1,6 +1,6 @@
 set :application, "intercon-k"
 set :user, "neiladmin"
-set :domain, "#{user}@apocalypse.dreamhost.com"
+set :domain, "#{user}@transit.dreamhost.com"
 set :repository, "file:///home/#{user}/svn/intercon/branches/K/src"
 
 task :sandbox do
