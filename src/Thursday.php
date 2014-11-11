@@ -272,7 +272,7 @@ function thursday_thing()
   echo "</td>\n";
   echo "</tr></table>\n\n";
 
-  echo "<p>Some of the panels and workshops at Precon O:<\p>\n";
+  echo "<p>Some of the panels and workshops at Precon O:</p>\n";
   echo "<ul>\n";
   echo "<li>Gender and Larp</li>\n";
   echo "<li>Writers are Total Cocks</li>\n";
