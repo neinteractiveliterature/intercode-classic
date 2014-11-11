@@ -262,28 +262,47 @@ function thursday_thing()
   echo "</style>\n";
 
   echo "<table id=\"precon_top\"><tr>";
-  $paid = false;
-  $url = '';
-  
   echo "<td id=\"precon_bid\" class=\"menulike\">";
   echo "<p class=\"title\">Bid a Pre-Convention Event!</p>\n";
-  echo "<p>If you'd like to propose a panel, discussion or workshop\n";
-  printf ("please contact %s at %s.</p>\n",
-      NAME_THURSDAY,
-      mailto_or_obfuscated_email_address (EMAIL_THURSDAY));
+
+  echo "<p>Want to add to this list, or be a panelist? We are still\n";
+  echo "accepting bids for new panels. Fill out the bid form at\n";
+  echo "<a href=\"https://www.surveymonkey.com/s/GNCFN2Y\" target=\"_blank\">https://www.surveymonkey.com/s/GNCFN2Y</a>.\n";
+  echo "The bid deadline will be Dec 1.</p>\n";
   echo "</td>\n";
-  
   echo "</tr></table>\n\n";
 
+  echo "<p>Some of the panels and workshops at Precon O:<\p>\n";
+  echo "<ul>\n";
+  echo "<li>Gender and Larp</li>\n";
+  echo "<li>Writers are Total Cocks</li>\n";
+  echo "<li>Building a strong and welcoming LARP community</li>\n";
+  echo "<li>Kids at Intercon</li>\n";
+  echo "<li>What Live Action Roleplaying Games do well</li>\n";
+  echo "<li>Small Weekend Games Writing Workshop</li>\n";
+  echo "<li>Ars Armani Workshop</li>\n";
+  echo "<li>Introduction to Make-Up for LARPS</li>\n";
+  echo "<li>Introduction to Dancing</li>\n";
+  echo "<li>Acting Exercises for LARPers</li>\n";
+  echo "<li>Using goals to distribute reality across game participants</li>\n";
+  echo "<li>Vortex Mechanics: Viewing a game as interacting systems</li>\n";
+  echo "<li>Turning a work of fiction into a LARP</li>\n";
+  echo "<li>I don't like your game mechanics. So What?</li>\n";
+  echo "<li>Writing Romance in Games</li>\n";
+  echo "<li>Intellectual Property Issues in Game Design</li>\n";
+  echo "<li>Using Querki for LARP Creation and Management</li>\n";
+  echo "<li>Introduction to Accelerant for theater players</li>\n";
+  echo "<li>Rails or Agency: A discussion of plot and players</li>\n";
+  echo "<li>Props Workshop</li>\n";
+  echo "<li>The Role of NPCs</li>\n";
+  echo "<li>So you want to run a game: questions you should be asking yourself</li>\n";
+  echo "<li>How to run a game wrap</li>\n";
+  echo "<li>How to set expectations: blurbs and surveys</li>\n";
+  echo "</ul>\n";
   echo "<p>If you have any questions about the Pre-Convention, we'd be happy to";
   echo " help.  Email the Pre-Convention coordinator, ".NAME_THURSDAY.", at ";
   echo mailto_or_obfuscated_email_address (EMAIL_THURSDAY);
   echo ".</p>\n\n";
-
-  if (is_readable (TEXT_DIR."/precon-news.html"))
-      include (TEXT_DIR."/precon-news.html");
-
-  list_accepted_events();
 }
 
 /*
