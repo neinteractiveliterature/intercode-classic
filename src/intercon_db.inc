@@ -3390,6 +3390,7 @@ function form_con_rooms($display, $key)
   room_check($rooms, 'Chelmsford');
   room_check($rooms, 'Concord');
   room_check($rooms, 'Drawing');
+  room_check($rooms, 'Executive Suite');
   room_check($rooms, 'Hawthorne');
   echo "          </td>\n";
   echo "          <td>\n";
