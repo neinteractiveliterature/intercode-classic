@@ -319,7 +319,8 @@ function build_attendees_subnavbar() {
   $usersSection->push(NavBarItem::newAction('How Users Heard', 'Reports.php', REPORT_HOW_HEARD));
   $usersSection->push(NavBarItem::newAction('Bio Report', 'index.php', BIO_REPORT));
 
-  if (user_has_priv(PRIV_REGISTRAR))
+  if (user_has_priv(PRIV_REGISTRAR) ||
+      user_has_priv(PRIV_GM_LIAISON))
     $usersSection->push(NavBarItem::newAction('Users By Age', 'Reports.php', REPORT_BY_AGE));
     
   if (user_has_priv(PRIV_STAFF))
