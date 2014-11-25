@@ -1343,7 +1343,8 @@ function report_users_csv ()
   $sql = 'SELECT Users.UserId UserId, FirstName, Nickname, LastName, EMail, CanSignup, LastLogin, ';
   $sql .= ' (SELECT Status FROM Thursday WHERE Thursday.UserId = Users.UserId AND Status = "Paid") ThursdayStatus,';
   $sql .= ' (SELECT SUM(Quantity) FROM DeadDog WHERE DeadDog.UserId = Users.UserId AND Status = "Paid") DeadDogTickets,';
-  $sql .= " (SELECT GROUP_CONCAT(CONCAT(Quantity, ' ', Size, ' ', Color, ' ', Style, ' ', IF(Quantity = 1, Singular, Plural), ' (', StoreOrders.Status, ')') SEPARATOR ', ') ShirtOrders FROM StoreOrders LEFT JOIN StoreOrderEntries ON StoreOrders.OrderId = StoreOrderEntries.OrderId LEFT JOIN StoreItems ON StoreOrderEntries.ItemId = StoreItems.ItemId WHERE StoreOrders.Status != 'Cancelled' AND StoreOrders.UserId = Users.UserId) ShirtOrders";
+  $sql .= " (SELECT GROUP_CONCAT(CONCAT(Quantity, ' ', Size, ' ', Color, ' ', Style, ' ', IF(Quantity = 1, Singular, Plural), ' (', StoreOrders.Status, ')') SEPARATOR ', ') ShirtOrders FROM StoreOrders LEFT JOIN StoreOrderEntries ON StoreOrders.OrderId = StoreOrderEntries.OrderId LEFT JOIN StoreItems ON StoreOrderEntries.ItemId = StoreItems.ItemId WHERE StoreOrders.Status != 'Cancelled' AND StoreOrders.UserId = Users.UserId) ShirtOrders,";
+  $sql .= ' EXISTS (SELECT UserId FROM GMs WHERE UserId = Users.UserId) IsGM';
   $sql .= ' FROM Users';
 //  $sql .= ' WHERE CanSignup<>"Alumni"';
 //  $sql .= '   AND LastName<>"Admin"';
@@ -1355,7 +1356,7 @@ function report_users_csv ()
   if (! $result)
     return display_mysql_error ('Query for users failed');
 
-  echo "\"LastName\",\"FirstName\",\"Nickname\",\"EMail\",\"Status\",\"LastLogin\",\"ShirtOrder\",\"PreCon\",\"DeadDogTickets\"\n";
+  echo "\"LastName\",\"FirstName\",\"Nickname\",\"EMail\",\"Status\",\"LastLogin\",\"ShirtOrder\",\"PreCon\",\"DeadDogTickets\",\"IsGM\"\n";
 
   while ($row = mysql_fetch_object ($result))
   {
@@ -1367,7 +1368,8 @@ function report_users_csv ()
     echo "\"$row->LastLogin\",";    
     echo "\"$row->ShirtOrders\",";
     echo "\"$row->ThursdayStatus\",";
-    echo "\"$row->DeadDogTickets\"";
+    echo "\"$row->DeadDogTickets\",";
+    echo "\"$row->IsGM\"";
     echo "\n";
   }
 }

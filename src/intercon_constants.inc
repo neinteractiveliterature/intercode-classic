@@ -26,13 +26,13 @@ define (DB_NAME,   'itest');
 // credit card numbers or other sensative stuff in here anyway...
 
 define (DB_ADMIN_USR, 'root');
-define (DB_ADMIN_PWD, 'Thebrows');
+define (DB_ADMIN_PWD, '');
 
 define (DB_STAFF_USR, 'root');
-define (DB_STAFF_PWD, 'Thebrows');
+define (DB_STAFF_PWD, '');
 
 define (DB_USER_USR, 'root');
-define (DB_USER_PWD, 'Thebrows');
+define (DB_USER_PWD, '');
 
 
 // When DEVELOPMENT_VERSION is set to 1, all mail will be diverted to this
