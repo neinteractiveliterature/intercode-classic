@@ -1961,7 +1961,7 @@ function show_game ()
 	    }
 
 	    // Check whether the user is already signed up for this run
-
+	    $is_confirmed = false;
 	    get_user_status_for_run ($run_row->RunId, $SignupId, $is_confirmed);
 
 	    // Get the signup counts for the run
