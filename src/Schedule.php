@@ -1962,7 +1962,7 @@ function show_game ()
 
 	    // Check whether the user is already signed up for this run
 
-	    get_user_status_for_run ($run_row->RunId, $SignupId, $is_signedup);
+	    get_user_status_for_run ($run_row->RunId, $SignupId, $is_confirmed);
 
 	    // Get the signup counts for the run
 
@@ -1993,11 +1993,12 @@ function show_game ()
 				   $waitlisted['Male'],
 				   $waitlisted['Female']);
 
-	    // If the user can edit the GM (he/she is a GM) or if they
-	    // have Outreach privilege, let them view the signups
-
+	    // Allow the user to see who's in the game if:
+	    //  - They are confirmed for the game
+	    //  - They are a GM (can edit the game)
+	    //  - Have Outreach priv
 	    $show_signups = 0;
-	    if (-1 != $SignupId)
+	    if ($is_confirmed)
 	      $show_signups = SCHEDULE_SHOW_USER_SIGNUPS;
 	    if ($can_edit_game ||
 		user_has_priv (PRIV_OUTREACH))
@@ -2018,7 +2019,7 @@ function show_game ()
 	    if (-1 != $SignupId)
 	    {
 	      $text = $run_text . '<P>' . $count_text;
-	      if ($is_signedup)
+	      if ($is_confirmed)
 		$text .= '<P><I>You are signed up</I>';
 	      else
 	      {
