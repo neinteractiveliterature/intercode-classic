@@ -22,13 +22,6 @@ switch ($action)
 {
   case THURSDAY_THING:
     thursday_thing();
-    /*
-    $page = "ThursdaySchedule.html";
-    if (! is_readable ($page))
-      display_error ("Unable to read $page");
-    else
-      readfile ($page);
-    */
     break;
 
   case THURSDAY_REPORT:
@@ -58,7 +51,10 @@ switch ($action)
    if (! process_precon_event_form())
      display_precon_event_form();
    else
-     display_bid_thank_you();
+     if (user_has_priv(PRIV_PRECON_BID_CHAIR))
+       display_event_summary();
+     else
+       display_bid_thank_you();
    break;
 
   case PRECON_MANAGE_EVENTS:
@@ -252,7 +248,6 @@ function thursday_thing()
   echo "<b>Admission to the Pre-Convention is included with your admission\n";
   echo " to " .CON_NAME . ".</b></p>\n";
 
-  
   echo "<style type=\"text/css\">\n";
   echo "#precon_top { border-spacing: 5px; }\n";
   echo "#precon_top td { vertical-align: top; padding: 0; width: 50%; text-align: left !important; font-size: 90%; }\n";
@@ -261,17 +256,16 @@ function thursday_thing()
 //  echo "#precon_top td h3 { background-color: black; color: white; font-size: 100%; padding: 0; text-align: center; }\n";
   echo "</style>\n";
 
-  echo "<table id=\"precon_top\"><tr>";
-  echo "<td id=\"precon_bid\" class=\"menulike\">";
-  echo "<p class=\"title\">Bid a Pre-Convention Event!</p>\n";
+//  echo "<table id=\"precon_top\"><tr>";
+//  echo "<td id=\"precon_bid\" class=\"menulike\">";
+//  echo "<p class=\"title\">Bid a Pre-Convention Event!</p>\n";
 
-  echo "<p>Want to add to this list, or be a panelist? We are still\n";
-  echo "accepting bids for new panels. Fill out the bid form at\n";
-  echo "<a href=\"https://www.surveymonkey.com/s/GNCFN2Y\" target=\"_blank\">https://www.surveymonkey.com/s/GNCFN2Y</a>.\n";
-  echo "The bid deadline will be Dec 1.</p>\n";
-  echo "</td>\n";
-  echo "</tr></table>\n\n";
-
+  //  echo "<p>Want to add to this list, or be a panelist? We are still\n";
+  //  echo "accepting bids for new panels. Fill out the bid form.\n";
+  //  echo "The bid deadline will be Dec 1, 2014.</p>\n";
+  //  echo "</td>\n";
+  //  echo "</tr></table>\n\n";
+  /*
   echo "<p>Some of the panels and workshops at Precon O:</p>\n";
   echo "<ul>\n";
   echo "<li>Gender and Larp</li>\n";
@@ -303,6 +297,8 @@ function thursday_thing()
   echo " help.  Email the Pre-Convention coordinator, ".NAME_THURSDAY.", at ";
   echo mailto_or_obfuscated_email_address (EMAIL_THURSDAY);
   echo ".</p>\n\n";
+  */
+  list_accepted_events();
 }
 
 /*
@@ -995,8 +991,11 @@ function process_precon_event_form()
 {
   //  dump_array('$_REQUEST', $_REQUEST);
 
-  // If we're updating a bid, grab the bid ID
+  // Check for a sequence error
+  if (out_of_sequence())
+    return display_sequence_error(false);
 
+  // If we're updating a bid, grab the bid ID
   $PreConEventId = request_int('PreConEventId');
 
   // We must have a title, Length and Descriptions!
@@ -1047,8 +1046,11 @@ function process_precon_event_form()
   if (! $result)
     return display_mysql_error ('Submission failed');
 
-  if (! intercon_mail (EMAIL_THURSDAY, $subject, $body))
-    display_error ('Attempt to send changes to Pre-Con event chair failed!');
+  if (! user_has_priv(PRIV_PRECON_BID_CHAIR))
+  {
+    if (! intercon_mail (EMAIL_THURSDAY, $subject, $body))
+      display_error ('Attempt to send changes to Pre-Con event chair failed!');
+  }
 
   return true;
 }
@@ -1082,9 +1084,12 @@ function display_event_summary()
   if (! $result)
     return display_mysql_error('Query for PreCon Events failed', $sql);
 
+  printf("<p><a href=\"Thursday.php?action=%d\">Add new event</a></p>",
+	 PRECON_SHOW_EVENT_FORM);
+
   if (0 == mysql_num_rows($result))
   {
-    echo "<p>There are no Pre Convention events yet.</p>";
+    echo "<p>There are no Pre Convention events yet.</p>\n";
     return true;
   }
 
@@ -1340,6 +1345,8 @@ function show_status_form()
   echo "    </td>\n";
   echo "  </tr>\n";
 
+  form_con_rooms ('Room(s)', 'Rooms');
+
   form_submit('Submit');
 
   form_section ('Schedule Preferences');
@@ -1446,18 +1453,17 @@ function show_precon_event()
 function process_status_form()
 {
   // Make sure that only privileged users get here
-
   if (! user_has_priv (PRIV_PRECON_BID_CHAIR))
     return display_access_error ();
 
-  // Fetch the PreConEventId
+  //  dump_array('$_POST', $_POST);
 
+  // Fetch the PreConEventId
   $PreConEventId = request_int('PreConEventId');
   if (0 == $PreConEventId)
     return display_error ('Invalid PreConEventId');
 
   // Fetch the Status
-
   $Status = request_string('Status');
   switch ($Status)
   {
@@ -1498,7 +1504,6 @@ function process_status_form()
     return true;
 
   // Fetch the Start time
-
   $day = '';
   $hour = 0;
   $StartTime = request_string('StartTime');
@@ -1571,11 +1576,16 @@ function process_status_form()
     default:
       return display_error ('Invalid StartTime');
   }
-  
+
+  $Rooms = '';
+  if (array_key_exists('Rooms', $_POST))
+    $Rooms = implode(',', $_POST['Rooms']);
+
   $sql = 'INSERT PreConRuns SET ';
   $sql .= build_sql_string('PreConEventId', $PreConEventId, false);
   $sql .= build_sql_string('Day', $day);
   $sql .= build_sql_string('StartHour', $hour);
+  $sql .= build_sql_string('Rooms', $Rooms);
   $sql .= ', UpdatedById=' . $_SESSION[SESSION_LOGIN_USER_ID];
 
   $result = mysql_query($sql);
@@ -1592,7 +1602,7 @@ function show_run_form()
   if (! user_has_priv (PRIV_PRECON_BID_CHAIR))
     return display_access_error ();
 
-  dump_array('$_REQUEST', $_REQUEST);
+  //  dump_array('$_REQUEST', $_REQUEST);
 
   // Fetch the PreConEventId
 

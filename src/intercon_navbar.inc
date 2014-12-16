@@ -254,8 +254,10 @@ function build_precon_subnavbar() {
   $thursdaySection->push(NavBarItem::newAction('Pre-Convention Events', 'Thursday.php'));
   if (user_has_priv(PRIV_PRECON_SCHEDULING))
     $thursdaySection->push(NavBarItem::newAction('Manage PreCon Event Schedule', 'Thursday.php', PRECON_MANAGE_EVENTS));
+  /*
   if (user_has_priv(PRIV_REGISTRAR))
     $thursdaySection->push(NavBarItem::newAction('Edit User PreCon Event Info', 'Thursday.php', THURSDAY_SELECT_USER));
+  */
   return $thursdaySection;
 }
 
