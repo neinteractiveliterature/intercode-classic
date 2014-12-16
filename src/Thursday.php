@@ -1329,6 +1329,9 @@ function show_status_form()
   echo "    <td>\n";
   echo "      <select name=\"StartTime\">\n";
   echo "        <option value=\"None\" $none_selected>None</option>\n";
+  scheduling_start_option('Thursday', 18, '');
+  scheduling_start_option('Thursday', 19, '');
+  scheduling_start_option('Thursday', 20, '');
   scheduling_start_option('Thursday', 21, '');
   scheduling_start_option('Thursday', 22, '');
   scheduling_start_option('Thursday', 23, '');
@@ -1513,6 +1516,11 @@ function process_status_form()
     case 'None':
       return true;  // We're done!
 
+    case 'Thursday20':
+      $day = 'Thu';
+      $hour = 20;
+      break;
+
     case 'Thursday21':
       $day = 'Thu';
       $hour = 21;
@@ -1683,6 +1691,9 @@ function show_run_form()
   echo "    <td>\n";
   echo "      <select name=\"StartTime\">\n";
   echo "        <option value=\"None\" $none_selected>None</option>\n";
+  scheduling_start_option('Thursday', 18, $start_time_selection);
+  scheduling_start_option('Thursday', 19, $start_time_selection);
+  scheduling_start_option('Thursday', 20, $start_time_selection);
   scheduling_start_option('Thursday', 21, $start_time_selection);
   scheduling_start_option('Thursday', 22, $start_time_selection);
   scheduling_start_option('Thursday', 23, $start_time_selection);
