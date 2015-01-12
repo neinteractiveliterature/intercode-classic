@@ -3186,12 +3186,16 @@ function build_shirt_order_string ($a)
 /*
  * past_shirt_deadline
  *
- * Return 1 if it's past the shirt ordering deadline, 0 if it's not
+ * Return 1 if it's past the shirt ordering deadline, 0 if it's not.
+ *
+ * Note that the deadline is always at the end of the day, not the
+ * start, so we add 24 hours * 60 minutes * 60 seconds to the 
  */
 
 function past_shirt_deadline()
 {
-  if (time() > parse_date(SHIRT_CLOSE))
+  $one_day = 24 * 60 * 60;
+  if (time() > (parse_date(SHIRT_CLOSE) + $one_day))
     return 1;
   else
     return 0;
