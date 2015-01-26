@@ -1,4 +1,4 @@
-set :application, "intercon-o"
+set :application, "intercon-p"
 set :user, "neiladmin"
 set :domain, "#{user}@interactiveliterature.org"
 set :repository, "file:///home/#{user}/svn/intercon/trunk/src"
