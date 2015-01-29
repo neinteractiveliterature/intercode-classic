@@ -1,7 +1,7 @@
 set :application, "intercon-o"
 set :user, "neiladmin"
 set :domain, "#{user}@interactiveliterature.org"
-set :repository, "file:///home/#{user}/svn/intercon/trunk/src"
+set :repository, "file:///home/#{user}/svn/intercon/branches/O/src"
 set :skip_scm, false
 
 task :sandbox do
