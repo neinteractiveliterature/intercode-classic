@@ -75,6 +75,9 @@ function DisplayContactsPage ()
   echo "  </tr>\n"; */
 
   DisplayContact ('Advertising',   NAME_ADVERTISING,   EMAIL_ADVERTISING);
+  DisplayContact ('Attendee Coordinator',
+		                   NAME_ATTENDEE_COORDINATOR,
+		                                       EMAIL_ATTENDEE_COORDINATOR);
   DisplayContact ('Hospitality',   NAME_CON_SUITE,     EMAIL_CON_SUITE);
   DisplayContact ('Game Bids',     NAME_BID_CHAIR,     EMAIL_BID_CHAIR);
   DisplayContact ('GM Coordinator',NAME_GM_COORDINATOR,EMAIL_GM_COORDINATOR);
