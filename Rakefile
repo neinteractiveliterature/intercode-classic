@@ -5,7 +5,7 @@ require 'hoe'
 
 begin
   require "vlad"
-  Vlad.load(:app => nil)
-rescue Exception => e
-  puts "Vlad failed to load: #{e}"
+  Vlad.load(:app => nil, :scm => :git)
+rescue LoadError
+  # do nothing
 end
