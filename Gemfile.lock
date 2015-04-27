@@ -11,6 +11,8 @@ GEM
     vlad (2.2.5)
       rake (~> 0.8)
       rake-remote_task (~> 2.0)
+    vlad-git (2.2.0)
+      vlad (>= 2.1.0)
 
 PLATFORMS
   ruby
@@ -19,3 +21,4 @@ DEPENDENCIES
   hoe
   rake
   vlad
+  vlad-git
