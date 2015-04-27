@@ -1,15 +1,16 @@
 set :application, "intercon-o"
-set :user, "neiladmin"
-set :domain, "#{user}@interactiveliterature.org"
-set :repository, "file:///home/#{user}/svn/intercon/branches/O/src"
+set :user, "deploy"
+set :domain, "#{user}@vps1.interconlarp.org"
+set :repository, "git@vps1.interconlarp.org:intercode1.git"
+set :revision, "origin/O"
 set :skip_scm, false
 
 task :sandbox do
-  set :deploy_to, "/home/#{user}/sandbox.interactiveliterature.org"
+  set :deploy_to, "/var/www/sandbox.interactiveliterature.org"
 end
 
 task :production do
-  set :deploy_to, "/home/#{user}/#{application}"
+  set :deploy_to, "/var/www/#{application}"
 end
 
 namespace :vlad do
@@ -36,8 +37,8 @@ do
   if [[ $FILENAME != *~ ]]
   then
     echo "Linking in local copy of $f"
-    rm -f #{release_path}/$FILENAME
-    ln -s #{shared_path}/local/$FILENAME #{release_path}/$FILENAME
+    rm -f #{release_path}/src/$FILENAME
+    ln -s #{shared_path}/local/$FILENAME #{release_path}/src/$FILENAME
   fi
 done
 EOF
