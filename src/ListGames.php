@@ -94,7 +94,6 @@ function list_games ($type = 0)
     $type = $_SESSION['ListType'];
   else
   {
-    session_register ('ListType');
     $_SESSION['ListType'] = $type;
   }
 

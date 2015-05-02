@@ -1757,19 +1757,13 @@ function can_show_schedule ()
     return FALSE;
   }
 
-  session_register (SESSION_TIMEOUT);
   $_SESSION[SESSION_TIMEOUT] = $now + 180;
 
   printf ("<!-- Timeout set - %d  at %d-->\n",
 	  $_SESSION[SESSION_TIMEOUT], $now);
 
-  session_register (SESSION_CON_LAST_UPDATED);
   $_SESSION[SESSION_CON_LAST_UPDATED] = $row->LastUpdated;
-
-  session_register (SESSION_CON_NEWS);
   $_SESSION[SESSION_CON_NEWS] = $row->News;
-
-  session_register (SESSION_CON_SHOW_SCHEDULE);
   switch ($row->ShowSchedule)
   {
     // All users can see the schedule
@@ -2704,7 +2698,6 @@ function increment_sequence_number ()
 {
   if (! array_key_exists (SESSION_SEQUENCE_NUMBER, $_SESSION))
   {
-    session_register (SESSION_SEQUENCE_NUMBER);
     $_SESSION[SESSION_SEQUENCE_NUMBER] = 0;
   }
 
