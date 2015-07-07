@@ -1599,15 +1599,18 @@ function add_user ()
   
   // If this is a new registration, check the CAPTCHA
   if (!$update) {
-      require_once('recaptchalib.php');
-      $resp = recaptcha_check_answer (RECAPTCHA_PRIVATE_KEY,
-                                $_SERVER["REMOTE_ADDR"],
-                                $_POST["recaptcha_challenge_field"],
-                                $_POST["recaptcha_response_field"]);
+      require_once('recaptcha2.php');
+      
+      $response = $_REQUEST['g-recaptcha-response'];
+ 
+      if(!empty($response))
+      {
+            $cap = new GoogleRecaptcha();
+            $verified = $cap->VerifyCaptcha($response);
 
-      if (!$resp->is_valid) {
-          // What happens when the CAPTCHA was entered incorrectly
-          return "Sorry, the two words you entered for the reCAPTCHA check were incorrect.  Please try again.";
+            if(!$verified) {
+              return "Sorry, the reCAPTCHA check failed.  Please try again.";
+            }
       }
   }
 
@@ -1970,7 +1973,8 @@ function display_user_form ($returning_alumni, $errors='')
   if (! $update) {
       require_once('recaptchalib.php');
       echo "<tr><td></td><td>";
-      echo recaptcha_get_html(RECAPTCHA_PUBLIC_KEY);
+      echo '<script src="https://www.google.com/recaptcha/api.js" async defer></script>';
+      echo '<div class="g-recaptcha" data-sitekey="'.RECAPTCHA_PUBLIC_KEY.'"></div>';
       echo "</td></tr>\n";
   }
 
