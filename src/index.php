@@ -1971,7 +1971,6 @@ function display_user_form ($returning_alumni, $errors='')
   form_text (64, 'How did you hear about ' . CON_NAME . '?', 'HowHeard');
   
   if (! $update) {
-      require_once('recaptchalib.php');
       echo "<tr><td></td><td>";
       echo '<script src="https://www.google.com/recaptcha/api.js" async defer></script>';
       echo '<div class="g-recaptcha" data-sitekey="'.RECAPTCHA_PUBLIC_KEY.'"></div>';
