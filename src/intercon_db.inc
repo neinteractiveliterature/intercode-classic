@@ -610,6 +610,10 @@ function html_begin ($bShowLogo=true)
     printf ("<p class=dev_warning>Development Version  %s@%s</p>\n",
 	    DB_NAME,
 	    DB_SERVER);
+      
+  if (!defined("MINI_LOGO")) {
+    display_full_logo();
+  }
 }
 
 /*
@@ -2651,10 +2655,12 @@ function display_available_games ()
  */
 function display_full_logo () 
 {
-  if (defined("FULL_LOGO")) {
+  if (!$full_logo_already_displayed && defined("FULL_LOGO")) {
     echo '<div style="text-align: center;">';
     echo '<img class="full-logo" src="' . FULL_LOGO . '" alt="' . CON_NAME . ' logo">';
     echo '</div>';
+    
+    $full_logo_already_displayed = 1;
   }
 }
 
