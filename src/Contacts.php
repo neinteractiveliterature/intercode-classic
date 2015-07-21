@@ -24,7 +24,7 @@ html_end ();
 function DisplayContact ($title, $name, $email)
 {
   if ('' == $name)
-    $name = NAME_CON_CHAIR;
+    return;
   if ('' == $email)
     $email = EMAIL_CON_CHAIR;
 
@@ -90,6 +90,9 @@ function DisplayContactsPage ()
 		                   NAME_REGISTRAR,     EMAIL_REGISTRAR);
   DisplayContact ('Pre-Convention',NAME_THURSDAY,      EMAIL_THURSDAY);
   DisplayContact ('Vendors',       NAME_VENDOR_LIAISON,EMAIL_VENDOR_LIAISON);
+  DisplayContact ('Volunteer Coordinator',
+		                   NAME_VOLUNTEER_COORDINATOR,
+		                                       EMAIL_VOLUNTEER_COORDINATOR);
   echo "</table>\n";
   echo "<p>\n";
 }
