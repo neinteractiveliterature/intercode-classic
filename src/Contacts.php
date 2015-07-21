@@ -89,10 +89,10 @@ function DisplayContactsPage ()
   DisplayContact ('Registration and<br>Event Signup',
 		                   NAME_REGISTRAR,     EMAIL_REGISTRAR);
   DisplayContact ('Pre-Convention',NAME_THURSDAY,      EMAIL_THURSDAY);
+  DisplayContact ('Staff Coordinator',
+		                   NAME_STAFF_COORDINATOR,
+		                                       EMAIL_STAFF_COORDINATOR);
   DisplayContact ('Vendors',       NAME_VENDOR_LIAISON,EMAIL_VENDOR_LIAISON);
-  DisplayContact ('Volunteer Coordinator',
-		                   NAME_VOLUNTEER_COORDINATOR,
-		                                       EMAIL_VOLUNTEER_COORDINATOR);
   echo "</table>\n";
   echo "<p>\n";
 }
