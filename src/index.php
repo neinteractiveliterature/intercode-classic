@@ -56,7 +56,7 @@ switch ($action)
     // Log the referrer, if one's available
     log_referrer ();
     
-    if (!$_REQUEST['dest']) {
+    if (!$_REQUEST['dest'] && defined("MINI_LOGO")) {
       display_full_logo ();
     }
     display_login_form ();
@@ -67,7 +67,9 @@ switch ($action)
     session_unset ();
 
     html_begin ();
-    display_full_logo ();
+    if (defined("MINI_LOGO")) {
+      display_full_logo ();
+    }
     display_login_form ();
     break;
 
@@ -1536,7 +1538,9 @@ function show_user_homepage_bio_info ()
 
 function show_user_homepage ()
 {
-  display_full_logo();
+  if (defined("MINI_LOGO")) {
+    display_full_logo();
+  }
   
   // Show user status info
 

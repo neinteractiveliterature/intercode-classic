@@ -2655,12 +2655,10 @@ function display_available_games ()
  */
 function display_full_logo () 
 {
-  if (!$full_logo_already_displayed && defined("FULL_LOGO")) {
+  if (defined("FULL_LOGO")) {
     echo '<div style="text-align: center;">';
     echo '<img class="full-logo" src="' . FULL_LOGO . '" alt="' . CON_NAME . ' logo">';
     echo '</div>';
-    
-    $full_logo_already_displayed = 1;
   }
 }
 
