@@ -499,6 +499,9 @@ function display_links_navbar() {
 function display_mini_logo() {
   if (defined("MINI_LOGO")) {
     echo '<img class="mini-logo" src="' . MINI_LOGO . '" alt="' . CON_NAME .' logo">';
+  } elseif (defined("FULL_LOGO")) {
+    // we need a spacer to bump the navbar down since there is a page banner on the right
+    echo '<div class="mini-logo" style="height: 120px">&nbsp</div>';
   }
 }
 
