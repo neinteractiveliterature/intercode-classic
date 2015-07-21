@@ -8,11 +8,6 @@ body
 	background-color: <?echo COLOR_PAGE_BG; ?>;
 	color: #000000;
 	font-family: sans-serif;
-	background-image: url("PageBanner.png");
-	background-repeat: no-repeat;
-	background-color: #ffffff;
-	background-position: 9px 5px;
-	margin: 90px 0 0 0;
 }
 
 a img {
@@ -24,7 +19,7 @@ a img {
 	position: absolute;
 	z-index: 5;
 	width: 200px;
-	top: 100px;
+	top: 0px;
 	left: 9px;
 	margin: 0;
 	padding: 0;
