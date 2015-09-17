@@ -489,8 +489,6 @@ function display_links_navbar() {
   $plugsSection->push(NavBarItem::newAction("Shameless Plugs", "Plugs.php"));
   if (user_has_priv(PRIV_STAFF))
     $plugsSection->push(NavBarItem::newAction('Manage Shameless Plugs', 'Plugs.php', PLUGS_MANAGE_PLUGS));
-  $plugsSection->push(NavBarItem::newExternal("LARPA", "http://www.larpaweb.net"));
-  $plugsSection->push(NavBarItem::newExternal("Intercon Mid-Atlantic", "http://www.larpaweb.net"));
   $links->push($plugsSection);
 	
 	echo $links->render("menu links");
