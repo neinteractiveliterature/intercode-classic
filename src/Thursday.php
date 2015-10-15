@@ -256,15 +256,14 @@ function thursday_thing()
 //  echo "#precon_top td h3 { background-color: black; color: white; font-size: 100%; padding: 0; text-align: center; }\n";
   echo "</style>\n";
 
-//  echo "<table id=\"precon_top\"><tr>";
-//  echo "<td id=\"precon_bid\" class=\"menulike\">";
-//  echo "<p class=\"title\">Bid a Pre-Convention Event!</p>\n";
+ echo "<table id=\"precon_top\"><tr>";
+ echo "<td id=\"precon_bid\" class=\"menulike\">";
+ echo "<p class=\"title\">Help Precon be awesome!</p>\n";
 
-  //  echo "<p>Want to add to this list, or be a panelist? We are still\n";
-  //  echo "accepting bids for new panels. Fill out the bid form.\n";
-  //  echo "The bid deadline will be Dec 1, 2014.</p>\n";
-  //  echo "</td>\n";
-  //  echo "</tr></table>\n\n";
+   echo "<p>We're seeking panelists, moderators and workshop runners.\n";
+   echo "<a href=\"https://docs.google.com/forms/d/1T9o6uP40EfV78WEAd-8skSanyqkHBajcGk0JKUXMNDY/viewform\">Sign up to be a panelist, moderate a discussion, or run a workshop here!</a>\n";
+   echo "</td>\n";
+   echo "</tr></table>\n\n";
   /*
   echo "<p>Some of the panels and workshops at Precon O:</p>\n";
   echo "<ul>\n";
