@@ -3386,47 +3386,34 @@ function form_con_rooms($display, $key)
     else
       $rooms = array_flip($_POST[$key]);
   }
-
+  
+  $result = mysql_query("SELECT RoomName FROM Rooms ORDER BY RoomName");
+  if (! $result)
+    display_mysql_error ("Query failed for Rooms list");
+  
+  $possibleRooms = [];
+  while ($row = mysql_fetch_assoc($result)) {
+    array_push($possibleRooms, $row['RoomName']);
+  }
+  
+  $chunkLength = count($possibleRooms) / 4;
+  $chunks = [];
+  for ($i = 0; $i < $chunkLength; $i++) {
+    array_push($chunks, array_slice($possibleRooms, $chunkLength * $i, $chunkLength));
+  }
+  
   echo "  <tr>\n";
   echo "    <td valign=\"right\">$display:</td>\n";
   echo "    <td>\n";
   echo "      <table>\n";
   echo "        <tr valign=\"top\">\n";
-  echo "          <td>\n";
-  room_check($rooms, 'Boardroom');
-  room_check($rooms, 'Carlisle');
-  room_check($rooms, 'Chelmsford');
-  room_check($rooms, 'Concord');
-  room_check($rooms, 'Drawing');
-  room_check($rooms, 'Executive Suite');
-  room_check($rooms, 'Hawthorne');
-  echo "          </td>\n";
-  echo "          <td>\n";
-  room_check($rooms, 'Heritage A');
-  room_check($rooms, 'Heritage B');
-  room_check($rooms, 'Merrimack');
-  room_check($rooms, 'Middlesex');
-  room_check($rooms, 'Parkhurst');
-  room_check($rooms, 'Pool');
-  room_check($rooms, 'Presidential Suite');
-  echo "          </td>\n";
-  echo "          <td>\n";
-  room_check($rooms, 'Salon A');
-  room_check($rooms, 'Salon B');
-  room_check($rooms, 'Salon C');
-  room_check($rooms, 'Suite A');
-  room_check($rooms, 'Suite B');
-  room_check($rooms, 'Suite C');
-  echo "          </td>\n";
-  echo "          <td>\n";
-  room_check($rooms, 'Suite D');
-  room_check($rooms, 'Suite E');
-  room_check($rooms, 'Suite F');
-  room_check($rooms, 'Suite G');
-  room_check($rooms, 'Suite H');
-  room_check($rooms, 'Suite I');
-  room_check($rooms, 'Suite J');
-  echo "          </td>\n";
+  foreach ($chunks as $chunk) {
+    echo "          <td>\n";
+    foreach ($chunk as $possibleRoom) {
+      room_check($rooms, $possibleRoom);
+    }
+    echo "          </td>\n";    
+  }
   echo "        </tr>\n";
   echo "      </table>\n";
   echo "    </td>\n";
