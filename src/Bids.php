@@ -1130,7 +1130,7 @@ function display_bid_form ($first_try)
   echo "      <p><b>NOTE:</b> Intercon P is not accepting further\n";
   echo "      larps during Precon (Thursday evening/Friday afternoon).\n";
   echo "      We are still gladly accepting larp proposals during the\n";
-  echo "      rest of the con!</p>"
+  echo "      rest of the con!</p>";
   echo "    </td>\n";
   echo "  </tr>\n";
 
