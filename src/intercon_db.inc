@@ -3396,7 +3396,7 @@ function form_con_rooms($display, $key)
     array_push($possibleRooms, $row['RoomName']);
   }
   
-  $chunkLength = count($possibleRooms) / 4;
+  $chunkLength = ceil(count($possibleRooms) / 4);
   $chunks = [];
   for ($i = 0; $i < $chunkLength; $i++) {
     array_push($chunks, array_slice($possibleRooms, $chunkLength * $i, $chunkLength));
