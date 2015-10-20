@@ -1127,6 +1127,10 @@ function display_bid_form ($first_try)
   echo "      flexibility in scheduling your game is vital.</p>\n";
   echo "      <p>Please pick your top three preferences for when\n";
   echo "      you'd like to run your game.</p>\n";
+  echo "      <p><b>NOTE:</b> Intercon P is not accepting further\n";
+  echo "      larps during Precon (Thursday evening/Friday afternoon).\n";
+  echo "      We are still gladly accepting larp proposals during the\n";
+  echo "      rest of the con!</p>"
   echo "    </td>\n";
   echo "  </tr>\n";
 
@@ -1147,7 +1151,8 @@ function display_bid_form ($first_try)
     echo "          <th>{$main_slot}</th>\n";
     foreach ($CON_DAYS as $day)
     {
-     if (in_array($main_slot,$BID_SLOTS[$day]))
+      // temporarily disabling precon bids - Nat
+     if ($day != 'Thursday' && !($day == 'Friday' && $main_slot == 'Afternoon') && in_array($main_slot,$BID_SLOTS[$day]))
 	schedule_table_entry ("{$day}_{$main_slot}");
       else
 	echo "          <td>&nbsp;</td>\n";
