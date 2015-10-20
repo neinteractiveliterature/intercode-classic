@@ -3368,8 +3368,8 @@ function room_check($ary, $room)
     if (array_key_exists($room, $ary))
       $checked = 'checked';
 
-  printf ('            <input type="checkbox" name="Rooms[]" ' .
-	  "value=\"%s\" %s>%s<br>\n",
+  printf ('<label><input type="checkbox" name="Rooms[]" ' .
+	  "value=\"%s\" %s>%s</label><br>\n",
 	  $room,
 	  $checked,
 	  $room);
