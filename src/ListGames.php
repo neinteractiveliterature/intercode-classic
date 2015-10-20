@@ -404,7 +404,7 @@ function add_run_form ($update)
 
   // Start by fetching the title
 
-  $sql = "SELECT Title FROM Events WHERE EventId=$EventId";
+  $sql = "SELECT Title, Hours FROM Events WHERE EventId=$EventId";
   $result = mysql_query ($sql);
   if (! $result)
     return display_error ("Cannot query game title for EventId $EventId: " . mysql_error ());
@@ -417,6 +417,7 @@ function add_run_form ($update)
 
   $row = mysql_fetch_object ($result);
   $Title = $row->Title;
+  $hours = $row->Hours;
 
   // Display the form for the user
 
@@ -440,6 +441,9 @@ function add_run_form ($update)
 
   form_day ('Day');
   form_start_hour ('Start Hour', 'StartHour');
+  echo '<tr><td align="right">Length:</td><td>';
+  echo "$hours hour(s)";
+  echo '</td></tr>';
   form_text (32, 'Title Suffix', 'TitleSuffix');
   form_text (32, 'Schedule Note', 'ScheduleNote');
   form_con_rooms('Rooms(s)', 'Rooms');
