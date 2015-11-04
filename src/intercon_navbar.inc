@@ -2,11 +2,11 @@
 
 class NavBar {
   public $items;
-  
+
   function __construct() {
     $this->items = array();
   }
-  
+
   function renderInner() {
     $html = "";
     foreach ($this->items as $item) {
@@ -14,14 +14,14 @@ class NavBar {
     }
     return $html;
   }
-  
+
   function render($class="menu") {
     $html = "<ul class=\"$class\">";
     $html .= $this->renderInner();
     $html .= "</ul>";
     return $html;
   }
-  
+
   function push($item) {
     array_push($this->items, $item);
   }
@@ -31,18 +31,18 @@ class SubNavBar extends NavBar {
   public $title;
   public $useFirstItemTitleIfSingle;
   public $class;
-  
+
   function __construct($title, $useFirstItemTitleIfSingle=false, $class=NULL) {
     $this->title = $title;
     $this->class = $class;
     $this->useFirstItemTitleIfSingle = $useFirstItemTitleIfSingle;
     parent::__construct();
   }
-  
+
   function haveMultipleItems() {
     return (count($this->items) > 1);
   }
-  
+
   function getHeadItem() {
     $firstItem = $this->items[0];
     if ($this->useFirstItemTitleIfSingle && !$this->haveMultipleItems()) {
@@ -52,53 +52,53 @@ class SubNavBar extends NavBar {
     }
     return new NavBarItem($title, $firstItem->url, $firstItem->class);
   }
-  
+
   function renderInner() {
     $html = $this->getHeadItem()->render("title");
     $html .= parent::renderInner();
     return $html;
   }
-  
+
   function render($class=NULL) {
     if ($class === NULL) {
       $class = $this->class;
     }
     $class = "subhead $class";
-    
+
     if ($this->haveMultipleItems() && $this->isCurrent()) {
       $html = "<li class=\"$class\">";
       $html .= parent::render($class);
       $html .= "</li>";
       return $html;
-      
+
     } elseif ($this->haveMultipleItems()) {
       return $this->getHeadItem()->render("expandable");
     } else {
       return $this->getHeadItem()->render();
     }
   }
-  
+
   function isCurrent() {
     foreach ($this->items as $item) {
       if ($item->isCurrent())
         return true;
     }
-    
+
     return false;
   }
 }
 
 class NavBarTitle {
   public $text;
-  
+
   function __construct($text) {
     $this->text = $text;
   }
-  
+
   function render() {
     return "<li class=\"title\">$this->text</li>\n";
   }
-  
+
   function isCurrent() {
     return false;
   }
@@ -108,7 +108,7 @@ class NavBarItem {
   public $title;
   public $url;
   public $class;
-  
+
   function __construct($title, $url, $class=NULL) {
     $this->title = $title;
     $this->url = $url;
@@ -118,27 +118,27 @@ class NavBarItem {
       $this->class = $class;
     }
   }
-  
+
   public static function newStatic($title, $page, $extraClass="") {
     return new NavBarItem($title, "Static.php?page=".$page, "static $extraClass");
   }
-  
+
   public static function newExternal($title, $url, $extraClass="") {
     return new NavBarItem($title, $url, "external $extraClass");
   }
-  
+
   public static function newProgram($title, $prefix, $page, $class="") {
     return new NavBarItem($title, "$prefix$page", $class);
   }
-  
+
   public static function newAction($title, $page, $action=NULL, $class=NULL) {
     $url = $page;
     if (NULL !== $action)
       $url .= "?action=$action";
-      
+
     return new NavBarItem($title, $url, $class);
   }
-  
+
   public function renderInner() {
     $html = "<a href=\"$this->url\"";
     if (preg_match("/^https?:/", $this->url)) {
@@ -147,7 +147,7 @@ class NavBarItem {
     $html .= ">$this->title</a>";
     return $html;
   }
-  
+
   public function render($extraClass="") {
     $class = $this->class . " $extraClass";
     if ($this->isCurrent())
@@ -159,7 +159,7 @@ class NavBarItem {
     $html .= ">".$this->renderInner()."</li>";
     return $html;
   }
-  
+
   public function isCurrent() {
     return substr($_SERVER["REQUEST_URI"], strlen($_SERVER["REQUEST_URI"]) - strlen($this->url) - 1) == "/" . $this->url;
   }
@@ -206,7 +206,7 @@ function navbar_action ($text, $page, $class=NULL, $action=-1) {
   $url = $page;
   if (-1 != $action)
     $url .= "?action=$action";
-  
+
   navbar_entry($text, $url, $class);
 }
 
@@ -232,16 +232,16 @@ function navbar_end() {
 function build_larps_subnavbar() {
   $larpSection = new SubNavBar("Events at <NOBR>".(USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME)."</NOBR>");
   if (can_show_schedule()) {
-    $larpSection->push(NavBarItem::newAction("Con Schedule", "Schedule.php"));    
+    $larpSection->push(NavBarItem::newAction("Con Schedule", "Schedule.php"));
     if (user_has_priv(PRIV_CON_COM))
-      $larpSection->push(NavBarItem::newAction("Schedule with Counts", "Schedule.php", SCHEDULE_WITH_COUNTS));            
+      $larpSection->push(NavBarItem::newAction("Schedule with Counts", "Schedule.php", SCHEDULE_WITH_COUNTS));
   }
   $larpSection->push(NavBarItem::newAction("List of Games", "Schedule.php", LIST_GAMES));
   if (IRONGM_ENABLED)
     $larpSection->push(NavBarItem::newStatic('Iron GM Contest', 'irongm'));
   if (can_show_schedule() && user_has_priv(PRIV_CON_COM)) {
     $larpSection->push(NavBarItem::newAction('Player Signups', 'UserSignupScan.php'));
-    $larpSection->push(NavBarItem::newAction('Last 100 Signups', 'SignupSpy.php'));    
+    $larpSection->push(NavBarItem::newAction('Last 100 Signups', 'SignupSpy.php'));
     $larpSection->push(NavBarItem::newAction('All Signups', 'SignupSpy.php', SHOW_ALL_SIGNUPS));
     $larpSection->push(NavBarItem::newAction('Signups with Choice #s', 'Choice1.php'));
     $larpSection->push(NavBarItem::newAction('Games by Choice', 'Choice3.php'));
@@ -293,18 +293,18 @@ function build_bids_subnavbar() {
   $bidsSection = new SubNavBar("Proposals", true);
   if (user_has_priv(PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON))
     $bidsSection->push(NavBarItem::newAction("Status of Proposals", "Bids.php", BID_REVIEW_BIDS));
-  
-  if (user_has_priv (PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON)) {  
+
+  if (user_has_priv (PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON)) {
     $bidsSection->push(NavBarItem::newAction("BidCom Feedback Summary", "Bids.php", BID_FEEDBACK_SUMMARY));
     if (user_has_priv(PRIV_GM_LIAISON))
       $bidsSection->push(NavBarItem::newStatic("Bid Commmittee Responsibilities", "BidCommittee"));
   }
-  
+
   if (user_has_priv (PRIV_SCHEDULING))
     $bidsSection->push(NavBarItem::newAction('Manage Proposal Page Info', 'biddingAGame.php', BAG_SHOW_FORM));
 
   $bidsSection->push(NavBarItem::newAction("Propose a Game!", "biddingAGame.php"));
-    
+
   return $bidsSection;
 }
 
@@ -324,10 +324,10 @@ function build_attendees_subnavbar() {
   if (user_has_priv(PRIV_REGISTRAR) ||
       user_has_priv(PRIV_GM_LIAISON))
     $usersSection->push(NavBarItem::newAction('Users By Age', 'Reports.php', REPORT_BY_AGE));
-    
+
   if (user_has_priv(PRIV_STAFF))
     $usersSection->push(NavBarItem::newAction('Become User', 'index.php', SELECT_USER_TO_BECOME));
-    
+
   return $usersSection;
 }
 
@@ -341,7 +341,7 @@ function build_mail_subnavbar() {
   $mailSection->push(NavBarItem::newAction('Bio Lists', 'MailTo.php', MAIL_BIO_LISTS));
   $mailSection->push(NavBarItem::newAction('Waitlisted Players', 'MailTo.php', MAIL_WAITLISTED));
   $mailSection->push(NavBarItem::newAction('Who\'s Not Playing When', 'Reports.php', REPORT_WHOS_NOT_PLAYING_FORM));
-  
+
   return $mailSection;
 }
 
@@ -371,7 +371,7 @@ function build_print_materials_subnavbar() {
     $opsSection->push(NavBarItem::newProgram("Program Cover", PROGRAM_PDF_PREFIX, "Cover.pdf"));
     $opsSection->push(NavBarItem::newProgram("Program Interior", PROGRAM_PDF_PREFIX, "Interior.pdf"));
   }
-  
+
   return $opsSection;
 }
 
@@ -383,13 +383,13 @@ function build_schedule_subnavbar() {
 //    $scheduleSection->push(NavBarItem::newAction('Add a Parallel Run', 'ListGames.php', LIST_TO_ADD_PARALLEL_RUN));
   $scheduleSection->push(NavBarItem::newAction('Add Special Event', 'SpecialEvents.php'));
   $scheduleSection->push(NavBarItem::newAction('Manage Special Events', 'SpecialEvents.php', SPECIAL_EVENT_LIST));
-  
+
   return $scheduleSection;
 }
 
 function build_about_subnavbar() {
   $aboutSection = new SubNavBar("About <NOBR>".(USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME)."</NOBR>");
-  $aboutSection->push(NavBarItem::newStatic("Frequently Asked Questions", "faq"));
+  $aboutSection->push(NavBarItem::newStatic("Table of Contents", "about"));
   $aboutSection->push(NavBarItem::newStatic("Convention Rules", "ConRules"));
   if (NAV_SHOW_COST)
     $aboutSection->push(NavBarItem::newAction("What Does It Cost?", "cost.php"));
@@ -402,7 +402,7 @@ function build_about_subnavbar() {
     $aboutSection->push(NavBarItem::newAction((USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME).' Flyer', 'InterconFlyer.pdf'));
   if (NAV_SHOW_PROGRAM)
     $aboutSection->push(NavBarItem::newAction((USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME).' Program', 'program-page-order.pdf'));
-  
+
   return $aboutSection;
 }
 
@@ -421,7 +421,7 @@ function build_website_subnavbar() {
     $websiteSection->push(NavBarItem::newAction('Import TShirts',
 						'Shirts.php',
 						IMPORT_TSHIRTS));
-  }	  
+  }
   return $websiteSection;
 }
 
@@ -446,7 +446,7 @@ function display_main_navbar() {
   $navbar = new NavBar();
   $navbar->push(new NavBarTitle("Navigation"));
   $navbar->push(NavBarItem::newAction('Home', 'index.php'));
-  
+
   $navbar->push(build_about_subnavbar());
   $navbar->push(build_larps_subnavbar());
   if (accepting_bids() || user_has_priv(PRIV_BID_COM) || user_has_priv(PRIV_GM_LIAISON))
@@ -483,14 +483,14 @@ function display_links_navbar() {
 	  $links->push(NavBarItem::newExternal("Intercon Wiki", "http://www.interactiveliterature.org/Wiki"));
     $links->push(NavBarItem::newExternal((USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME) . " Google Login", "http://www.google.com/a/" . CON_DOMAIN));
 	}
-	
+
   // Shameless Plugs section
   $plugsSection = new SubNavBar("Community Links");
   $plugsSection->push(NavBarItem::newAction("Shameless Plugs", "Plugs.php"));
   if (user_has_priv(PRIV_STAFF))
     $plugsSection->push(NavBarItem::newAction('Manage Shameless Plugs', 'Plugs.php', PLUGS_MANAGE_PLUGS));
   $links->push($plugsSection);
-	
+
 	echo $links->render("menu links");
 }
 
@@ -505,14 +505,14 @@ function display_mini_logo() {
 
 function display_navbar() {
   echo "<div class=navbar>\n";
-  
+
   display_mini_logo();
-  
+
   display_account_control_navbar();
   display_main_navbar();
   if (NAV_SHOW_LINKS)
     display_links_navbar();
-  
+
   echo "</div> <!-- navbar -->\n\n";
 }
 
