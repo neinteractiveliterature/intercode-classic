@@ -1,0 +1,21 @@
+web:
+  build: .
+  ports:
+   - "32768:80"
+  volumes:
+   - "./src:/var/www/html"
+   - "./img:/var/www/html/img"
+   - "./app-config:/etc/intercode"
+  environment:
+    INTERCON_DB_HOST: mysql
+    INTERCON_DB_NAME: intercode
+    INTERCON_DB_USER: root
+    INTERCON_DB_PASSWORD: password
+  links:
+   - mysql
+mysql:
+  image: mysql
+  ports:
+    - "33306:3306"
+  environment:
+    MYSQL_ROOT_PASSWORD: password
