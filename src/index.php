@@ -55,7 +55,7 @@ switch ($action)
 
     // Log the referrer, if one's available
     log_referrer ();
-    
+
     if (!$_REQUEST['dest'] && defined("MINI_LOGO")) {
       display_full_logo ();
     }
@@ -63,7 +63,7 @@ switch ($action)
     break;
 
   case LOGOUT_USER:
-      
+
     session_unset ();
 
     html_begin ();
@@ -194,7 +194,7 @@ switch ($action)
     else
       show_user_homepage ();
     break;
-    
+
   case SELECT_USER_TO_EDIT:
     html_begin ();
     select_user_to_edit ();
@@ -665,7 +665,7 @@ function show_user_homepage_dead_dog ($UserId)
   $result = mysql_query ($sql);
   if (! $result)
     return display_mysql_error ('Thursday query failed', $sql);
-    
+
   $row = mysql_fetch_row($result);
   $tickets = $row[0];
 
@@ -790,7 +790,7 @@ function show_shirt_link ($count, $order, $type)
       echo "The deadline for shirt orders is $shirt_close.  Any unpaid\n";
       echo "shirt orders as of $shirt_close will be cancelled.\n";
       break;
-  }      
+  }
 }
 
 /*
@@ -968,9 +968,9 @@ function show_user_homepage_plugs ($UserId)
 
 function mark_user_paid ()
 {
-    
+
   //  dump_array ('POST - mark_user_paid', $_POST);
-  
+
   // Flip the "Paid" bit in the user's record
 
   $paid_by = 'Paid via PayPal ' . strftime ('%d-%b-%Y %H:%M');
@@ -1038,7 +1038,7 @@ function mark_user_paid ()
     // shirt paid and fetch the UserId from the TShirt record
 
     $TShirtID = 0;
- 
+
     if (array_key_exists ('custom', $_POST))
       $TShirtID = intval ($_POST['custom']);
 
@@ -1142,7 +1142,7 @@ function display_signup_status ()
       echo " games at this time.  &quot;Ops!&quot;, or games that you are\n";
       echo "a GM for do not count towards your total.<p>\n";
       break;
-      
+
     case UNLIMITED_SIGNUPS:
       echo "Game signup is now fully open!  You can sign up for any number of games.<p>\n";
       break;
@@ -1515,7 +1515,7 @@ function show_user_homepage ()
   if (defined("MINI_LOGO")) {
     display_full_logo();
   }
-  
+
   // Show user status info
 
   if (! show_user_homepage_status ())
@@ -1547,7 +1547,7 @@ function show_user_homepage ()
 
   if (SHOW_TSHIRTS)
     show_user_homepage_shirts ($_SESSION[SESSION_LOGIN_USER_ID]);
-    
+
   // Show whether the user has signed up for the Dead Dog
 
   if (DEAD_DOG_ENABLED)
@@ -1574,13 +1574,13 @@ function show_user_homepage ()
 function add_user ()
 {
   $update = isset ($_SESSION[SESSION_LOGIN_USER_ID]);
-  
+
   // If this is a new registration, check the CAPTCHA
   if (!$update) {
       require_once('recaptcha2.php');
-      
+
       $response = $_REQUEST['g-recaptcha-response'];
- 
+
       if(!empty($response))
       {
             $cap = new GoogleRecaptcha();
@@ -1779,7 +1779,7 @@ function add_user ()
 
       unset($_SESSION[SESSION_REFERRER_ID]);
     }
-    
+
   }
 
   return $UserId;
@@ -1947,7 +1947,7 @@ function display_user_form ($returning_alumni, $errors='')
   form_text (64, 'Best Time to Call', 'BestTime', 128);
   form_preferred_contact ('Preferred Contact', 'PreferredContact');
   form_text (64, 'How did you hear about ' . CON_NAME . '?', 'HowHeard');
-  
+
   if (! $update) {
       echo "<tr><td></td><td>";
       echo '<script src="https://www.google.com/recaptcha/api.js" async defer></script>';
@@ -2227,7 +2227,7 @@ function display_user_form_for_others ()
     $Modified = timestamp_to_datetime ($_POST['Modified']);
     $LastLogin = timestamp_to_datetime ($_POST['LastLogin']);
     $Created = timestamp_to_datetime ($_POST['Created']);
-    
+
     // If the ModifiedBy column is 0, the user's record hasn't ever been
     // modified
 
@@ -2492,7 +2492,7 @@ function display_user_information ($user_id)
   //    echo '<-- Cannot execute query: ' . mysql_error ();
   //    return 'Cannot execute query: ' . mysql_error();
   //  }
-  
+
   //  $row = mysql_fetch_object ($result);
 
   //  display_text_info ('Created', $row->Created);
@@ -2534,7 +2534,7 @@ function display_password_form ()
   echo "mail to AOL accounts.  We expect to have this fixed soon, but if\n";
   echo "you do not receive your password shortly after requesting it, send\n";
   echo "mail to the\n";
-  
+
   printf ("<a href=%s>Registrar</a> or the\n",
 	  mailto_url(EMAIL_REGISTRAR, 'Password reset problem'));
   printf ("<a href=%s>Webmaster</a>\n",
@@ -2574,17 +2574,17 @@ function process_password_request ()
   $UserId = $row->UserId;
 
   // Generate a new random password
-  
+
   $NewPassword = '';
   for ($i=0; $i<8; $i++)
   {
     $ascii = rand(ord('a'), ord('z'));
     $NewPassword .= chr($ascii);
   }
-    
+
   // Reconnect to the database with forced admin privileges in order
   // to reset user's password
-  
+
   intercon_db_connect (1);
 
   $sql = 'UPDATE Users SET ';
@@ -2593,7 +2593,7 @@ function process_password_request ()
   $result = mysql_query ($sql);
   if (! $result)
     return display_mysql_error ('Cannot execute query');
- 
+
   // Send the user his password
 
   if (! intercon_mail ($EMail,
@@ -2601,7 +2601,7 @@ function process_password_request ()
 		       "The password to your Intercon account has been reset to a " .
                        "random string.  The new password is $NewPassword."))
     return display_error ('Attempt to send mail failed');
- 
+
   echo "Your new password has been mailed to your EMail account";
 
   return TRUE;
@@ -3100,7 +3100,7 @@ function delete_user ()
 
   $name = trim ("$row->FirstName $row->LastName");
   $pronoun = gender_to_pronoun ($row->Gender);
-    
+
   // Remove the user as a GM from any games
 
   $gm_count = 0;
@@ -3562,7 +3562,7 @@ function view_user ()
     $Modified = timestamp_to_datetime ($_POST['Modified']);
     $LastLogin = timestamp_to_datetime ($_POST['LastLogin']);
     $Created = timestamp_to_datetime ($_POST['Created']);
-    
+
     // If the ModifiedBy column is 0, the user's record hasn't ever been
     // modified
 
@@ -3837,7 +3837,7 @@ function edit_bio ()
     printf ("<INPUT TYPE=TEXT NAME=Title SIZE=80 MAXLENGTH=256 VALUE=\"%s\"><P>\n",
 	    htmlspecialchars ($text));
   }
-    
+
 
   echo "Biography.  Your bio should use HTML tags for formatting.  A quick\n";
   echo "primer on a couple of useful HTML tags is available\n";
@@ -3851,7 +3851,7 @@ function edit_bio ()
   echo "<TEXTAREA NAME=BioText COLS=80 ROWS=20 WRAP=PHYSICAL>$text</TEXTAREA>\n";
   echo "<CENTER><INPUT TYPE=SUBMIT VALUE=\"Submit\"></CENTER>\n";
   echo "</FORM>\n";
-  
+
   return true;
 }
 

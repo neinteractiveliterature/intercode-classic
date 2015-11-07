@@ -179,7 +179,7 @@ switch ($action)
     if (! confirm_withdraw_from_game ())
       show_game();
     break;
-      
+
   case WITHDRAW_FROM_GAME_CONFIRMED:
     if (! withdraw_from_game ())
       show_game();
@@ -334,7 +334,7 @@ function process_away_form ()
  */
 
 function show_away_schedule_form ()
-{  
+{
   // Arrays for times away for each day
 
   $thu_hours = array ();
@@ -636,7 +636,7 @@ function display_event ($hour, $away_all_day, $away_hours,
       $text .= "<br>RunId: $row->RunId";
     }
   }
-  
+
   echo "<div style=\"".$dimensions->getCSS()."\">";
   write_centering_table($text, $bgcolor);
   echo "</div>\n";
@@ -660,17 +660,17 @@ function display_event_with_counts($hour, $row, $dimensions,
   if ($male_confirmed < $row->MinPlayersMale ||
 	  $female_confirmed < $row->MinPlayersFemale ||
 	  $total_confirmed < ($row->MinPlayersMale + $row->MinPlayersFemale + $row->MinPlayersNeutral)) {
-	
+
     $bgcolor = get_bgcolor_hex ('Full');       // Light red
   } elseif ($male_confirmed < $row->PrefPlayersMale ||
 	  $female_confirmed < $row->PrefPlayersFemale ||
 	  $total_confirmed < ($row->PrefPlayersMale + $row->PrefPlayersFemale + $row->PrefPlayersNeutral)) {
 
-    $bgcolor = get_bgcolor_hex ('Waitlisted'); // Light yellow		
+    $bgcolor = get_bgcolor_hex ('Waitlisted'); // Light yellow
   } elseif ($male_confirmed < $row->MaxPlayersMale ||
 	  $female_confirmed < $row->MaxPlayersFemale ||
 	  $total_confirmed < ($row->MaxPlayersMale + $row->MaxPlayersFemale + $row->MaxPlayersNeutral)) {
-	
+
     $bgcolor = get_bgcolor_hex ('Confirmed');  // Light green
   } else {
     $bgcolor = get_bgcolor_hex ('CanPlayConcurrently'); // Light blue
@@ -696,7 +696,7 @@ function display_event_with_counts($hour, $row, $dimensions,
 
   $text .= sprintf ('<P><NOBR>%d/%d/%d</NOBR><BR>' .
 		    '<NOBR><FONT COLOR=green>%d</FONT>/' .
-		    '<FONT COLOR=blue>%d</FONT>/' . 
+		    '<FONT COLOR=blue>%d</FONT>/' .
 		    '<FONT COLOR=red>%d</FONT></NOBR>',
 		    $row->MinPlayersMale + $row->MinPlayersFemale + $row->MinPlayersNeutral,
 		    $row->PrefPlayersMale + $row->PrefPlayersFemale + $row->PrefPlayersNeutral,
@@ -724,7 +724,7 @@ function display_special_event($row, $dimensions, $bgcolor) {
   }
   if ('' != $row->Rooms)
     $text .= '<p>' . pretty_rooms($row->Rooms) . "\n";
-  
+
 
   echo "<div style=\"".$dimensions->getCSS()."\">";
   write_centering_table($text, $bgcolor);
@@ -735,16 +735,16 @@ function display_schedule_runs_in_div($block, $eventRuns, $css,
 									  $hour, $away_all_day, $away_hours,
 									  $signed_up_runs, $signup_counts,
 									  $show_counts) {
-  
+
   $runDimensions = $block->getRunDimensions();
-  
+
   echo "<div style=\"$css\">";
   echo "<div style=\"position: relative; height: 100%; width: 100%;\">";
 
   foreach ($runDimensions as $dimensions) {
 	$runId = $dimensions->run->id;
 	$row = $eventRuns[$runId];
-	
+
 	if (1 == $row->SpecialEvent) {
 	  display_special_event($row, $dimensions, $show_counts ? "#cccccc" : "#ffffff");
     } else {
@@ -753,21 +753,21 @@ function display_schedule_runs_in_div($block, $eventRuns, $css,
 				 $signup_counts[$row->RunId]);
 	  } else {
 		display_event ($hour, $away_all_day, $away_hours, $row, $dimensions,
-					 $signed_up_runs, $signup_counts[$row->RunId]);		
+					 $signed_up_runs, $signup_counts[$row->RunId]);
 	  }
 	}
   }
-  
+
   echo "</div></div>";
 }
 
 function get_signup_counts($run_ids) {
   $signup_counts = array();
-  
+
   if (count($run_ids) == 0) {
 	return $signup_counts;
   }
-  
+
   foreach ($run_ids as $run_id) {
 	$signup_counts[$run_id] = array(
 		  "Male" => 0,
@@ -776,7 +776,7 @@ function get_signup_counts($run_ids) {
 		  "Waitlisted" => 0
 		  );
   }
-  
+
   $sql = 'SELECT RunId, State, Counted, Gender, COUNT(*) AS Count';
   $sql .= ' FROM Signup';
   $sql .= ' WHERE RunId IN ('.implode(",", $run_ids).')';
@@ -786,7 +786,7 @@ function get_signup_counts($run_ids) {
   if (! $result)
     return display_mysql_error ('Query for male signups failed');
 
-  while ($row = mysql_fetch_object ($result)) {	
+  while ($row = mysql_fetch_object ($result)) {
 	if ($row->Counted == "Y") {
 	  if ($row->State == "Waitlisted") {
 		$signup_counts[$row->RunId]["Waitlisted"] += $row->Count;
@@ -797,7 +797,7 @@ function get_signup_counts($run_ids) {
 	  $signup_counts[$row->RunId]["Uncounted"] += $row->Count;
 	}
   }
-  
+
   return $signup_counts;
 }
 
@@ -806,7 +806,7 @@ function schedule_day ($day, $away_all_day, $away_hours,
 		       $show_away_column, $show_counts)
 {
   $show_debug_info = user_has_priv (PRIV_SCHEDULING);
-  
+
   // Get the day's events
 
   $sql = 'SELECT Runs.RunId, Runs.Track, Runs.TitleSuffix, Runs.StartHour,';
@@ -840,17 +840,17 @@ function schedule_day ($day, $away_all_day, $away_hours,
   echo "<h2>" . day_to_date ($day) . "</h2>\n";
   if (('Hidden' != $away_all_day) && $show_away_column)
     echo "<input type=checkbox $away_all_day name=$day value=1> Away all day\n";
-	
+
   $volunteerRuns = array();
   $eventRuns = array();
-  
+
   $mainBlock = new ScheduleBlock(36, 0);
   $volunteerBlock = new ScheduleBlock(36, 0);
 
   while ($row = mysql_fetch_object ($result))
   {
 	$pcsgRun = new EventRun($row->StartHour, $row->Hours, $row->RunId);
-	
+
 	if ($row->IsOps == "Y" || $row->IsConSuite == "Y") {
 	  $volunteerRuns[$row->RunId] = $row;
 	  $volunteerBlock->addEventRun($pcsgRun);
@@ -861,9 +861,9 @@ function schedule_day ($day, $away_all_day, $away_hours,
   }
 
   mysql_free_result ($result);
-  
+
   $signup_counts = get_signup_counts(array_merge(array_keys($eventRuns), array_keys($volunteerRuns)));
-  
+
   // expand both blocks to match start/end times
   $blockStart = min(array($mainBlock->startHour, $volunteerBlock->startHour));
   $blockEnd = max(array($mainBlock->endHour, $volunteerBlock->endHour));
@@ -872,26 +872,26 @@ function schedule_day ($day, $away_all_day, $away_hours,
   $mainBlock->endHour = $blockEnd;
   $volunteerBlock->startHour = $blockStart;
   $volunteerBlock->endHour = $blockEnd;
-  
+
   $mainBlock->computeRunDimensions();
   $volunteerBlock->computeRunDimensions();
-  
+
   $maxColumns = ($mainBlock->maxColumns + $volunteerBlock->maxColumns);
-  
+
   if ($show_counts) {
 	// calculate the totals for the right column if we're looking at counts
-	
+
 	$avail_min = array ();
 	$avail_max = array ();
 	$avail_pref = array ();
-  
+
 	$total_confirmed = array ();
 	$total_not_counted = array ();
 	$total_waitlisted = array ();
-	
+
 	foreach (array_merge($eventRuns, $volunteerRuns) as $row) {
 	  $run_counts = $signup_counts[$row->RunId];
-	  
+
 	  // Add to the totals for all hours covered by this game
 	  for ($h = $row->StartHour; $h < $row->StartHour + $row->Hours; $h++)
 	  {
@@ -904,32 +904,32 @@ function schedule_day ($day, $away_all_day, $away_hours,
 		  $total_not_counted[$h] = 0;
 		  $total_waitlisted[$h] = 0;
 		}
-	
+
 	    $avail_min[$h] += ($row->MinPlayersMale + $row->MinPlayersFemale + $row->MinPlayersNeutral);
 	    $avail_pref[$h] += ($row->PrefPlayersMale + $row->PrefPlayersFemale + $row->PrefPlayersNeutral);
 	    $avail_max[$h] += ($row->MaxPlayersMale + $row->MaxPlayersFemale + $row->MaxPlayersNeutral);
-	
+
 		$total_confirmed[$h] += $run_counts["Male"];
 		$total_confirmed[$h] += $run_counts["Female"];
 		$total_not_counted[$h] += $run_counts["Uncounted"];
 		$total_waitlisted[$h] += $run_counts["Waitlisted"];
 	  }
 	}
-	
+
 	// count the number of people away each hour
     $away = array ();
-  
+
 	// Number of people away by hour
-  
+
 	away_init ($away, 'Fri', FRI_MIN, FRI_MAX, 0);
 	away_init ($away, 'Sat', SAT_MIN, SAT_MAX, 0);
 	away_init ($away, 'Sun', SUN_MIN, SUN_MAX, 0);
-  
+
 	$sql = 'SELECT * FROM Away';
 	$result = mysql_query ($sql);
 	if (! $result)
 	  return display_mysql_error ('Query for away records failed', $sql);
-  
+
 	while ($row = mysql_fetch_array ($result))
 	{
 	  away_add ($away, $row, 'Fri', FRI_MIN, FRI_MAX);
@@ -937,11 +937,11 @@ function schedule_day ($day, $away_all_day, $away_hours,
 	  away_add ($away, $row, 'Sun', SUN_MIN, SUN_MAX);
 	}
   }
-  
+
   $time_width = 70;
   $away_width = 70;
   $totals_width = 125;
-  
+
   // calculate the minimum schedule width in pixels
   $full_width = $maxColumns * 90;
   $full_width += $time_width;
@@ -955,21 +955,21 @@ function schedule_day ($day, $away_all_day, $away_hours,
   $time_width .= "px";
   $away_width .= "px";
   $totals_width .= "px";
-  
+
   $full_height = ($mainBlock->getHours() * 9) . "em";
 
   $events_width = ($mainBlock->maxColumns / $maxColumns) * 100 . "%";
   $volunteer_width = ($volunteerBlock->maxColumns / $maxColumns) * 100 . "%";
-  
+
   // main wrapper for the whole schedule
   echo "<div style=\"position: relative; border: 1px black solid; min-width: $full_width;\">";
-  
+
   // left column: times
   echo "<div style=\"position: relative; width: $time_width; float: left;\">";
   echo "<div style=\"width: 100%; height: 30px;\">";
   write_centering_table("<b>Time</b>");
   echo "</div>";
-  
+
   echo "<div style=\"position: relative; width: 100%; height: $full_height;\">";
   for ($hour = $blockStart; $hour < $blockEnd; $hour++) {
 	echo "<div style=\"position: absolute; ";
@@ -977,13 +977,13 @@ function schedule_day ($day, $away_all_day, $away_hours,
 	echo "top: " . ((($hour - $blockStart) / $mainBlock->getHours()) * 100.0) . "%; ";
 	echo "height: " . (100.0 / $mainBlock->getHours()) . "%;";
 	echo "\">";
-	
+
 	write_24_hour($hour);
-	
+
 	echo "</div>";
   }
   echo "</div></div>";
-  
+
   // right column: away checkboxes or totals
   if ($show_away_column || $show_counts) {
 	echo "<div style=\"position: relative; width: ";
@@ -1008,7 +1008,7 @@ function schedule_day ($day, $away_all_day, $away_hours,
 	  echo "top: " . ((($hour - $blockStart) / $mainBlock->getHours()) * 100.0) . "%; ";
 	  echo "height: " . (100.0 / $mainBlock->getHours()) . "%;";
 	  echo "\">";
-	  
+
 	  if ($show_away_column) {
 		write_away_checkbox ($away_hours[$hour], $day, $hour, $away_all_day);
 	  } else if ($show_counts) {
@@ -1019,12 +1019,12 @@ function schedule_day ($day, $away_all_day, $away_hours,
 		    $total_waitlisted[$hour],
 		    $away[$k] + $away[$day]);
 	  }
-	  
+
 	  echo "</div>";
 	}
 	echo "</div></div>";
   }
-  
+
   // main column: events and volunteer track
   echo "<div style=\"position: relative; margin-left: $time_width; ";
   // ie6 and 7 hacks to give this div hasLayout=true
@@ -1034,7 +1034,7 @@ function schedule_day ($day, $away_all_day, $away_hours,
   } else if ($show_counts) {
 	echo " margin-right: $totals_width;";
   }
-  echo "\">";  
+  echo "\">";
   echo "<div style=\"height: 30px; width: $events_width;\">";
   write_centering_table("<b>Events</b>");
   echo "</div>";
@@ -1044,11 +1044,11 @@ function schedule_day ($day, $away_all_day, $away_hours,
 							   $hour, $away_all_day, $away_hours,
 							   $signed_up_runs, $signup_counts,
 							   $show_counts);
-  
+
   echo "<div style=\"position: absolute; height: 30px; right: 0px; top: 0px; width: $volunteer_width;\">";
   write_centering_table("<b>Volunteer</b>");
   echo "</div>";
-  
+
   display_schedule_runs_in_div($volunteerBlock, $volunteerRuns,
 							   "position: absolute; right: 0px; top: 30px; width: $volunteer_width; height: $full_height;",
 							   $hour, $away_all_day, $away_hours,
@@ -1455,7 +1455,7 @@ function show_iron_gms()
   while ($team_row = mysql_fetch_object ($team_result))
   {
     echo "<li><i>$team_row->Name</i>";
-    
+
     $sql = 'SELECT Users.FirstName, Users.LastName';
     $sql .= ' FROM IronGm, Users';
     $sql .= ' WHERE Users.UserId=IronGm.UserId';
@@ -1503,7 +1503,7 @@ function display_comp_info($EventId)
 	      DISPLAY_GM_LIST, $EventId);
       echo "</li>\n";
       break;
-      
+
     case 1:
       $row = mysql_fetch_object($result);
 //      $name = trim("$row->FirstName $row->LastName");
@@ -1573,7 +1573,7 @@ function show_game ()
   $sql .= " WHERE EventId=$EventId";
 
   //  print ($sql . "\n<p>\n");
- 
+
   $game_result = mysql_query ($sql);
   if (! $game_result)
     return display_mysql_error ('Cannot query database');
@@ -1630,7 +1630,7 @@ function show_game ()
 	      SCHEDULE_IRON_GM_TEAM_LIST, $EventId);
     }
     display_comp_info($EventId);
-    
+
     $updater_name = '<Unknown>';
 
     $sql = 'SELECT FirstName, LastName';
@@ -1705,7 +1705,7 @@ function show_game ()
 	if ('' != $gm_row->Nickname)
 	  $name .= '&quot;' . $gm_row->Nickname . '&quot; ';
 	$name .= $gm_row->LastName . '&nbsp;&nbsp;&nbsp;';
-	
+
 	if ('Y' == $gm_row->DisplayEMail)
 	  $EMail = mailto_or_obfuscated_email_address ($gm_row->EMail);
 	else
@@ -2071,7 +2071,7 @@ function show_game ()
     echo "<img src=\"LittleLARPA.gif\" width=\"61\" height=\"19\" align=\"left\">\n";
     echo "This is a LARPA Small Game Contest entry.</p>\n";
   }
-    
+
   echo "<p>\n<hr>\n";
 
   if ($is_iron_gm)
@@ -2459,7 +2459,7 @@ function signup_user_for_game ($RunId, $EventId, $Title,
   {
     $state = 'Confirmed';
   }
-  
+
   // If the array of conflicting games the user is waitlisted on is not
   // empty, display a form asking the user to confirm the he wants us to
   // drop him from the waitlisted games
@@ -3183,7 +3183,7 @@ function display_game_form ()
 
   $conmail_gamemail_checked = '';
   $conmail_gms_checked = '';
- 
+
   switch ($_POST['ConMailDest'])
   {
     case 'GameMail':
@@ -3205,7 +3205,7 @@ function display_game_form ()
 	  $conmail_gms_checked);
   echo "    </td>\n";
   echo "  </tr>\n";
- 
+
   if ('Y' == trim ($_POST['CanPlayConcurrently']))
     $concurrent_state = "can";
   else
@@ -3307,7 +3307,7 @@ function list_games_alphabetically ()
   if (accepting_bids())
   {
      if (file_exists(TEXT_DIR.'/acceptingbids.html'))
-	include(TEXT_DIR.'/acceptingbids.html');	
+	include(TEXT_DIR.'/acceptingbids.html');
   }
 
   $sql = 'SELECT EventId, Title, Author, ShortBlurb, SpecialEvent,';
@@ -3590,7 +3590,7 @@ function show_signups ()
       $include_number_checked = 'CHECKED';
     else
       $include_number_checked = '';
-    
+
     if (array_key_exists ('IncludeName', $_REQUEST))
       $include_name_checked = 'CHECKED';
     else
@@ -4088,7 +4088,7 @@ function show_user_signups ()
   $conf_sql = $sql . "   AND Signup.State='Confirmed'";
   $wait_sql = $sql . "   AND Signup.State='Waitlisted'";
 
-  
+
   show_user_signups_list($sql, true);
   show_user_signups_list($sql, false);
 
@@ -4639,7 +4639,7 @@ function update_signup_accept_player_from_waitlist ($SignupId)
 
   //  echo "Title: $row->Title\n";
   //  echo "Day: $row->Day\n";
-  
+
   accept_players_from_waitlist_for_run ($row->EventId, $RunId, $RunId,
 					$row->Title, $row->Day,
 					$row->StartHour, $row->Hours,
@@ -5265,17 +5265,17 @@ function display_gm_information ()
   display_text_info ('Preferred Contact', $row->PreferredContact);
 
   echo "  <tr>\n";
-  echo "    <td colspan=\"2\">\n";	// 
+  echo "    <td colspan=\"2\">\n";	//
 
   form_checkbox ('DisplayAsGM', 'Y' == $row->DisplayAsGM);
   echo " Display as GM<br>\n";
   form_checkbox ('DisplayEMail', 'Y' == $row->DisplayEMail);
   echo " Display EMail Address<br>\n";
   form_checkbox ('ReceiveConEMail', 'Y' == $row->ReceiveConEMail);
-  echo " Receive mail from Con<br>\n"; 
+  echo " Receive mail from Con<br>\n";
   form_checkbox ('ReceiveSignupEMail', 'Y' == $row->ReceiveSignupEMail);
   echo " Receive mail on Signup or Withdrawal<br>\n";
-		 
+
   echo "    </td>\n";
   echo "  </tr>\n";
 

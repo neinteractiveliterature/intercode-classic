@@ -3,8 +3,8 @@ if (strstr($_SERVER["SERVER_NAME"], "interactiveliterature.org")) {
     session_set_cookie_params(0, '/', '.interactiveliterature.org');
 }
 
-ini_set( 
-  'include_path', 
+ini_set(
+  'include_path',
   ini_get( 'include_path' ) . PATH_SEPARATOR . "/home/neiladmin/pear/php"
 );
 
@@ -321,7 +321,7 @@ define ('SESSION_LOGIN_USER_PRIVS', 'LoginUserPrivs_' . CON_ID);
 define ('SESSION_REFERRER_ID', 'ReferrerId_' . CON_ID);
 define ('SESSION_LOGIN_USER_GENDER', 'LoginUserGender_' . CON_ID);
 define ('SESSION_LOGIN_USER_NAME', 'LoginUserName_' . CON_ID);
-define ('SESSION_LOGIN_USER_EMAIL', 'LoginUserEMail_' . CON_ID); 
+define ('SESSION_LOGIN_USER_EMAIL', 'LoginUserEMail_' . CON_ID);
 define ('SESSION_CON_SHOW_SCHEDULE', 'ConShowSchedule_' . CON_ID);
 define ('SESSION_CON_NEWS', 'ConNews_' . CON_ID);
 define ('SESSION_ATTENDENCE_SHOWN', 'AttendenceShown_' . CON_ID);
@@ -377,7 +377,7 @@ function post_int($key, $default=0)
 
 function user_has_priv ($priv, $accept_staff_priv=true)
 {
-  
+
   // If the session hasn't been setup yet, then the user can't be
   // privileged
 
@@ -515,7 +515,7 @@ function intercon_db_connect ($forceadmin=0)
     $user = DB_ADMIN_USR;
     $pass = DB_ADMIN_PWD;
   }
-  elseif (user_has_priv (PRIV_STAFF, FALSE) || 
+  elseif (user_has_priv (PRIV_STAFF, FALSE) ||
 	  user_has_priv (PRIV_BID_CHAIR, FALSE) ||
 	  user_has_priv (PRIV_REGISTRAR, FALSE) ||
 	  user_has_priv (PRIV_SCHEDULING, FALSE))
@@ -528,7 +528,7 @@ function intercon_db_connect ($forceadmin=0)
     $user = DB_USER_USR;
     $pass = DB_USER_PWD;
   }
-  
+
   $link = @mysql_connect (DB_SERVER, $user, $pass);
   if ($link && mysql_select_db (DB_NAME))
     return $link;
@@ -610,7 +610,7 @@ function html_begin ($bShowLogo=true)
     printf ("<p class=dev_warning>Development Version  %s@%s</p>\n",
 	    DB_NAME,
 	    DB_SERVER);
-      
+
   if (!defined("MINI_LOGO")) {
     display_full_logo();
   }
@@ -627,7 +627,7 @@ function html_end ($bShowCopyright=true)
   if ($bShowCopyright)
   {
      if (file_exists(TEXT_DIR.'/copyright.html'))
-	include(TEXT_DIR.'/copyright.html');	
+	include(TEXT_DIR.'/copyright.html');
   }
   echo"</BODY>\n</HTML>\n";
 }
@@ -637,14 +637,14 @@ function html_end ($bShowCopyright=true)
  *
  * Returns the number of signups allowed now
  */
- 
+
 function con_signups_allowed () {
     // we cache this value not only for performance reasons, but because the SELECT
     // statement can sometimes fail if tables are locked, as happens late in the
     // registration functions
     if (!isset($GLOBALS['CON_SIGNUPS_ALLOWED']))
         $GLOBALS['CON_SIGNUPS_ALLOWED'] = calculate_con_signups_allowed();
-    
+
     return $GLOBALS['CON_SIGNUPS_ALLOWED'];
 }
 
@@ -683,7 +683,7 @@ function calculate_con_signups_allowed ()
   }
 
   // Signups aren't allowed at this time
-  
+
   return 0;
 }
 
@@ -694,12 +694,12 @@ function con_signups_frozen () {
   if (!$result) {
       return 0;
   }
-  
+
   $row = mysql_fetch_object ($result);
   if (!$row) {
     return 0;
   }
-  
+
   return ($row->SignupsAllowed == "NotNow");
 }
 
@@ -718,7 +718,7 @@ function attendees_at_max() {
     if (('Alumni' <> $row->CanSignup) && ('Unpaid' <> $row->CanSignup))
       $attendees += $row->Count;
   }
-  
+
   return $attendees >= CON_MAX;
 }
 
@@ -1348,11 +1348,11 @@ function is_valid_email_address ($key='EMail', $required=TRUE)
 
   // Make sure this lookes like an EMail address
 
-  $pattern =  "^" .                             // Start at BOL  
+  $pattern =  "^" .                             // Start at BOL
               "[a-z0-9]+([_\\.-][a-z0-9]+)*" .  //user
               "@" .
               "([a-z0-9]+([\.-][a-z0-9]+)*)+" . //domain
-              "\\.[a-z]{2,}" .                  //sld, tld 
+              "\\.[a-z]{2,}" .                  //sld, tld
               "$";
 
   return eregi ($pattern, $value);
@@ -1547,7 +1547,7 @@ function validate_file_exists ($key, $dir='.', $display=0)
 function can_signup () {
     if (!is_logged_in())
         return false;
-    
+
     if (!isset($GLOBALS['USER_CAN_SIGNUP'])) {
         $sql = 'SELECT CanSignup FROM Users WHERE UserId=';
         $sql .= $_SESSION[SESSION_LOGIN_USER_ID];
@@ -1558,13 +1558,13 @@ function can_signup () {
             display_error ('Failed to find UserId ' . $_SESSION[SESSION_LOGIN_USER_ID]);
 
         $row = mysql_fetch_object ($result);
-    
+
         if (is_unpaid ($row->CanSignup))
             $GLOBALS['USER_CAN_SIGNUP'] = false;
         else
             $GLOBALS['USER_CAN_SIGNUP'] = true;
     }
-    
+
     return $GLOBALS['USER_CAN_SIGNUP'];
 }
 
@@ -1679,7 +1679,7 @@ function can_show_schedule ()
 function get_con_settings() {
     if (!isset($GLOBALS['CACHED_CON'])) {
         $sql = 'SELECT * FROM Con';
-        
+
         $result = mysql_query ($sql);
         if (! $result)
         {
@@ -1694,10 +1694,10 @@ function get_con_settings() {
           echo "<!-- No rows fetched for Con.ShowSchedule -->\n";
           return FALSE;
         }
-        
+
         $GLOBALS['CACHED_CON'] = $row;
     }
-    
+
     return $GLOBALS['CACHED_CON'];
 }
 
@@ -2032,7 +2032,7 @@ function notify_gms ($EventId, $Title, $Day, $StartHour, $signup_result,
   $user_name = trim ("$row->FirstName $row->LastName");
   $user_email = $row->EMail;
 
-  notify_gms_for_user (trim ("$row->FirstName $row->LastName"), 
+  notify_gms_for_user (trim ("$row->FirstName $row->LastName"),
 		       $row->EMail,
 		       $EventId,
 		       $Title,
@@ -2702,7 +2702,7 @@ function display_available_games ()
  *
  * Display the large-format site logo, if it exists
  */
-function display_full_logo () 
+function display_full_logo ()
 {
   if (defined("FULL_LOGO")) {
     echo '<div style="text-align: center;">';
@@ -2727,7 +2727,7 @@ function display_login_form ($error='', $dest='')
   if ('' == $dest)
   {
   	if (file_exists(TEXT_DIR.'/logintop.html'))
-		include(TEXT_DIR.'/logintop.html');	
+		include(TEXT_DIR.'/logintop.html');
   }
 
   // If there's an error from a prior screen, display it now
@@ -2746,7 +2746,7 @@ function display_login_form ($error='', $dest='')
   form_hidden_value('dest', $dest);
   echo "<table border=\"0\">\n";
   form_text (64, 'EMail');
-  
+
   // Yeah, yeah, I copied and pasted this from form_password.  I wanted to add a "forgot your password?"
   // link and didn't want to break other pages that use the function. - Nat
   print ("  <TR>\n");
@@ -2759,8 +2759,8 @@ function display_login_form ($error='', $dest='')
   form_submit("Login");
   echo "</table>\n";
   echo "</form>\n";
-  
-  
+
+
 
   if ('' != $dest)
     return false;
@@ -2770,7 +2770,7 @@ function display_login_form ($error='', $dest='')
   display_available_games ();
 
   if (file_exists(TEXT_DIR.'/loginbottom.html'))
-	include(TEXT_DIR.'/loginbottom.html');	
+	include(TEXT_DIR.'/loginbottom.html');
 }
 
 /*
@@ -2991,7 +2991,7 @@ function obfuscate_email_address ($addr)
   $addr = $parts[0];
   for ($i = 1; $i < count($parts); $i++)
     $addr .= ' DOT ' . $parts[$i];
-    
+
   return $addr;
 }
 
@@ -3242,7 +3242,7 @@ function build_shirt_order_string ($a)
  * Return 1 if it's past the shirt ordering deadline, 0 if it's not.
  *
  * Note that the deadline is always at the end of the day, not the
- * start, so we add 24 hours * 60 minutes * 60 seconds to the 
+ * start, so we add 24 hours * 60 minutes * 60 seconds to the
  */
 
 function past_shirt_deadline()
@@ -3435,22 +3435,22 @@ function form_con_rooms($display, $key)
     else
       $rooms = array_flip($_POST[$key]);
   }
-  
+
   $result = mysql_query("SELECT RoomName FROM Rooms ORDER BY RoomName");
   if (! $result)
     display_mysql_error ("Query failed for Rooms list");
-  
+
   $possibleRooms = [];
   while ($row = mysql_fetch_assoc($result)) {
     array_push($possibleRooms, $row['RoomName']);
   }
-  
+
   $chunkLength = ceil(count($possibleRooms) / 4);
   $chunks = [];
   for ($i = 0; $i < $chunkLength; $i++) {
     array_push($chunks, array_slice($possibleRooms, $chunkLength * $i, $chunkLength));
   }
-  
+
   echo "  <tr>\n";
   echo "    <td valign=\"right\">$display:</td>\n";
   echo "    <td>\n";
@@ -3461,7 +3461,7 @@ function form_con_rooms($display, $key)
     foreach ($chunk as $possibleRoom) {
       room_check($rooms, $possibleRoom);
     }
-    echo "          </td>\n";    
+    echo "          </td>\n";
   }
   echo "        </tr>\n";
   echo "      </table>\n";
