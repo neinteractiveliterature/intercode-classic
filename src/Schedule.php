@@ -58,7 +58,7 @@ switch ($action)
     break;
 
   case PROCESS_ADD_GAME:
-    if (! can_edit_game_info ())
+    if (! can_edit_game_info_by_request_event_id ())
     {
       display_access_error ();
       break;
@@ -71,7 +71,7 @@ switch ($action)
     break;
 
   case EDIT_GAME:
-    if (! can_edit_game_info ())
+    if (! can_edit_game_info_by_request_event_id ())
     {
       display_access_error ();
       break;
@@ -86,7 +86,7 @@ switch ($action)
     break;
 
   case SCHEDULE_SHOW_SIGNUPS:
-    if (can_edit_game_info () || user_has_priv (PRIV_CON_COM))
+    if (can_edit_game_info_by_request_run_id () || user_has_priv (PRIV_CON_COM))
       show_signups ();
     else
       display_access_error ();
@@ -97,21 +97,21 @@ switch ($action)
     break;
 
   case SCHEDULE_SHOW_ALL_SIGNUPS:
-    if (can_edit_game_info () || user_has_priv (PRIV_CON_COM))
+    if (can_edit_game_info_by_request_event_id () || user_has_priv (PRIV_CON_COM))
       show_all_signups ();
     else
       display_access_error ();
     break;
 
   case SHOW_USER:
-    if (can_edit_game_info ())
+    if (can_edit_game_info_by_request_signup_id ())
       display_user_information ();
     else
       display_access_error ();
     break;
 
   case SCHEDULE_UPDATE_SIGNUP:
-    if (! can_edit_game_info ())
+    if (! can_edit_game_info_by_request_signup_id ())
     {
       display_access_error ();
       break;
@@ -124,28 +124,28 @@ switch ($action)
     break;
 
   case DISPLAY_GM_LIST:
-    if (! can_edit_game_info ())
+    if (! can_edit_game_info_by_request_event_id ())
       display_access_error ();
     else
       display_gm_list ();
     break;
 
   case SCHEDULE_COMP_USER_FOR_EVENT:
-    if (! can_edit_game_info())
+    if (! can_edit_game_info_by_request_event_id())
       display_access_error();
     else
       comp_user_for_event();
     break;
 
   case ADD_GM:
-    if (! can_edit_game_info ())
+    if (! can_edit_game_info_by_request_event_id ())
       display_access_error ();
     else
       select_user_as_gm ();
     break;
 
   case PROCESS_ADD_GM:
-    if (! can_edit_game_info ())
+    if (! can_edit_game_info_by_request_event_id ())
       display_access_error ();
     else
     {
@@ -157,14 +157,14 @@ switch ($action)
     break;
 
   case EDIT_GM:
-    if (! can_edit_game_info ())
+    if (! can_edit_game_info_by_request_event_id ())
       display_access_error ();
     else
       display_gm_information ();
     break;
 
   case SCHEDULE_UPDATE_GM:
-    if (! can_edit_game_info ())
+    if (! can_edit_game_info_by_request_event_id ())
       display_access_error ();
     else
     {
@@ -3033,7 +3033,7 @@ function load_game_post_array ()
  * if it's the Bid Chair (or staff member) or a GM for the game.
  */
 
-function can_edit_game_info ()
+function can_edit_game_info ($EventId)
 {
   // If the user isn't logged in then they can't edit anything!!!
 
@@ -3051,10 +3051,6 @@ function can_edit_game_info ()
   if (user_has_priv (PRIV_GM_LIAISON))
     return true;
 
-  $EventId = intval (trim ($_REQUEST['EventId']));
-  if (0 == $EventId)
-    return display_error ('Invalid EventId');
-
   // See if the logged in user is a GM for this game
 
   $sql = 'SELECT GMId FROM GMs';
@@ -3066,6 +3062,53 @@ function can_edit_game_info ()
     return display_mysql_error ('Check for GMs failed');
 
   return (mysql_num_rows ($result) > 0);
+}
+
+function can_edit_game_info_by_request_event_id() {
+  $EventId = intval (trim ($_REQUEST['EventId']));
+  if (0 == $EventId)
+    return display_error ('Invalid EventId');
+
+  return can_edit_game_info($EventId);
+}
+
+function can_edit_game_info_by_request_run_id() {
+  $RunId = intval (trim ($_REQUEST['RunId']));
+  if (0 == $RunId)
+    return display_error ('Invalid RunId');
+
+  $sql = 'select EventId from Runs ';
+  $sql .= "where RunId = $RunId";
+
+  $result = mysql_query ($sql);
+  if (! $result)
+    return display_mysql_error ('Check for GMs failed');
+
+  $row = mysql_fetch_object($result);
+  if (! $row)
+    return display_mysql_error ('Loading event ID failed');
+
+  return can_edit_game_info($row->EventId);
+}
+
+function can_edit_game_info_by_request_signup_id() {
+  $SignupId = intval (trim ($_REQUEST['SignupId']));
+  if (0 == $SignupId)
+    return display_error ('Invalid SignupId');
+
+  $sql = 'select EventId from Signup ';
+  $sql .= 'inner join Runs on Runs.RunId = Signup.RunId ';
+  $sql .= "where SignupId = $SignupId";
+
+  $result = mysql_query ($sql);
+  if (! $result)
+    return display_mysql_error ('Check for GMs failed');
+
+  $row = mysql_fetch_object($result);
+  if (! $row)
+    return display_mysql_error ('Loading event ID failed');
+
+  return can_edit_game_info($row->EventId);
 }
 
 function scheduling_priv_option ($name, $field, $check_key)
@@ -3872,7 +3915,7 @@ function show_signups ()
     }
     else
     {
-      $can_edit = can_edit_game_info ();
+      $can_edit = can_edit_game_info ($EventId);
 
       if ('' != $include_confirmed_checked)
 	show_signups_state (true, $EventId, $RunId, $order_by_text,
@@ -3965,6 +4008,17 @@ function show_user_signups ()
 {
   $RunId = intval (trim ($_REQUEST['RunId']));
   $EventId = intval (trim ($_REQUEST['EventId']));
+
+  if (!user_can_edit_game($EventId)) {
+    $SignupId = null;
+    $is_confirmed = null;
+    get_user_status_for_run ($RunId, $SignupId, $is_confirmed);
+
+    if (!$is_confirmed) {
+      display_access_error();
+      return;
+    }
+  }
 
   // Fetch the game title and suffix (if any)
   $sql = 'SELECT Events.Title, Events.Hours,';
@@ -4290,7 +4344,7 @@ function show_all_signups ()
     }
     else
     {
-      $can_edit = can_edit_game_info ();
+      $can_edit = can_edit_game_info ($EventId);
 
       show_signups_state (true, $EventId, 0, $order_by_text,
 			  $OrderBy, $result, $status, $gms, $can_edit,
