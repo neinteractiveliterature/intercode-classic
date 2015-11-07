@@ -201,10 +201,20 @@ switch ($action)
     break;
 
   case SCHEDULE_FREEZE_GENDER_BALANCE:
+    if (! can_edit_game_info_by_request_event_id ()) {
+      display_access_error ();
+      break;
+    }
+
     freeze_gender_balance ();
     break;
 
   case SCHEDULE_CONFIRM_FREEZE_GENDER_BALANCE:
+    if (! can_edit_game_info_by_request_event_id ()) {
+      display_access_error ();
+      break;
+    }
+
     confirm_freeze_gender_balance ();
     show_game ();
     break;
