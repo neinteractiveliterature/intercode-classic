@@ -1386,60 +1386,12 @@ function get_counts_for_run ($RunId, &$confirmed, &$waitlisted)
   return true;
 }
 
-/*
- * user_is_gm_for_game
- *
- * Returns true if the user is a GM for the specified game.
- */
-
-function user_is_gm_for_game ($UserId, $EventId)
-{
-  // If the user isn't logged in, then they're not a GM, are they?
-
-  if (0 == $UserId)
+function current_user_is_gm_for_game ($EventId) {
+  if (!is_logged_in()) {
     return false;
+  }
 
-  // Query the database to see if the user is GM
-
-  $sql = "SELECT GMId FROM GMs WHERE UserId=$UserId AND EventId=$EventId";
-  $sql .= '  LIMIT 1';
-
-  //  echo "Query: $sql<p>\n";
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Query for GMs failed');
-
-  $num = mysql_num_rows ($result);
-  mysql_free_result ($result);
-
-  return $num != 0;
-}
-
-/*
- * is_user_gm_for_game
- *
- * Check whether the user is a GM for a game
- */
-
-function is_user_gm_for_game ($UserId, $EventId)
-{
-  $sql = 'SELECT GMId FROM GMs';
-  $sql .= " WHERE UserId=$UserId";
-  $sql .= "   AND EventId=$EventId";
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Cannot query GM status', $sql);
-
-  if (mysql_num_rows ($result) > 1)
-    return display_mysql_error ('Matched more than 1 GM entry', $sql);
-
-  $row = mysql_fetch_object ($result);
-  if (! $row)
-    return false;
-  else
-    return true;
+  return user_is_gm_for_game($_SESSION[SESSION_LOGIN_USER_ID], $EventId);
 }
 
 /*
@@ -1469,7 +1421,7 @@ function count_signed_up_games ()
 
   while ($row = mysql_fetch_object($result))
   {
-    if ((! is_user_gm_for_game ($_SESSION[SESSION_LOGIN_USER_ID], $row->EventId)) &&
+    if ((! current_user_is_gm_for_game ($row->EventId)) &&
 	($row->IsOps=='N') &&
 	($row->IsConSuite=='N'))
       $count++;
@@ -1572,6 +1524,14 @@ function display_comp_info($EventId)
   }
 }
 
+function user_can_edit_game($EventId) {
+  if (user_has_priv (PRIV_SCHEDULING) || user_has_priv (PRIV_GM_LIAISON)) {
+    return true;
+  }
+
+  return current_user_is_gm_for_game ($EventId);
+}
+
 /*
  * show_game
  *
@@ -1590,20 +1550,9 @@ function show_game ()
 
   // Note if this is one of the GMs
 
-  if (array_key_exists (SESSION_LOGIN_USER_ID, $_SESSION))
-    $is_gm = user_is_gm_for_game ($_SESSION[SESSION_LOGIN_USER_ID], $EventId);
-  else
-    $is_gm = false;
-
+  $is_gm = current_user_is_gm_for_game($EventId);
   $signups_allowed = con_signups_allowed();
-
-  // If this is a GM, or a privileged user, they can edit the game.
-
-  $can_edit_game = $is_gm;
-
-  if (user_has_priv (PRIV_SCHEDULING) || user_has_priv (PRIV_GM_LIAISON))
-    $can_edit_game = true;
-
+  $can_edit_game = user_can_edit_game($EventId);
   $can_signup = can_signup();
 
   // Get the information about this game

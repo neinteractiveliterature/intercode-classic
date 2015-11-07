@@ -1927,6 +1927,36 @@ function last_login_to_con ($timestamp)
 }
 
 /*
+ * user_is_gm_for_game
+ *
+ * Returns true if the user is a GM for the specified game.
+ */
+
+function user_is_gm_for_game ($UserId, $EventId)
+{
+  // If the user isn't logged in, then they're not a GM, are they?
+
+  if (0 == $UserId)
+    return false;
+
+  // Query the database to see if the user is GM
+
+  $sql = "SELECT GMId FROM GMs WHERE UserId=$UserId AND EventId=$EventId";
+  $sql .= '  LIMIT 1';
+
+  //  echo "Query: $sql<p>\n";
+
+  $result = mysql_query ($sql);
+  if (! $result)
+    return display_mysql_error ('Query for GMs failed');
+
+  $num = mysql_num_rows ($result);
+  mysql_free_result ($result);
+
+  return $num != 0;
+}
+
+/*
  * notify_gms_for_user
  *
  *

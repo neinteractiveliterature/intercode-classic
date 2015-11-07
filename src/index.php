@@ -547,32 +547,6 @@ function login_with_data ($row, $EMail)
 }
 
 /*
- * is_user_gm_for_game
- *
- * Check whether the user is a GM for a game
- */
-
-function is_user_gm_for_game ($UserId, $EventId)
-{
-  $sql = 'SELECT GMId FROM GMs';
-  $sql .= " WHERE UserId=$UserId";
-  $sql .= "   AND EventId=$EventId";
-
-  $result = mysql_query ($sql);
-  if (! $result)
-    return display_mysql_error ('Cannot query GM status', $sql);
-
-  if (mysql_num_rows ($result) > 1)
-    return display_mysql_error ('Matched more than 1 GM entry', $sql);
-
-  $row = mysql_fetch_object ($result);
-  if (! $row)
-    return false;
-  else
-    return true;
-}
-
-/*
  * show_games
  *
  * Show the games the user is signed up for.  If the sequence number is
@@ -649,7 +623,7 @@ function show_games ($UserId, $prefix, $type, $state, $sequence_number = -1)
     echo "    <TD><A HREF=Schedule.php?action=" . SCHEDULE_SHOW_GAME .
                        "&EventId=$row->EventId>$Title</A>&nbsp;&nbsp;&nbsp;";
 
-    if (is_user_gm_for_game ($UserId, $row->EventId))
+    if (user_is_gm_for_game ($UserId, $row->EventId))
       echo  '[GM]&nbsp;&nbsp;&nbsp;';
 
     echo "</TD>\n";
