@@ -2459,8 +2459,33 @@ function calculate_available_slot ($run_id, $gender,
     $male_slots = 1;
   else
     $female_slots = 1;
-  
+
   return true;
+}
+
+function user_can_withdraw_from_game($SignupId) {
+  if (! user_has_priv (PRIV_STAFF)) {
+    $sql = "SELECT UserId FROM Signup WHERE SignupId=$SignupId";
+
+    $result = mysql_query ($sql);
+    if (! $result) {
+      display_mysql_error ('Signup table query failed');
+      return false;
+    }
+
+    $row = mysql_fetch_object ($result);
+    if (! $row) {
+      display_error ("Failed to find info for signup $SignupId");
+      return false;
+    }
+
+    if ($row->UserId != $_SESSION[SESSION_LOGIN_USER_ID]) {
+      display_error ('You are not allowed to withdraw from a game for another user.');
+      return false;
+    }
+
+    return true;
+  }
 }
 
 /*
@@ -2479,24 +2504,12 @@ function withdraw_from_game ($SignupId = 0)
       return display_sequence_error (false);
 
     $SignupId = intval (trim ($_REQUEST['SignupId']));
+  }
 
-    // Make sure that this is the user or a staff member
+  // Make sure that this is the user or a staff member
 
-    if (! user_has_priv (PRIV_STAFF))
-    {
-	$sql = "SELECT UserId FROM Signup WHERE SignupId=$SignupId";
-
-	$result = mysql_query ($sql);
-	if (! $result)
-	  return display_mysql_error ('Signup table query failed');
-
-	$row = mysql_fetch_object ($result);
-	if (! $row)
-	  return display_error ("Failed to find info for signup $SignupId");
-
-	if ($row->UserId != $_SESSION[SESSION_LOGIN_USER_ID])
-	  return display_error ('You are not allowed to withdraw from a game for another user.');
-    }
+  if (!user_can_withdraw_from_game($SignupId)) {
+    return;
   }
 
   if (!con_signups_allowed()) {
@@ -2560,6 +2573,12 @@ function confirm_withdraw_from_game ()
     return display_sequence_error (false);
 
   $SignupId = intval (trim ($_REQUEST['SignupId']));
+
+  // Make sure that this is the user or a staff member
+
+  if (!user_can_withdraw_from_game($SignupId)) {
+    return;
+  }
 
   $sql = 'SELECT Events.Title, Events.Hours, Runs.Day, Runs.StartHour, ';
   $sql .= ' Signup.State';
