@@ -2477,7 +2477,12 @@ function calculate_available_slot ($run_id, $gender,
 }
 
 function user_can_withdraw_from_game($SignupId) {
-  if (! user_has_priv (PRIV_STAFF)) {
+  if (user_has_priv (PRIV_STAFF)) {
+
+    return true;
+
+  } else {
+
     $sql = "SELECT UserId FROM Signup WHERE SignupId=$SignupId";
 
     $result = mysql_query ($sql);
