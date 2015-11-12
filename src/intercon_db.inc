@@ -319,7 +319,6 @@ define ('SESSION_LOGIN_USER_GM', 'LoginUserGM_' . CON_ID);
 define ('SESSION_LOGIN_USER_ID', 'LoginUserId_' . CON_ID);
 define ('SESSION_LOGIN_USER_PRIVS', 'LoginUserPrivs_' . CON_ID);
 define ('SESSION_REFERRER_ID', 'ReferrerId_' . CON_ID);
-define ('SESSION_LOGIN_USER_GENDER', 'LoginUserGender_' . CON_ID);
 define ('SESSION_LOGIN_USER_NAME', 'LoginUserName_' . CON_ID);
 define ('SESSION_LOGIN_USER_EMAIL', 'LoginUserEMail_' . CON_ID);
 define ('SESSION_CON_SHOW_SCHEDULE', 'ConShowSchedule_' . CON_ID);
@@ -409,6 +408,20 @@ function user_has_any_mail_priv ()
          user_has_priv (PRIV_MAIL_VENDORS) ||
          user_has_priv (PRIV_MAIL_UNPAID) ||
          user_has_priv (PRIV_MAIL_ALUMNI);
+}
+
+function user_gender($UserId) {
+  $sql = 'SELECT Gender FROM Users WHERE Users.UserId='.$_SESSION[SESSION_LOGIN_USER_ID];
+
+  $result = mysql_query ($sql);
+  if (! $result)
+  {
+    display_mysql_error ('Cannot query database for user information', $sql);
+    return SIGNUP_FAIL;
+  }
+
+  $row = mysql_fetch_object ($result);
+  return $row->Gender;
 }
 
 /*

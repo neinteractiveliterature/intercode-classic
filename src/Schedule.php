@@ -1940,7 +1940,7 @@ function show_game ()
 					$run_row->StartHour,
 					$game_row->Hours);
 
-	    $game_full = game_full ($full_msg, $_SESSION[SESSION_LOGIN_USER_GENDER],
+	    $game_full = game_full ($full_msg, user_gender($_SESSION[SESSION_LOGIN_USER_ID]),
 				    $confirmed['Male'], $confirmed['Female'],
 				    $game_row->MaxPlayersMale,
 				    $game_row->MaxPlayersFemale,
@@ -2363,6 +2363,9 @@ function process_signup_request ()
     }
   }
 
+  $gender = user_gender($_SESSION[SESSION_LOGIN_USER_ID]);
+
+
   // We lock the Signup table to make sure that if there are two users trying
   // to get the last slot in a game, then only one will succeed.  A READ lock
   // allows clients that only read the table to continue, but will block
@@ -2377,7 +2380,7 @@ function process_signup_request ()
 
   // Make sure there's room in the game, and add a signup record if there is
 
-  $signup_ok = signup_user_for_game ($RunId, $EventId, $game_title,
+  $signup_ok = signup_user_for_game ($RunId, $EventId, $game_title, $gender,
 				     $user_is_gm,
 				     $max_male, $max_female, $max_neutral,
 				     $waitlist_conflicts,
@@ -2426,7 +2429,7 @@ function process_signup_request ()
  * Signup the logged in user for the specified run or a game
  */
 
-function signup_user_for_game ($RunId, $EventId, $Title,
+function signup_user_for_game ($RunId, $EventId, $Title, $gender,
 			       $user_is_gm,
 			       $max_male, $max_female, $max_neutral,
 			       $waitlist_conflicts, $withdraw_from_conflicts,
@@ -2448,7 +2451,7 @@ function signup_user_for_game ($RunId, $EventId, $Title,
   else
   {
     $counts_towards_total = 'Y';
-    $game_full = game_full ($full_msg, $_SESSION[SESSION_LOGIN_USER_GENDER],
+    $game_full = game_full ($full_msg, $gender,
 			    $confirmed['Male'], $confirmed['Female'],
 			    $max_male, $max_female, $max_neutral);
   }
@@ -2474,7 +2477,7 @@ function signup_user_for_game ($RunId, $EventId, $Title,
   $sql = 'INSERT INTO Signup SET UserId=' . $_SESSION[SESSION_LOGIN_USER_ID];
   $sql .= build_sql_string ('RunId', $RunId);
   $sql .= build_sql_string ('State', $state);
-  $sql .= build_sql_string ('Gender', $_SESSION[SESSION_LOGIN_USER_GENDER]);
+  $sql .= build_sql_string ('Gender', $gender);
   $sql .= build_sql_string ('Counted', $counts_towards_total);
   $sql .= build_sql_string ('UpdatedById', $_SESSION[SESSION_LOGIN_USER_ID]);
 

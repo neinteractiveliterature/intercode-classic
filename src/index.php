@@ -489,7 +489,6 @@ function login_with_data ($row, $EMail)
 
   $_SESSION[SESSION_LOGIN_USER_ID] = $UserId;
   $_SESSION[SESSION_LOGIN_USER_PRIVS] = ",$row->Priv,";
-  $_SESSION[SESSION_LOGIN_USER_GENDER] = $Gender;
   $_SESSION[SESSION_LOGIN_USER_NAME] = $name;
   $_SESSION[SESSION_LOGIN_USER_EMAIL] = $EMail;
   $_SESSION['IncludeAlumni'] = 0;
@@ -1759,7 +1758,6 @@ function add_user ()
     $UserId = mysql_insert_id ();
     $_SESSION[SESSION_LOGIN_USER_ID] = $UserId;
     $_SESSION[SESSION_LOGIN_USER_PRIVS] = ',,';
-    $_SESSION[SESSION_LOGIN_USER_GENDER] = $_POST['Gender'];
 
     $name = $_POST['FirstName'] . ' ' . $_POST['LastName'];
     $_SESSION[SESSION_LOGIN_USER_NAME] = trim ($name);
