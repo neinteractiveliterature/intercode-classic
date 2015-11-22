@@ -620,16 +620,23 @@ function show_shirt_summary()
 
   display_header (CON_NAME . ' Shirt Order Summary');
 
+  $sizes = array();
+  $sql = 'SELECT Sizes FROM StoreItems';
+  $result = mysql_query($sql);
+  if (! $result)
+    return display_mysql_error ('Query for shirt sizes failed', $sql);
+
+  while ($row = mysql_fetch_object($result)) {
+    $sizes = array_merge($sizes, explode(',', $row->Sizes));
+  }
+  $sizes = array_unique($sizes);
+
+  $quantities = array();
+  foreach ($sizes as $size) {
+    $quantities[$size] = 0;
+  }
+
   $shirts = array();
-  $quantities =
-    array('Small' => 0,
-	  'Medium' => 0,
-	  'Large' => 0,
-	  'XLarge' => 0,
-	  'X2Large' => 0,
-	  'X3Large' => 0);
-  $sizes =
-    array('Small', 'Medium', 'Large', 'XLarge', 'X2Large', 'X3Large');
 
   // Build the array of shirts
   $sql  = 'SELECT ItemId, Color, Gender, Style, Plural';
@@ -724,7 +731,7 @@ function show_shirt_report ()
     echo "<p>Click on the user name to send mail<br>\n";
     echo "Click on the status to update the order<br>\n";
   }
-  
+
   echo "<table border=\"1\">\n";
   echo "<tr>\n";
   echo "<th align=\"left\">User</th>\n";
