@@ -109,11 +109,11 @@ function list_accepted_events()
   $result = mysql_query($sql);
   if (! $result)
     return display_mysql_error('Query for PreCon events failed', $sql);
-  
+
   $thursday = new ScheduleBlock(20, 24);
   $friday = new ScheduleBlock(9, 18);
   $runs = array();
-  
+
   while ($row = mysql_fetch_object($result))
   {
     $pcsgRun = new EventRun($row->StartHour, $row->Hours, $row->PreConRunId);
@@ -122,11 +122,11 @@ function list_accepted_events()
     } else {
       $friday->addEventRun($pcsgRun);
     }
-    
+
     $runs[$row->PreConRunId] = $row;
     echo "<p>\n";
   }
-  
+
   mysql_free_result($result);
 
   if (0 == sizeof($runs))
@@ -134,9 +134,9 @@ function list_accepted_events()
 
   $thursday->computeRunDimensions();
   $friday->computeRunDimensions();
-  
+
   echo "<h3>Schedule of Events</h3>";
-  
+
   echo "<h4>Thursday, " . THR_DATE . "</h4>\n";
   precon_schedule_day($thursday, $runs);
 
@@ -144,27 +144,27 @@ function list_accepted_events()
   precon_schedule_day($friday, $runs);
 }
 
-function precon_schedule_day($block, $runs) {  
+function precon_schedule_day($block, $runs) {
   // calculate the minimum schedule width in pixels
   $time_width = 70;
   $events_width = $block->maxColumns * 90;
   $full_width = $events_width + $time_width;
-  
+
   $events_width .= "px";
   $full_width .= "px";
   $time_width .= "px";
-  
+
   $full_height = ($block->getHours() * 9) . "em";
 
   // main wrapper for the whole schedule
   echo "<div style=\"position: relative; border: 1px black solid; min-width: $full_width;\">";
-  
+
   // left column: times
   echo "<div style=\"position: relative; width: $time_width; float: left;\">";
   echo "<div style=\"width: 100%; height: 30px;\">";
   write_centering_table("<b>Time</b>");
   echo "</div>";
-  
+
   echo "<div style=\"position: relative; width: 100%; height: $full_height;\">";
   for ($hour = $block->startHour; $hour < $block->endHour; $hour++) {
 	echo "<div style=\"position: absolute; ";
@@ -172,18 +172,18 @@ function precon_schedule_day($block, $runs) {
 	echo "top: " . ((($hour - $block->startHour) / $block->getHours()) * 100.0) . "%; ";
 	echo "height: " . (100.0 / $block->getHours()) . "%;";
 	echo "\">";
-	
+
 	write_24_hour($hour);
-	
+
 	echo "</div>";
   }
   echo "</div></div>";
-  
+
   // main column: events and volunteer track
   echo "<div style=\"position: relative; margin-left: $time_width; ";
   // ie6 and 7 hacks to give this div hasLayout=true
   echo "_height: 0; min-height: 0;";
-  echo "\">";  
+  echo "\">";
   echo "<div style=\"height: 30px;\">";
   write_centering_table("<b>Events</b>");
   echo "</div>";
@@ -191,24 +191,24 @@ function precon_schedule_day($block, $runs) {
   display_precon_runs_in_div($block, $runs,
 							   "height: $full_height;",
 							   $hour);
-  
+
   echo "</div></div>";
 }
 
 function display_precon_runs_in_div($block, $runs, $css) {
-  
+
   $runDimensions = $block->getRunDimensions();
-  
+
   echo "<div style=\"$css\">";
   echo "<div style=\"position: relative; height: 100%; width: 100%;\">";
 
   foreach ($runDimensions as $dimensions) {
 	$runId = $dimensions->run->id;
 	$row = $runs[$runId];
-	
-    display_precon_event ($row, $dimensions);		
+
+    display_precon_event ($row, $dimensions);
   }
-  
+
   echo "</div></div>";
 }
 
@@ -260,10 +260,16 @@ function thursday_thing()
  echo "<td id=\"precon_bid\" class=\"menulike\">";
  echo "<p class=\"title\">Help Precon be awesome!</p>\n";
 
-   echo "<p>We're seeking panelists, moderators and workshop runners.\n";
-   echo "<a href=\"https://docs.google.com/forms/d/1T9o6uP40EfV78WEAd-8skSanyqkHBajcGk0JKUXMNDY/viewform\">Sign up to be a panelist, moderate a discussion, or run a workshop here!</a>\n";
+   echo "<p>It's never too late to get involved!  If you want to be on a panel or run a workshop, email\n";
+   echo mailto_or_obfuscated_email_address(EMAIL_THURSDAY);
+   echo "!</p>";
    echo "</td>\n";
    echo "</tr></table>\n\n";
+
+
+   echo "<p><strong>NOTE: The schedule below is tentative.  Events, times, and participants may still change before\n";
+   echo "Precon.</strong></p>\n";
+
   /*
   echo "<p>Some of the panels and workshops at Precon O:</p>\n";
   echo "<ul>\n";
@@ -321,7 +327,7 @@ function thursday_report()
 
   $count = mysql_num_rows($result);
   display_header ("$count Paid PreCon Attendees");
-  
+
   while ($row = mysql_fetch_object($result))
   {
     echo "$row->LastName, $row->FirstName<br>\n";
@@ -442,7 +448,7 @@ function select_from_all_users ($header, $href)
       else
 	printf ("    <td>&nbsp;%s&nbsp;&nbsp;</td>\n", $a[0]);
       printf ("    <td>%s</td>\n", $a[2]);
-      
+
     }
 
     echo "  </tr>\n";
@@ -898,7 +904,7 @@ function display_precon_event_form()
   $text .= "a couple of useful HTML tags is available\n";
   $text .= "<A HREF=HtmlPrimer.html TARGET=_blank>here</A>.\n";
   form_textarea ($text, 'Description', 15, TRUE, TRUE);
-  
+
   form_section ('Scheduling Requests');
 
   echo "  <tr>\n";
@@ -1355,7 +1361,7 @@ function show_status_form()
   echo "  <tr>\n";
   echo "    <td colspan=\"2\">\n";
   echo "      <table border=\"1\">\n";
-  
+
   scheduling_preference_row('Thursday', 21, $ary, 3);
   scheduling_preference_row('Thursday', 22, $ary);
   scheduling_preference_row('Thursday', 23, $ary);
@@ -1370,8 +1376,8 @@ function show_status_form()
   scheduling_preference_row('Friday', 17, $ary);
   echo "      </table>\n";
   echo "    </td>\n";
-  echo "  </tr>\n";  
-  
+  echo "  </tr>\n";
+
   echo "</table>\n";
   echo "</form>\n";
 }
@@ -1474,7 +1480,7 @@ function process_status_form()
     case 'Rejected':
     case 'Dropped':
       break;
-    
+
     default:
       return display_error ('Invalid Status');
   }
@@ -1618,7 +1624,7 @@ function show_run_form()
     return display_error ('Invalid PreConEventId');
 
   // Fetch the PreConRunId
-    
+
   $PreConRunId = request_int('PreConRunId');
 
   if (0 == $PreConRunId)
@@ -1765,7 +1771,7 @@ function process_run_form()
     $sql = 'INSERT PreConRuns SET ';
   else
     $sql = 'UPDATE PreConRuns SET ';
-		     
+
   $sql .= build_sql_string('PreConEventId', $PreConEventId, false);
   $sql .= build_sql_string('Day', $day);
   $sql .= build_sql_string('StartHour', $hour);
