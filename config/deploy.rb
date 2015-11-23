@@ -45,7 +45,7 @@ EOF
   end
 
   remote_task :reload_php, :roles => :app do
-    run "sudo reload php5-fpm"
+    run "sudo restart php5-fpm"
   end
 
   task :log_revision => :reload_php
