@@ -19,7 +19,7 @@ namespace :vlad do
   task :check_deploy_to do
     begin
       Rake::RemoteTask.fetch :deploy_to
-    rescue 
+    rescue
       puts "No deployment target set.  Please run using either 'sandbox' or 'production'."
       puts "For example: rake sandbox vlad:update"
     end
@@ -32,7 +32,7 @@ namespace :vlad do
 remote_task :update_symlinks, :roles => :app do
     run <<-EOF
 for f in $(ls #{shared_path}/local/*)
-do 
+do
   FILENAME=$(basename $f)
   if [[ $FILENAME != *~ ]]
   then
@@ -43,4 +43,10 @@ do
 done
 EOF
   end
+
+  remote_task :reload_php, :roles => :app do
+    run "sudo reload php5-fpm"
+  end
+
+  task :log_revision => :reload_php
 end
