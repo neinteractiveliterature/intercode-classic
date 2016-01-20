@@ -1,4 +1,4 @@
-<?
+<?php
 include ("intercon_db.inc");
 
 // Connect to the database
@@ -249,7 +249,7 @@ function display_all_signups ()
       $last_end_hour = 0;
       $last_can_play_concurrently = 'N';
     }
-    
+
     $game = trim ("$row->Title $row->TitleSuffix");
     $start_hour = $row->StartHour;
     $end_hour = $start_hour + $row->Hours;

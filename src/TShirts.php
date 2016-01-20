@@ -1,4 +1,4 @@
-<?
+<?php
 include ("intercon_db.inc");
 
 // If the user's not logged in, send him to the entrypoint
@@ -280,7 +280,7 @@ function show_tshirt_form ()
       echo "The order deadline for shirts was $shirt_close.  When you\n";
       echo "checkin at registration at the con ask if there are any shirts\n";
       echo "in your size.<p>\n";
-      
+
       return show_shirts();
     }
 
@@ -375,7 +375,7 @@ function show_tshirt_form ()
     echo "We'll have information about these shirts for you soon, once we've finished updating our online store.";
     echo "</td>";
 
-/*  
+/*
     TODO TODO TODO
 
     Uncomment this section, and remove the above echo statements, once shirts are ready for Intercon M.
@@ -390,10 +390,10 @@ function show_tshirt_form ()
 //    echo "first is a burgundy men's polo shirt.\n";
 //    echo "The second is a baby blue babydoll-style shirt.\n";
 //    echo "Both shirts are 100% cotton.\n";
-    
+
     echo "We'll have information about these shirts for you soon, once we finalize ";
     echo "the designs.\n";
-    
+
     echo "If you want a size that's not listed on the website,\n";
     echo 'please contact ' . NAME_OPS . " at $email.<p>\n";
     echo "We will be ordering fewer shirts this year, so if you want\n";
@@ -421,10 +421,10 @@ function show_tshirt_form ()
 
   echo "  </tr>\n";
 
-  /* 
+  /*
 
   TODO TODO TODO
-  
+
   Uncomment this once shirts are ready to order for Intercon M.
 
   echo "  <tr class=\"shirtBody\">\n";
@@ -686,7 +686,7 @@ function show_tshirt_summary ()
     return display_mysql_error ('Query for TShirts failed', $sql);
 
   display_header (CON_NAME . ' Shirt Order Summary');
-  
+
   while ($row = mysql_fetch_object ($result))
   {
     $small += $row->Small;
@@ -1410,7 +1410,7 @@ class StoreItem
     echo "<td>$this->color</td>\n";
     echo "<td>$this->sizes</td>\n";
   }
-  
+
   private $item_id;
   private $price;
   private $name;

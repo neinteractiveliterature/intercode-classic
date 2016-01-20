@@ -1,4 +1,4 @@
-<?
+<?php
 include ("intercon_db.inc");
 
 // Connect to the database
@@ -475,7 +475,7 @@ function show_form()
   form_hidden_value ('action', PLUGS_PROCESS_FORM);
   form_hidden_value ('PlugId', $PlugId);
   echo "<table>\n";
-  
+
   form_text (64, 'Name', '', 128);
   form_text (64, 'Url', '', 128);
   form_textarea ('Plug Text - Max 1000 characters', 'Text', 5, false);
@@ -523,7 +523,7 @@ function show_form()
   echo "</form>\n";
   echo "<p><b>Note:</b> New England Interactive Literature reserves the\n";
   echo "right to remove or edit any Shameless Plug posted to this website.</p>\n";
-  
+
 }
 
 function process_form()

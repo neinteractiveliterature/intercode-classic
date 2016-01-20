@@ -1,4 +1,4 @@
-<?
+<?php
 
 include_once "StoreOrderEntry.inc";
 
@@ -85,7 +85,7 @@ class StoreOrder
 	  {
 	    $dollars = intval($parts[0]);
 	    $payment_ok = true;
-	  }  
+	  }
 	  break;
 
         case 2:
@@ -130,7 +130,7 @@ class StoreOrder
 	$ok = display_error("<p>Invalid value \"$quantity\" for $size</p>\n");
 	continue;
       }
-      
+
       if ($quantity < 0)
       {
 	$ok = display_error("<p>Invalid value \"$quantity\" for $size</p>\n");
@@ -147,8 +147,8 @@ class StoreOrder
 
       $entry = new StoreOrderEntry();
       $entry->fill_from_POST_data($entry_id, $item_id, $size, $quantity);
-      
-      $this->entries[] = $entry; 
+
+      $this->entries[] = $entry;
     }
 
     return $ok;
@@ -491,7 +491,7 @@ class StoreOrder
 	if (-1 != $selected_choice)
 	  $_POST[$key] = $selected_choice;
       }
-      
+
       render_dropdown_list($choices, $key);
       echo "    </td>\n";
       echo "  </tr>\n";
@@ -609,7 +609,7 @@ class StoreOrder
       echo "The " . CON_NAME . " database is frozen.  No modifications are\n";
       echo "allowed at this time.\n";
       return;
-    }      
+    }
 
     // If any unavailable shirts are ordered, they must be converted to
     // available shirts before anything else happens

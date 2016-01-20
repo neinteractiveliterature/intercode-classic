@@ -1,4 +1,4 @@
-<?
+<?php
 include ("intercon_db.inc");
 
 // If the user's not logged in, send him to the entrypoint
@@ -995,7 +995,7 @@ function whos_not_playing_when ()
   {
     $users[$row->UserId] = $hour_mask;
   }
-    
+
   // Now get the runs during the period
 
   $sql = 'SELECT Signup.UserId, Runs.StartHour, Events.Hours';
@@ -1308,24 +1308,24 @@ function count_tshirts_by_user () {
             );
         }
         $status = $row["Status"];
-        
+
         unset($row["Status"]);
         unset($row["UserId"]);
         unset($row["TShirtId"]);
         unset($row["PaymentAmount"]);
         unset($row["PaymentNote"]);
         unset($row["LastUpdated"]);
-        
-        
+
+
         foreach (array_keys($row) as $key) {
             if (!array_key_exists($key, $userShirts[$userId][$status])) {
                 $userShirts[$userId][$status][$key] = 0;
             }
-            
+
             $userShirts[$userId][$status][$key] += $row[$key];
         }
     }
-    
+
     return $userShirts;
 }
 
@@ -1349,7 +1349,7 @@ function report_users_csv ()
 //  $sql .= ' WHERE CanSignup<>"Alumni"';
 //  $sql .= '   AND LastName<>"Admin"';
   $sql .= ' ORDER BY LastName, FirstName';
-  
+
 //  SELECT Users.UserId UserId, GROUP_CONCAT(CONCAT(Quantity, ' ', Size, ' ', Color, ' ', Style, ' ', Singular, ' (', StoreOrders.Status, ')') SEPARATOR ', ') ShirtOrders FROM Users LEFT JOIN StoreOrders ON StoreOrders.UserId = Users.UserId LEFT JOIN StoreOrderEntries ON StoreOrders.OrderId = StoreOrderEntries.OrderId LEFT JOIN StoreItems ON StoreOrderEntries.ItemId = StoreItems.ItemId WHERE StoreOrders.Status != 'Cancelled'
 
   $result = mysql_query ($sql);
@@ -1365,7 +1365,7 @@ function report_users_csv ()
     echo "\"$row->Nickname\",";
     echo "\"$row->EMail\",";
     echo "\"$row->CanSignup\",";
-    echo "\"$row->LastLogin\",";    
+    echo "\"$row->LastLogin\",";
     echo "\"$row->ShirtOrders\",";
     echo "\"$row->ThursdayStatus\",";
     echo "\"$row->DeadDogTickets\",";
@@ -1545,7 +1545,7 @@ function report_by_age ()
 
   sort ($a);
 
-  
+
   $last_age_range = '';
   echo "<table>\n";
   foreach ($a as $v)
@@ -1576,7 +1576,7 @@ function report_by_age ()
 	  $age_range = 'Adult (21 and up)';
 	  $pct = ($adults * 100.0) / $total_users;
 	  break;
-       
+
         default:
 	  $age_range = 'Unknown';
 	  $pct = 0.0;
@@ -1678,7 +1678,7 @@ function report_user_on_demand()
 		       $row->MaxPlayersFemale,
 		       $row->MinPlayersNeutral,
 		       $row->MaxPlayersNeutral);
-  }  
+  }
 }
 
 ?>

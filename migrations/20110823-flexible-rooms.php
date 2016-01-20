@@ -1,4 +1,4 @@
-<?
+<?php
 
 set_include_path("../src:/usr/lib/php");
 include('intercon_db.inc');
@@ -11,7 +11,7 @@ function do_query($query) {
   if (!$result) {
     die("FATAL: " . mysql_error() . "\n");
   }
-  
+
   return $result;
 }
 
@@ -43,8 +43,8 @@ foreach ($rooms as $room) {
   do_query("INSERT INTO RunsRooms (RoomId, RunId) SELECT $room_id, RunId FROM Runs WHERE FIND_IN_SET('$sql_room', Rooms) > 0;");
 }
 
-do_query("ALTER TABLE Runs 
-  DROP COLUMN Rooms, 
+do_query("ALTER TABLE Runs
+  DROP COLUMN Rooms,
   MODIFY COLUMN `Day` char(32) NOT NULL DEFAULT '',
   MODIFY COLUMN `StartHour` char(10) NOT NULL DEFAULT '0'
 ");

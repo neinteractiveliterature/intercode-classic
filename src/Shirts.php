@@ -1,4 +1,4 @@
-<?
+<?php
 include ("intercon_db.inc");
 include_once "StoreShirts.inc";
 include_once "StoreOrder.inc";

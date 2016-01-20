@@ -1,4 +1,4 @@
-<?
+<?php
 define (LIST_BY_GAME, 1);
 define (LIST_BY_RUNID, 2);
 define (LIST_BY_TIME, 3);
@@ -66,7 +66,7 @@ switch ($action)
  case LIST_ADD_OPS:
    add_ops();
    break;
- 
+
  case LIST_ADD_CONSUITE:
    add_consuite();
    break;
@@ -272,7 +272,7 @@ function list_games_by ($type)
 
     default:
       return display_error ("Invalid ListType: $type");
-  }      
+  }
 
   $result = mysql_query ($sql);
   if (! $result)
@@ -596,7 +596,7 @@ function process_add_run ()
     return false;
 
   $Rooms = '';
-  
+
 
   $sql = "$verb Runs SET EventId=$EventId";
   $sql .= build_sql_string ('Day');
@@ -664,7 +664,7 @@ function add_ops_for_day ($OpsEventId, $Day)
 
   while ($row = mysql_fetch_object ($result))
     $max_ops_hour = $row->StartHour;
-  
+
   // Get the range of hours that events that are *not* Ops are scheduled for
   // Don't count ConSuite runs either...
 
@@ -683,7 +683,7 @@ function add_ops_for_day ($OpsEventId, $Day)
     echo "No events scheduled for $Day<p>\n";
     return true;
   }
-  
+
   if ($row = mysql_fetch_object ($result))
   {
     $min_event_hour = $row->StartHour;
@@ -715,7 +715,7 @@ function add_ops_for_day ($OpsEventId, $Day)
       $sql .= 'UpdatedById="' . $_SESSION[SESSION_LOGIN_USER_ID] . '"';
 
       //      echo "Command: $sql<p>\n";
-      
+
       $result = mysql_query ($sql);
       if (! $result)
 	display_mysql_error ('Failed to insert Ops run: ', $sql);
@@ -807,7 +807,7 @@ function add_consuite_for_day ($ConSuiteEventId, $Day, $min_hour, $max_hour)
     $sql .= 'UpdatedById="' . $_SESSION[SESSION_LOGIN_USER_ID] . '"';
 
     //      echo "Command: $sql<p>\n";
-      
+
     $result = mysql_query ($sql);
     if (! $result)
       display_mysql_error ('Failed to insert ConSuite run: ', $sql);

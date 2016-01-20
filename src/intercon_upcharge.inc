@@ -1,4 +1,4 @@
-<?
+<?php
 
 include("intercon_db.inc");
 
@@ -7,7 +7,7 @@ class UpchargeReportRow {
         $this->values = $this->formatData($data);
         $this->data = $data;
     }
-    
+
     function formatData($data) {
         return array(
             "Name" => "$data->LastName, $data->FirstName",
@@ -16,11 +16,11 @@ class UpchargeReportRow {
             "Notes" => $data->PaymentNote
         );
     }
-    
+
     function getColumnNames() {
         return array("Name", "Status", "Paid", "Notes");
     }
-    
+
     function get($col) {
         return $this->values[$col];
     }
@@ -30,19 +30,19 @@ class UpchargeReportTable {
     function UpchargeReportTable($rows) {
         $this->data = $this->getTableData($rows);
     }
-    
+
     function getColumnNames() {
         if (count($this->data) == 0) {
             return array();
         }
-        
+
         return $this->data[0]->getColumnNames();
     }
-    
+
     function getReportRow($row) {
         return new UpchargeReportRow($row);
     }
-    
+
     function getTableData($rows) {
         $table = array();
         foreach ($rows as $row) {
@@ -57,7 +57,7 @@ class UpchargeReportView {
         $this->manager = $manager;
         $this->table = $table;
     }
-    
+
     function getStatusColor($status) {
         switch ($status)
         {
@@ -67,19 +67,19 @@ class UpchargeReportView {
           default:          return get_bgcolor_hex('Full');       // Red
         }
     }
-    
+
     function displayCell($row, $col) {
         echo "<td>".$row->get($col)."</td>";
     }
-    
+
     function display() {
         if (count($this->table->data) == 0) {
             echo "<p>No payments yet for ".$this->manager->getCollectionName().".</p>\n";
             return;
         }
-        
+
         $cols = $this->table->getColumnNames();
-    
+
         echo "<table border=1>\n";
         echo "<tr>";
         foreach ($cols as $col) {
@@ -120,7 +120,7 @@ class UpchargePaypalLink {
         $this->itemName = $itemName;
         $this->cost = $cost;
     }
-    
+
     function getUrl() {
         // Build the URL for the PayPal links.  If the user cancels, just return
         // to index.php which will default to his homepage
@@ -150,10 +150,10 @@ class UpchargePaypalLink {
         $url .= build_url_string ('rm', '2');
         $url .= build_url_string ('cancel_return', $cancel_url);
         $url .= build_url_string ('return', $return_url, FALSE);
-        
+
         return $url;
     }
-    
+
     function displayButton() {
         echo "<a href=\"".$this->getUrl()."\"><img\n";
         echo "src=\"http://images.paypal.com/images/x-click-but3.gif\"\n";
@@ -175,7 +175,7 @@ abstract class UpchargeItemManager {
     abstract function userCanView();
     abstract function userCanEdit();
     abstract function getCollectionName();
-    
+
     function getItemName($row) {
         return $this->getCollectionName() . " record for ".$row->FirstName." ".$row->LastName;
     }
@@ -185,7 +185,7 @@ abstract class UpchargeItemManager {
         if (!array_search($this->getPrimaryKeyColumn(), $cols)) {
             array_push($cols, $this->getPrimaryKeyColumn());
         }
-        
+
         if (is_null($tableAlias)) {
             return $cols;
         } else {
@@ -206,18 +206,18 @@ abstract class UpchargeItemManager {
         $sql .= " LEFT OUTER JOIN Users upd ON i.UpdatedById = upd.UserId";
         $sql .= " LEFT OUTER JOIN Users u ON i.UserId = u.UserId";
         $sql .= " WHERE i.".$this->getPrimaryKeyColumn()." = '".mysql_real_escape_string($id)."' ";
-        
+
         $result = mysql_query($sql);
         if (! $result)
           return display_mysql_error ('Failed to get upcharge row',
       				$sql);
-      	
+
       	return mysql_fetch_object($result);
     }
-    
+
     // query the table for a list of upcharge records, joining with Users
     // to retrieve name
-    // 
+    //
     // optional parameters (passed as keys to the $options argument):
     //   "where" - specify additional conditions for the where clause
     //   "order" - specify an order clause
@@ -233,7 +233,7 @@ abstract class UpchargeItemManager {
         if (array_key_exists("order", $options)) {
             $sql .= ' ORDER BY ' . $options["order"];
         }
-        
+
         $rows = array();
         $result = mysql_query ($sql);
         if (! $result)
@@ -243,10 +243,10 @@ abstract class UpchargeItemManager {
         while ($row = mysql_fetch_object($result)) {
             array_push($rows, $row);
         }
-        
+
         return $rows;
     }
-    
+
     function fetchRowsForUser($userId, $options = array()) {
         if (array_key_exists("where", $options)) {
             $options["where"] = " AND (".$options["where"].")";
@@ -256,7 +256,7 @@ abstract class UpchargeItemManager {
         $options["where"] = "i.UserId = $userId " . $options["where"];
         return $this->fetchRows($options);
     }
-    
+
     function fetchRowsForLoggedInUser($options = array()) {
         if (is_logged_in()) {
             return $this->fetchRowsForUser($_SESSION[SESSION_LOGIN_USER_ID], $options);
@@ -264,19 +264,19 @@ abstract class UpchargeItemManager {
             return array();
         }
     }
-    
+
     function getReportTable($rows) {
         return new UpchargeReportTable($rows);
     }
-    
+
     function getReportView($table) {
         return new UpchargeReportView($this, $table);
     }
-    
+
     function getIndexView($table) {
         return new UpchargeIndexView($this, $table);
     }
-        
+
     function displayReport() {
         $rows = $this->fetchRows(array("order" => "i.Status, LastName, FirstName"));
 
@@ -297,19 +297,19 @@ abstract class UpchargeItemManager {
 
         $this->getReportView($this->getReportTable($rows))->display();
     }
-    
+
     function displayUpchargeIndex() {
         $rows = $this->fetchRows(array("order" => "i.Status, LastName, FirstName"));
 
         display_header($this->getCollectionName() . " Payment Records");
 
         $this->getIndexView($this->getReportTable($rows))->display();
-        
+
         echo "<a href=\"".$_SERVER["PHP_SELF"]."?action=".$this->getNewUpchargeAction()."\">";
         echo "Create new record";
         echo "</a>\n";
     }
-    
+
     function status_radio($value)
     {
       $checked = '';
@@ -319,7 +319,7 @@ abstract class UpchargeItemManager {
       printf ("    <input type=\"radio\" name=\"Status\" id=\"Status_%s\" value=\"%s\"%s><label for=\"Status_%s\">%s</label>\n",
     	  $value, $value, $checked, $value, $value);
     }
-    
+
     function displayFormFields($row=null) {
     	$pkeyColumn = $this->getPrimaryKeyColumn();
     	if (is_null($row)) {
@@ -327,7 +327,7 @@ abstract class UpchargeItemManager {
 	    } else {
     	    printf ("<input type=\"hidden\" name=\"%s\" value=%d>\n", "id", $row->$pkeyColumn);
             printf ("<input type=\"hidden\" name=\"UserId\" value=%d>\n", $row->UserId);
-        } 
+        }
         echo "<table border=\"0\">\n";
 
         echo "  <tr>\n";
@@ -342,7 +342,7 @@ abstract class UpchargeItemManager {
         form_text (5, 'Payment Amount $', 'PaymentAmount');
         form_text (64, 'Payment Note', 'PaymentNote');
     }
-    
+
     function displayUserSelector($caption, $action) {
         $upcharges = array();
         foreach ($this->fetchRows() as $row) {
@@ -447,11 +447,11 @@ abstract class UpchargeItemManager {
 
         echo "</table>\n";
     }
-    
+
     function displayNewUpchargeForm() {
         if (array_key_exists("UserId", $_REQUEST)) {
             $userId = intval(trim($_REQUEST["UserId"]));
-            
+
             $sql = "SELECT CONCAT(FirstName, ' ', LastName) FROM Users WHERE UserId = ".$userId;
             $result = mysql_query($sql);
             if (! $result)
@@ -459,7 +459,7 @@ abstract class UpchargeItemManager {
           				$sql);
             $row = mysql_fetch_array($result);
             $name = $row[0];
-            
+
             $seq = increment_sequence_number();
             display_header ("Creating new ".$this->getCollectionName(). " record for ".$name);
 
@@ -470,24 +470,24 @@ abstract class UpchargeItemManager {
             $this->displayFormFields();
 
             form_submit ('Create');
-            
+
             echo "</table>\n";
             echo "</form>\n";
         } else {
-            $this->displayUserSelector("Choose a user to create a new ".$this->getCollectionName()." for", 
+            $this->displayUserSelector("Choose a user to create a new ".$this->getCollectionName()." for",
                 $this->getNewUpchargeAction());
         }
     }
-    
+
     function displayUpchargeEditor() {
         $id = intval(trim($_REQUEST["id"]));
         if (0 == $id)
             return display_error ('Invalid id');
-        
+
         $row = $this->fetchRow($id);
         if (is_null($row))
             return display_error ("Couldn't find any rows with ID $id");
-        
+
         // Fetch the selected user's name
         $name = trim ("$row->FirstName $row->LastName");
 
@@ -496,9 +496,9 @@ abstract class UpchargeItemManager {
                 $_POST[$col] = $row->$col;
             }
         }
-        
+
         $_POST['PaymentAmount'] /= 100;
-        
+
         # dump_array ('$_POST', $_POST);
 
         if (0 == $_POST['UpdatedById'])
@@ -535,7 +535,7 @@ abstract class UpchargeItemManager {
         printf ("<p><a href=\"%s?action=%d\">Select a different record to edit</a></p>\n",
           $_SERVER['PHP_SELF'], $this->getSelectUpchargeAction());
     }
-    
+
     function getSqlSaveFieldsFromPost() {
         $PaymentAmount = intval(floatval ($_POST['PaymentAmount']) * 100);
 
@@ -547,7 +547,7 @@ abstract class UpchargeItemManager {
             "UserId" => $_POST['UserId']
         );
     }
-    
+
     function saveRecordFromPost($row=null) {
         $newRecord = is_null($row);
         if ($newRecord) {
@@ -555,7 +555,7 @@ abstract class UpchargeItemManager {
         } else {
             $sql = 'UPDATE '.$this->getTableName().' SET ';
         }
-        
+
         $fields = $this->getSqlSaveFieldsFromPost();
         $setClauses = array();
         foreach (array_keys($fields) as $fieldName) {
@@ -573,7 +573,7 @@ abstract class UpchargeItemManager {
         else
           return true;
     }
-    
+
     function processUpchargeEdit() {
         // Fetch the UserId
 
@@ -588,16 +588,16 @@ abstract class UpchargeItemManager {
 
         $row = $this->fetchRow($id);
         return $this->saveRecordFromPost($row);
-        
+
     }
-    
+
     function processUpchargeCreate() {
         if (out_of_sequence ())
           return display_sequence_error (false);
 
         return $this->saveRecordFromPost();
     }
-    
+
     function userHasPermission($type) {
         switch ($type) {
             case "view":
@@ -608,7 +608,7 @@ abstract class UpchargeItemManager {
                 return false;
         }
     }
-    
+
     function enforcePermission($type) {
         if (!$this->userHasPermission($type)) {
             display_error("Sorry, you don't have permissions to view this page.");
@@ -617,7 +617,7 @@ abstract class UpchargeItemManager {
             return true;
         }
     }
-    
+
     function processAction($action) {
         switch ($action) {
             case $this->getReportAction():
@@ -625,19 +625,19 @@ abstract class UpchargeItemManager {
                     $this->displayReport();
                 }
                 return true;
-            
+
             case $this->getSelectUpchargeAction():
                 if ($this->enforcePermission("edit")) {
                     $this->displayUpchargeIndex();
                 }
                 return true;
-                
+
             case $this->getNewUpchargeAction():
                 if ($this->enforcePermission("edit")) {
                     $this->displayNewUpchargeForm();
                 }
                 return true;
-                
+
             case $this->getCreateUpchargeAction():
                 if ($this->enforcePermission("edit")) {
                     if ($this->processUpchargeCreate()) {
@@ -645,13 +645,13 @@ abstract class UpchargeItemManager {
                     }
                 }
                 return true;
-            
+
             case $this->getEditUpchargeAction():
                 if ($this->enforcePermission("edit")) {
                     $this->displayUpchargeEditor();
                 }
                 return true;
-            
+
             case $this->getProcessUpchargeAction():
                 if ($this->enforcePermission("edit")) {
                     if ($this->processUpchargeEdit()) {
@@ -660,9 +660,9 @@ abstract class UpchargeItemManager {
                 }
                 return true;
         }
-        
+
         return false;
     }
-    
+
 }
 ?>

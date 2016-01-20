@@ -1,4 +1,4 @@
-<?
+<?php
 define (MAIL_LIST_NONE, 0);
 define (MAIL_LIST_ALL, 1);
 define (MAIL_LIST_ATTENDEES, 2);
@@ -1483,7 +1483,7 @@ function show_bio_lists ()
 
     if ((! $bOnlyMissing) && (! $have_bio))
       echo "</FONT>";
-    
+
     echo ",<BR>\n";
   }
 }

@@ -1,4 +1,4 @@
-<?
+<?php
 
 // Include common stuff
 
@@ -68,7 +68,7 @@ html_end ();
 function display_special_event_form ()
 {
   $update = isset ($_REQUEST['RunId']);
-  
+
   // If this is an update, load the $_POST array from the database
 
   if ($update)
@@ -187,12 +187,12 @@ function process_special_event_form ()
 	// No additional runs.  Delete the event.  Neatness counts
 
 	$sql = "DELETE FROM Events WHERE EventId=$EventId";
-      
+
 	$result = mysql_query ($sql);
 	if (! $result)
 	  return display_mysql_error ("Failed to delete event $EventId");
       }
-      
+
       echo "Deleted special event <I>$Title</I><P>\n";
 
       return true;

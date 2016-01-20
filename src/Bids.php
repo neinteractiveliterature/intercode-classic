@@ -1,4 +1,4 @@
-<?
+<?php
 include ("intercon_db.inc");
 
 // Connect to the database
@@ -137,7 +137,7 @@ function form_players_entry ($gender, $showword)
   if ($showword)
     print ("    <td align=\"right\">$gender Characters:</td>\n");
   else
-    print ("    <td align=\"right\">Characters:</td>\n");   
+    print ("    <td align=\"right\">Characters:</td>\n");
   print ("    <td align=\"left\">\n");
   printf ("      Min:<INPUT TYPE=TEXT NAME=%s SIZE=3 MAXLENGTH=3 VALUE=\"%s\">&nbsp;&nbsp;&nbsp;\n",
 	  $min,
@@ -649,25 +649,25 @@ function display_choose_form ()
 
   if (! isset ($_SESSION[SESSION_LOGIN_USER_ID]))
     return display_error ('You must login before submitting a game proposal');
-  
+
   display_header ('Propose an event for ' . CON_NAME);
 
   echo ("<p>Before you can propose an event for ". CON_NAME );
   echo (", we need to know what type of event it is.</p>\n");
-  
+
   echo "<form method=\"POST\" action=\"Bids.php\">\n";
-  
+
   echo "<TABLE BORDER=0>\n";
   form_add_sequence ();
- 
+
   form_hidden_value ('action', BID_GAME);
- 
+
   //  form_game_type ('What is your event?', 'GameType');
-  
+
   echo "<tr><td>&nbsp;</td></tr>\n";
-  
+
   form_submit ('Continue');
-  
+
   echo "</TABLE>\n";
   echo "</FORM>\n";
 }
@@ -681,7 +681,7 @@ function display_choose_form ()
 function display_bid_form ($first_try)
 {
   $EditGameInfo = 1;
-  
+
   global $BID_TYPES;
 
   // Make sure that the user is logged in
@@ -695,7 +695,7 @@ function display_bid_form ($first_try)
     $BidId = 0;
   else
     $BidId = intval (trim ($_REQUEST['BidId']));
-  
+
   if (! array_key_exists ('GameType', $_POST))
       $gametype = $BID_TYPES[0];
   else
@@ -810,16 +810,16 @@ function display_bid_form ($first_try)
   $thingstring = $gametype;
   if ($gametype == 'Other')
     $thingstring = 'event';
-    
+
   if ($gametype == 'Other')
     form_section ('Event Information');
   else if ($gametype == 'Panel')
     form_section ('Panel Information');
   else
     form_section ('Game Information');
-  
+
   form_hidden_value ('GameType', $gametype);
-  
+
   if (! $EditGameInfo)
   {
     form_hidden_value ('Title', $_POST['Title']);
@@ -870,7 +870,7 @@ function display_bid_form ($first_try)
     else
         $text .= "<A HREF=".TEXT_DIR."/HtmlPrimer.html TARGET=_blank>here</A>.\n";
     form_textarea ($text, 'ShortBlurb', 4, TRUE, TRUE);
-    
+
     if ($gametype != 'Panel')
     {
       form_section ('Character Counts');
@@ -928,25 +928,25 @@ function display_bid_form ($first_try)
       }
       else
       {
-	form_hidden_value ('MinPlayersMale', 0);            
-	form_hidden_value ('MaxPlayersMale', 0);            
+	form_hidden_value ('MinPlayersMale', 0);
+	form_hidden_value ('MaxPlayersMale', 0);
 	form_hidden_value ('PrefPlayersMale', 0);
-	form_hidden_value ('MinPlayersFemale', 0);            
-	form_hidden_value ('MaxPlayersFemale', 0);            
+	form_hidden_value ('MinPlayersFemale', 0);
+	form_hidden_value ('MaxPlayersFemale', 0);
 	form_hidden_value ('PrefPlayersFemale', 0);
 	form_players_entry ('Neutral',false);
       }
     }
     else
     {
-      form_hidden_value ('MinPlayersMale', 0);            
-      form_hidden_value ('MaxPlayersMale', 0);            
+      form_hidden_value ('MinPlayersMale', 0);
+      form_hidden_value ('MaxPlayersMale', 0);
       form_hidden_value ('PrefPlayersMale', 0);
-      form_hidden_value ('MinPlayersFemale', 0);            
-      form_hidden_value ('MaxPlayersFemale', 0);            
+      form_hidden_value ('MinPlayersFemale', 0);
+      form_hidden_value ('MaxPlayersFemale', 0);
       form_hidden_value ('PrefPlayersFemale', 0);
-      form_hidden_value ('MinPlayersNeutral', 0);            
-      form_hidden_value ('MaxPlayersNeutral', 0);            
+      form_hidden_value ('MinPlayersNeutral', 0);
+      form_hidden_value ('MaxPlayersNeutral', 0);
       form_hidden_value ('PrefPlayersNeutral', 0);
     }
   }
@@ -991,7 +991,7 @@ function display_bid_form ($first_try)
   {
     form_hidden_value ('RunBefore', '');
   }
-  
+
   if ($gametype == 'LARP' || $gametype == 'Tabletop RPG')
   {
     form_text (64, 'Game System', 'GameSystem', 128);
@@ -1004,7 +1004,7 @@ function display_bid_form ($first_try)
   {
     form_hidden_value ('GameSystem', '');
   }
-  
+
   if ($gametype == 'LARP')
   {
     form_combat ('CombatResolution', 'How combat will be resolved');
@@ -1013,7 +1013,7 @@ function display_bid_form ($first_try)
   {
     form_hidden_value ('CombatResolution', 'NoCombat');
   }
-  
+
   if ($gametype != 'Board Game')
   {
       form_textarea ('Please enter any additional background information here, or any other information you wish to tell the Bid Committee. This information will be shown only to the Bid Committee.', 'Premise', 5, TRUE, TRUE);
@@ -1064,7 +1064,7 @@ function display_bid_form ($first_try)
   {
       form_hidden_value ('OtherGames', '');
   }
-  
+
   form_section ('Restrictions');
 
   echo "  <TR>\n";
@@ -1109,13 +1109,13 @@ function display_bid_form ($first_try)
   $text .= "etc.) please explain. If your game has age restrictions,\n";
   $text .= "please be sure to mention this in the game descriptions.\n";
   form_textarea ($text, 'AgeAppropriate', 5);
-  
+
  if (ALLOW_EVENT_FEES)
     form_yn ("&nbsp;<BR>Do you wish to charge a fee for your {$thingstring}?  If so, con will be in touch to discuss this.",
            'Fee');
  else
     form_hidden_value ('Fee', 'N');
- 
+
   form_section ('Scheduling Information');
 
   echo "  <tr>\n";
@@ -1184,7 +1184,7 @@ function display_bid_form ($first_try)
   form_textarea ($text, 'SchedulingConstraints', 5);
 
   form_textarea ('Space Requirements', 'SpaceRequirements', 2);
-  
+
   /* Tweetable Blurb
   $text = "A short sentence for the {$thingstring} to be used to sell the {$thingstring} to the\n";
   $text .= "general public.  Include information about the genre.  For\n";
@@ -1264,8 +1264,8 @@ function process_bid_form ()
 
   //echo "EditGameInfo: $EditGameInfo<br>\n";
 
-  //echo "BidId: $BidId<br>\n";  
-  
+  //echo "BidId: $BidId<br>\n";
+
   //echo "GameType: ".$_REQUEST['GameType']."<br>\n";
 
   // Always hopeful...
@@ -1354,7 +1354,7 @@ function process_bid_form ()
     $sql .= build_sql_string ('Author');
     $sql .= build_sql_string ('Homepage');
     $sql .= build_sql_string ('GameEMail');
-    $sql .= build_sql_string ('Organization');    
+    $sql .= build_sql_string ('Organization');
     $sql .= build_sql_string ('GameType');
 
     $sql .= build_sql_string ('MinPlayersMale');
@@ -1391,7 +1391,7 @@ function process_bid_form ()
 /*  $sql .= build_sql_string ('IsSmallGameContestEntry'); */
   $sql .= build_sql_string ('GMs', '', true, true);
   $sql .= build_sql_string ('Premise', '', true, true);
-  $sql .= build_sql_string ('RunBefore');  
+  $sql .= build_sql_string ('RunBefore');
   $sql .= build_sql_string ('Fee');
   $sql .= build_sql_string ('GameSystem');
   $sql .= build_sql_string ('CombatResolution');
@@ -2731,7 +2731,7 @@ function update_feedback_by_game ()
   echo "  <tr><td>&nbsp;</td></tr>\n";
 
   form_bid_consensus ('Consensus');
-  
+
   // If magic quotes are on, strip off the slashes
 
   $key = 'Issues';

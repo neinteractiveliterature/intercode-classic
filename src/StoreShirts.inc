@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "StoreItem.inc";
 
 class StoreShirts
@@ -203,7 +203,7 @@ class StoreShirts
   public function render_conversion_thumbnails()
   {
     echo "<table>\n";
-    echo "<tr>\n";    
+    echo "<tr>\n";
     foreach ($this->catalog as $shirt)
     {
       if (! $shirt->for_sale())
@@ -215,7 +215,7 @@ class StoreShirts
       $shirt->render_thumbnail();
       echo "</td>\n";
     }
-    echo "</tr>\n";    
+    echo "</tr>\n";
     echo "</table>\n";
   }
 }

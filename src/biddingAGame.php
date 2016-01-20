@@ -1,4 +1,4 @@
-<?
+<?php
 include ("intercon_db.inc");
 
 // Connect to the database
@@ -55,7 +55,7 @@ function bidfaq_link ($hash, $text)
 
 function static_link ($page, $text)
 {
-  echo "<p><a href=\"Static.php?page=$page\">$text</a></p>\n"; 
+  echo "<p><a href=\"Static.php?page=$page\">$text</a></p>\n";
 }
 
 function display_bid_intro ()
@@ -74,7 +74,7 @@ function display_bid_intro ()
   echo "    <td width=\"60%\" valign=\"top\">\n";
   echo "      <h3>Proposing an Event for ".(USE_CON_SHORT_NAME ? CON_SHORT_NAME : CON_NAME)."</h3>\n";
     if (file_exists(TEXT_DIR.'/bidding1.html'))
-	include(TEXT_DIR.'/bidding1.html');	
+	include(TEXT_DIR.'/bidding1.html');
   echo "      <h3><a name=\"deadlines\">Proposal Deadlines</a></h3>\n";
   if (user_has_priv (PRIV_SCHEDULING))
   {
@@ -166,7 +166,7 @@ function display_bid_intro ()
   echo "<tr bgcolor=\"white\">\n";
   echo "<td>\n";
     if (file_exists(TEXT_DIR.'/bidearly.html'))
-	include(TEXT_DIR.'/bidearly.html');	
+	include(TEXT_DIR.'/bidearly.html');
   echo "</td></tr></table>\n";
   echo "</td></tr></table>\n";
 }

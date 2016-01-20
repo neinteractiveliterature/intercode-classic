@@ -1,4 +1,4 @@
-<?
+<?php
 
 class StoreItem
 {
@@ -230,7 +230,7 @@ class StoreItem
 
   public function load_POST()
   {
-    // Initialize the $_POST array 
+    // Initialize the $_POST array
     if (! array_key_exists('PriceCents', $_POST))
       $_POST['PriceCents'] = $this->price;
     if (! array_key_exists('Color', $_POST))

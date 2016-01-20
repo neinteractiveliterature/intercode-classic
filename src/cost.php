@@ -1,4 +1,4 @@
-<?
+<?php
 include ("intercon_db.inc");
 
 // Connect to the database
@@ -77,7 +77,7 @@ function show_cost ()
 //	  strftime ('%d-%b-%Y', $end_date),
 //	  strftime ('%d-%b-%Y', $now));
 
-	  
+
   // If we're after the last cutoff, just display the final price.  Otherwise,
   // show the list
 
