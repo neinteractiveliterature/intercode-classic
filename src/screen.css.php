@@ -1,11 +1,11 @@
-<? 
+<?php
 require ('intercon_db.inc');
 header("Content-type: text/css");
 ?>
 body
 {
 	padding: 16px 7% 0 230px;
-	background-color: <?echo COLOR_PAGE_BG; ?>;
+	background-color: <?php echo COLOR_PAGE_BG; ?>;
 	color: #000000;
 	font-family: sans-serif;
 }
@@ -41,25 +41,25 @@ ul.menu, ul.subhead, .menulike {
 	  list-style-type: none;
     margin-left: 0;
     padding: 0;
-    border: 2px <?echo COLOR_MENU_PUBLIC_FG; ?> solid;
-    
+    border: 2px <?php echo COLOR_MENU_PUBLIC_FG; ?> solid;
+
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     border-radius: 5px;
-    
-    background-color: <? echo COLOR_MENU_PUBLIC_BG; ?>;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(<? echo COLOR_MENU_PUBLIC_BG; ?>));
-    background-image: -moz-linear-gradient(top, #fff, <?echo COLOR_MENU_PUBLIC_BG; ?>);
 
-    -moz-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PUBLIC_FG; ?>;
-    -webkit-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PUBLIC_FG; ?>;
-    box-shadow: 0px 0px 5px <?echo COLOR_MENU_PUBLIC_FG; ?>;
+    background-color: <?php echo COLOR_MENU_PUBLIC_BG; ?>;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(<?php echo COLOR_MENU_PUBLIC_BG; ?>));
+    background-image: -moz-linear-gradient(top, #fff, <?php echo COLOR_MENU_PUBLIC_BG; ?>);
+
+    -moz-box-shadow: 0px 0px 5px <?php echo COLOR_MENU_PUBLIC_FG; ?>;
+    -webkit-box-shadow: 0px 0px 5px <?php echo COLOR_MENU_PUBLIC_FG; ?>;
+    box-shadow: 0px 0px 5px <?php echo COLOR_MENU_PUBLIC_FG; ?>;
 }
 
 ul.menu.priv {
-  -moz-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>;
-  -webkit-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>;
-  box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>;
+  -moz-box-shadow: 0px 0px 5px <?php echo COLOR_MENU_PRIV_FG; ?>;
+  -webkit-box-shadow: 0px 0px 5px <?php echo COLOR_MENU_PRIV_FG; ?>;
+  box-shadow: 0px 0px 5px <?php echo COLOR_MENU_PRIV_FG; ?>;
 }
 
 ul.subhead {
@@ -67,15 +67,15 @@ ul.subhead {
   -moz-border-radius: 0;
   -webkit-border-radius: 0;
   border-radius: 0;
-  
+
 /*  -moz-box-shadow: 0px 0px 3px black;
   -webkit-box-shadow: 0px 0px 3px black;
   box-shadow: 0px 0px 3px black; */
-  
+
   -moz-box-shadow: none;
   -webkit-box-shadow: none;
   box-shadow: none;
-  
+
   background-color: #aaa;
   background-color: rgba(0, 0, 0, 0.1);
 }
@@ -90,8 +90,8 @@ ul.loginBar {
   top: 130px;
   height: 22px;
   width: 850px;
-  
-  border-bottom: 1px <? echo COLOR_MENU_PRIV_FG; ?> solid;
+
+  border-bottom: 1px <?php echo COLOR_MENU_PRIV_FG; ?> solid;
 }
 
 ul.loginBar li {
@@ -102,7 +102,7 @@ ul.loginBar li {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  
+
   <!--[if IE lt 8]>
   zoom: 1;
   *display: inline;
@@ -176,20 +176,20 @@ ul.menu li.subhead {
 }
 
 ul.priv {
-    border-color: <?echo COLOR_MENU_PRIV_FG; ?>;
+    border-color: <?php echo COLOR_MENU_PRIV_FG; ?>;
 
-    background-color: <?echo COLOR_MENU_PRIV_BG ?>;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(<?echo COLOR_MENU_PRIV_BG; ?>));
-    background-image: -moz-linear-gradient(top, #fff, <?echo COLOR_MENU_PRIV_BG; ?>);
+    background-color: <?php echo COLOR_MENU_PRIV_BG ?>;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(<?php echo COLOR_MENU_PRIV_BG; ?>));
+    background-image: -moz-linear-gradient(top, #fff, <?php echo COLOR_MENU_PRIV_BG; ?>);
 
-/*    box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>;
-    -moz-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>;
-    -webkit-box-shadow: 0px 0px 5px <?echo COLOR_MENU_PRIV_FG; ?>; */
+/*    box-shadow: 0px 0px 5px <?php echo COLOR_MENU_PRIV_FG; ?>;
+    -moz-box-shadow: 0px 0px 5px <?php echo COLOR_MENU_PRIV_FG; ?>;
+    -webkit-box-shadow: 0px 0px 5px <?php echo COLOR_MENU_PRIV_FG; ?>; */
 }
 
 ul.menu.links {
   border-color: #555;
-  
+
   background-color: #aaa;
   background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#aaa));
   background-image: -moz-linear-gradient(top, #fff, #aaa);
@@ -216,7 +216,7 @@ ul.menu li.expandable a {
 }
 
 ul.menu li {
-    border-bottom: 1px <?echo COLOR_MENU_PUBLIC_FG; ?> solid;
+    border-bottom: 1px <?php echo COLOR_MENU_PUBLIC_FG; ?> solid;
 }
 
 ul.menu li a {
@@ -240,7 +240,7 @@ ul.menu li.current a, ul.accountControl li.current {
 }
 
 ul.priv li {
-    border-bottom-color: <?echo COLOR_MENU_PRIV_FG; ?>;
+    border-bottom-color: <?php echo COLOR_MENU_PRIV_FG; ?>;
 }
 
 ul.subhead li {
@@ -253,7 +253,7 @@ ul.menu li:last-child {
 
 ul.menu li.title, .menulike .title
 {
-	background-color: <?echo COLOR_MENU_PUBLIC_FG; ?>;
+	background-color: <?php echo COLOR_MENU_PUBLIC_FG; ?>;
 	color: #FFFFFF;
 	font-weight: bold;
         border-bottom: none;
@@ -261,7 +261,7 @@ ul.menu li.title, .menulike .title
 
 ul.menu.priv li.title
 {
-	background-color: <?echo COLOR_MENU_PRIV_FG; ?>;
+	background-color: <?php echo COLOR_MENU_PRIV_FG; ?>;
 	font-style: normal;
 }
 
@@ -285,7 +285,7 @@ ul.subhead li.title {
 
 ul.subhead.priv li.title {
   font-style: normal !important;
-  background-color: <? echo COLOR_MENU_PRIV_BG ?>;
+  background-color: <?php echo COLOR_MENU_PRIV_BG ?>;
 }
 
 ul.subhead li.title.current a {

@@ -1,4 +1,4 @@
-<?
+<?php
 
 // For site isolation, change the session name below to something appropriate
 // when deploying a new Intercon site.
@@ -209,7 +209,7 @@ define(SMTP_PASSWORD, "");
 //Look and feel items
 define (MINI_LOGO, 'O_Banner_FNL_200x200.png');
 define (FULL_LOGO, 'O_Banner_FNL_400x400.png');
-  
+
 //Items for Bids/Schedule
 global $CON_DAYS;
 $CON_DAYS = array('Thursday', 'Friday', 'Saturday', 'Sunday');
