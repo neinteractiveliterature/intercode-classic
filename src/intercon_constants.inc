@@ -3,7 +3,7 @@
 // For site isolation, change the session name below to something appropriate
 // when deploying a new Intercon site.
 
-session_name ('intercon_j');
+session_name ('intercon_p_sso');
 session_start ();
 
 // Setting DEVELOPMENT_VERSION turns on additional error checking, as well

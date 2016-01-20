@@ -2,7 +2,7 @@ set :application, "intercon-p"
 set :user, "deploy"
 set :domain, "#{user}@vps1.interconlarp.org"
 set :repository, "git@vps1.interconlarp.org:intercode1.git"
-set :revision, "origin/master"
+set :revision, "origin/P"
 set :skip_scm, false
 
 task :sandbox do
