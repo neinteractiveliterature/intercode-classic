@@ -88,7 +88,7 @@ function DisplayContactsPage ()
   DisplayContact ('Outreach',      NAME_OUTREACH,      EMAIL_OUTREACH);
   DisplayContact ('Registration and<br>Event Signup',
 		                   NAME_REGISTRAR,     EMAIL_REGISTRAR);
-  DisplayContact ('Pre-Convention',NAME_THURSDAY,      EMAIL_THURSDAY);
+  DisplayContact ('Panel Coordinator',NAME_THURSDAY,      EMAIL_THURSDAY);
   DisplayContact ('Staff Coordinator',
 		                   NAME_STAFF_COORDINATOR,
 		                                       EMAIL_STAFF_COORDINATOR);
