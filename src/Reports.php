@@ -196,7 +196,7 @@ function report_per_user ()
     if ('Admin' == $row->LastName)
       continue;
 
-    echo "<div class=\"print_logo\"><img src=\"PageBanner.png\"></div>\n";
+    echo "<div class=\"print_logo\"><img src=\"".FULL_LOGO."\"></div>\n";
 
     write_user_report (trim ("$row->LastName, $row->FirstName"),
 		       $row->UserId);
@@ -321,7 +321,7 @@ function report_per_room ()
 
   while ($row = mysql_fetch_object ($result))
   {
-    echo "<div class=\"print_logo\"><img src=\"PageBanner.png\"></div>\n";
+    echo "<div class=\"print_logo\"><img src=\"".FULL_LOGO."\"></div>\n";
 
     echo "<font size=\"+3\"><b>$row->RoomName</b></font><p>\n";
 
@@ -392,7 +392,7 @@ function old_report_per_room ()
     if (0 == mysql_num_rows($room_result))
       continue;
 
-    echo "<div class=\"print_logo\"><img src=\"PageBanner.png\"></div>\n";
+    echo "<div class=\"print_logo\"><img src=\"".FULL_LOGO."\"></div>\n";
 
     echo "<font size=\"+3\"><b>$room_name</b></font><p>\n";
 
@@ -603,7 +603,7 @@ function report_per_game ()
 
   while ($row = mysql_fetch_object ($result))
   {
-    echo "<div class=\"print_logo\"><img src=\"PageBanner.png\"></div>\n";
+    echo "<div class=\"print_logo\"><img src=\"".FULL_LOGO."\"></div>\n";
 
     write_game_report ($row->RunId,
 		       $row->Title,
@@ -1235,7 +1235,7 @@ function whos_not_playing_when ()
 
 function report_games_by_time ($day)
 {
-  echo "<div class=\"print_logo\"><img src=\"PageBanner.png\"></div>\n";
+  echo "<div class=\"print_logo\"><img src=\"".FULL_LOGO."\"></div>\n";
   printf ("<font size=\"+3\"><b>%s Schedule for %s</b></font><p>\n",
 	  CON_NAME,
 	  $day);
@@ -1637,7 +1637,7 @@ function report_user_on_demand()
   user_id_to_name($UserId, $name, true);
 
   // Write the per-user report for this user
-  echo "<div class=\"print_logo\"><img src=\"PageBanner.png\"></div>\n";
+  echo "<div class=\"print_logo\"><img src=\"".FULL_LOGO."\"></div>\n";
   write_user_report ($name, $UserId);
 
   // Generate a GM report for any games this user is a GM for
@@ -1664,7 +1664,7 @@ function report_user_on_demand()
     echo "All Rights Reserved\n";
     echo "</div> <!-- copyright-->\n";
 
-    echo "<div class=\"print_logo\"><img src=\"PageBanner.png\"></div>\n";
+    echo "<div class=\"print_logo\"><img src=\"".FULL_LOGO."\"></div>\n";
 
     write_game_report ($row->RunId,
 		       $row->Title,
