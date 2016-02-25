@@ -79,7 +79,7 @@ function DisplayContactsPage ()
 		                   NAME_ATTENDEE_COORDINATOR,
 		                                       EMAIL_ATTENDEE_COORDINATOR);
   DisplayContact ('Hospitality',   NAME_CON_SUITE,     EMAIL_CON_SUITE);
-  DisplayContact ('Game Bids',     NAME_BID_CHAIR,     EMAIL_BID_CHAIR);
+  DisplayContact ('Game Proposals',     NAME_BID_CHAIR,     EMAIL_BID_CHAIR);
   DisplayContact ('GM Coordinator',NAME_GM_COORDINATOR,EMAIL_GM_COORDINATOR);
   DisplayContact ('Hotel Liaison', NAME_HOTEL_LIAISON, EMAIL_HOTEL_LIAISON);
   DisplayContact ('Iron GM',       NAME_IRON_GM,       EMAIL_IRON_GM);
@@ -89,10 +89,12 @@ function DisplayContactsPage ()
   DisplayContact ('Registration and<br>Event Signup',
 		                   NAME_REGISTRAR,     EMAIL_REGISTRAR);
   DisplayContact ('Panel Coordinator',NAME_THURSDAY,      EMAIL_THURSDAY);
-  DisplayContact ('Staff Coordinator',
+  DisplayContact ('Safety Coordinator',NAME_SAFETY_COORDINATOR,      EMAIL_SAFETY_COORDINATOR);
+
+  DisplayContact ('Vendors',       NAME_VENDOR_LIAISON,EMAIL_VENDOR_LIAISON);
+  DisplayContact ('Volunteer Coordinator',
 		                   NAME_STAFF_COORDINATOR,
 		                                       EMAIL_STAFF_COORDINATOR);
-  DisplayContact ('Vendors',       NAME_VENDOR_LIAISON,EMAIL_VENDOR_LIAISON);
   echo "</table>\n";
   echo "<p>\n";
 }
