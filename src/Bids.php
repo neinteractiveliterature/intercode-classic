@@ -850,6 +850,10 @@ function display_bid_form ($first_try)
     $text .= "This information will displayed \n";
     $text .= "on the page users see for the game.  The description should be\n";
     $text .= "a couple of paragraphs, but can be as long as you like.</p>\n";
+    $text .= "<p><b>Per NEIL policy, game descriptions must include either a\n";
+    $text .= "content warning or an explicit statement that no content warnings\n";
+    $text .= "are applicable.</b> For more information,\n";
+    $text .= "<a href=\"http://interactiveliterature.org/NEIL/communityPolicies.html\" target=\"_blank\">see the NEIL policies page</a>.</p>";
     $text .= "<p>The description will be displayed in the user's browser.\n";
     $text .= "You must use HTML tags for formatting.  A quick primer on\n";
     $text .= "a couple of useful HTML tags is available\n";
