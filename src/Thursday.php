@@ -233,20 +233,17 @@ function display_precon_event($row, $dimensions) {
 
 function thursday_thing()
 {
-  printf ("<h2>%s Pre-Convention Events</h2>\n", CON_NAME);
+  printf ("<h2>%s Panels and Other Events</h2>\n", CON_NAME);
 
-  printf("<p>The %s Pre-Convention\n", CON_NAME);
-  echo "is a conference about the writing, production, and play of live\n";
-  echo "action roleplaying games.  There will be panels, discussions, and\n";
-  echo "interactive workshops discussing LARP theory, costuming, writing\n";
-  echo "techniques, play styles, and a variety of other topics.</p>\n";
-
-  printf ("<p>The Pre-Convention will be run at the Crowne Plaza\n");
-  printf ("from Thursday evening until the start of %s Friday evening.\n",
-	  CON_NAME);
-  echo "There is no addtional charge to attend the Pre-Convention.\n";
-  echo "<b>Admission to the Pre-Convention is included with your admission\n";
-  echo " to " .CON_NAME . ".</b></p>\n";
+  printf("<p>%s, as in previous years, will be starting with\n", CON_NAME);
+  echo "a day of panels, discussions, interactive workshops and\n";
+  echo "presentations about the writing, production, and play of\n";
+  echo "live action roleplaying games, LARP theory, costuming,\n";
+  echo "writing techniques, play styles, and a variety of other topics.\n";
+  echo "These sessions will be run at the Crowne Plaza from Thursday\n";
+  echo "evening until Friday evening around dinnertime.  There is no\n";
+  echo "additional charge to attend this part of the convention. Your\n";
+  echo "admission to " . CON_NAME ." includes all parts of the convention.</p>\n";
 
   echo "<style type=\"text/css\">\n";
   echo "#precon_top { border-spacing: 5px; }\n";
