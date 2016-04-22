@@ -364,7 +364,7 @@ function log_referrer ()
 
 
   if (1 != get_magic_quotes_gpc())
-    $url = mysql_escape_string ($url);
+    $url = mysql_real_escape_string ($url);
 
   $sql = "INSERT INTO Referrers SET Url='$url'";
 
@@ -401,7 +401,7 @@ function process_login_form ()
 
   $EMail = trim ($_POST['EMail']);
   if (1 != get_magic_quotes_gpc())
-    $EMail = mysql_escape_string ($EMail);
+    $EMail = mysql_real_escape_string ($EMail);
 
   $Password = trim ($_POST['Password']);
   $HashedPassword = md5 ($Password);
@@ -1614,7 +1614,7 @@ function add_user ()
 
   $EMail = trim ($_POST['EMail']);
   if (1 != get_magic_quotes_gpc())
-    $EMail = mysql_escape_string ($EMail);
+    $EMail = mysql_real_escape_string ($EMail);
 
   if (! is_valid_email_address ('EMail'))
     return "'$EMail' does not appear to be a valid EMail address";
@@ -2326,7 +2326,7 @@ function process_edit_user ()
   if (1 == get_magic_quotes_gpc())
     $EMail = stripslashes ($EMail);
 
-  $EMail = mysql_escape_string ($EMail);
+  $EMail = mysql_real_escape_string ($EMail);
 
   // Check that the EMail address isn't already being used by another player
 
@@ -2558,7 +2558,7 @@ function process_password_request ()
 
   $EMail = trim ($_POST['EMail']);
   if (1 != get_magic_quotes_gpc())
-    $EMail = mysql_escape_string ($EMail);
+    $EMail = mysql_real_escape_string ($EMail);
 
   $sql = "SELECT UserId FROM Users Where EMail='$EMail'";
   $result = mysql_query ($sql);
