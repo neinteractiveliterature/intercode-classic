@@ -1363,7 +1363,7 @@ function report_users_csv ()
     echo "\"$row->LastName\",";
     echo "\"$row->FirstName\",";
     echo "\"$row->Nickname\",";
-    echo "\"$row->PreferredCharacterGender\",";
+    echo "\"$row->Gender\",";
     echo "\"$row->EMail\",";
     echo "\"$row->CanSignup\",";
     echo "\"$row->LastLogin\",";
