@@ -1373,7 +1373,7 @@ function report_users_csv ()
       $row->ThursdayStatus,
       $row->DeadDogTickets,
       $row->IsGM
-    ))
+    ));
   }
 }
 
