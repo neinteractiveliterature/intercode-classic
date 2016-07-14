@@ -1356,22 +1356,24 @@ function report_users_csv ()
   if (! $result)
     return display_mysql_error ('Query for users failed');
 
-  echo "\"LastName\",\"FirstName\",\"Nickname\",\"PreferredCharacterGender\",\"EMail\",\"Status\",\"LastLogin\",\"ShirtOrder\",\"PreCon\",\"DeadDogTickets\",\"IsGM\"\n";
+  $out = fopen('php://output', 'w');
+  fputcsv($out, array("LastName","FirstName","Nickname","PreferredCharacterGender","EMail","Status","LastLogin","ShirtOrder","PreCon","DeadDogTickets","IsGM"));
 
   while ($row = mysql_fetch_object ($result))
   {
-    echo "\"$row->LastName\",";
-    echo "\"$row->FirstName\",";
-    echo "\"$row->Nickname\",";
-    echo "\"$row->Gender\",";
-    echo "\"$row->EMail\",";
-    echo "\"$row->CanSignup\",";
-    echo "\"$row->LastLogin\",";
-    echo "\"$row->ShirtOrders\",";
-    echo "\"$row->ThursdayStatus\",";
-    echo "\"$row->DeadDogTickets\",";
-    echo "\"$row->IsGM\"";
-    echo "\n";
+    fputcsv($out, array(
+      $row->LastName,
+      $row->FirstName,
+      $row->Nickname,
+      $row->Gender,
+      $row->EMail,
+      $row->CanSignup,
+      $row->LastLogin,
+      $row->ShirtOrders,
+      $row->ThursdayStatus,
+      $row->DeadDogTickets,
+      $row->IsGM
+    ))
   }
 }
 
