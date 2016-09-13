@@ -88,8 +88,7 @@ function show_cost ()
   else
   {
     if (($price < $max_price) && ($k < $max_index))
-      echo "<h1>Save BIG if you pay today!</h1>\n";
-    printf ("<h2>%s is only $%d.00!</h2>\n",
+    printf ("<h1>%s is only $%d.00!</h1>\n",
 	    CON_NAME,
 	    $price);
 
