@@ -245,7 +245,10 @@ function list_games_alphabetically ()
       }
     }
   }
-  echo "</table>\n";
+  echo "</table><p>\n";
+
+  printf('<a href="ListGames.php?action=%d" onclick="return confirm(\'Are you sure?  This will automatically add the Ops event and schedule runs of it that people can sign up for.\');">Add and schedule "Ops"</a><br>', LIST_ADD_OPS);
+  printf('<a href="ListGames.php?action=%d" onclick="return confirm(\'Are you sure?  This will automatically add the ConSuite event and schedule runs of it that people can sign up for.\');">Add and schedule "ConSuite"</a>', LIST_ADD_CONSUITE);
 }
 
 /*
