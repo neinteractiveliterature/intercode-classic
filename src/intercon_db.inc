@@ -308,7 +308,7 @@ define ('MAX_TRACKS', 15);
 
 define ('THU_MIN', 20);    // 8PM
 define ('THU_MAX', 24);    // 12 midnight
-define ('FRI_MIN', 12);    // 12 noon
+define ('FRI_MIN', 8);     // 8AM
 define ('FRI_MAX', 31);    // 7AM
 define ('SAT_MIN', 8);     // 8AM
 define ('SAT_MAX', 31);    // 7AM
