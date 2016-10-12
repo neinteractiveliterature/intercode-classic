@@ -258,7 +258,7 @@ function thursday_thing()
  echo "<p class=\"title\">Help Precon be awesome!</p>\n";
 
  echo "<p>Curious about what panels might run at this upcoming Intercon? Have a larp technique you'd like to share with others? Have any recent discussions with your friends about larping you'd like to have with a wider audience? Come participate in the panels at Intercon as a moderator or panelist!
-<a href=\"https://docs.google.com/forms/d/e/1FAIpQLScaKc6ID1WzisyVg5hMgsVnz01-kQb7-Os8ojr1WM3zyjJMyw/viewform?c=0&w=1\">Click this link!</a></p>"
+<a href=\"https://docs.google.com/forms/d/e/1FAIpQLScaKc6ID1WzisyVg5hMgsVnz01-kQb7-Os8ojr1WM3zyjJMyw/viewform?c=0&w=1\">Click this link!</a></p>";
 
    echo "<p>It's never too late to get involved!  If you have any additional ideas or questions, email\n";
    echo mailto_or_obfuscated_email_address(EMAIL_THURSDAY);
