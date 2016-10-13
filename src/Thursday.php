@@ -255,9 +255,9 @@ function thursday_thing()
 
  echo "<table id=\"precon_top\"><tr>";
  echo "<td id=\"precon_bid\" class=\"menulike\">";
- echo "<p class=\"title\">Help Precon be awesome!</p>\n";
+ echo "<p class=\"title\">Help Intercon Panels be awesome!</p>\n";
 
- echo "<p>Curious about what panels might run at this upcoming Intercon? Have a larp technique you'd like to share with others? Have any recent discussions with your friends about larping you'd like to have with a wider audience? Come participate in the panels at Intercon as a moderator or panelist!
+ echo "<p>Curious about what panels, discussions, and workshops might run at this upcoming Intercon? Have a larp technique you'd like to share with others? Have any recent discussions with your friends about larping you'd like to have with a wider audience? Come participate in the panels at Intercon as a moderator or panelist!
 <a href=\"https://docs.google.com/forms/d/e/1FAIpQLScaKc6ID1WzisyVg5hMgsVnz01-kQb7-Os8ojr1WM3zyjJMyw/viewform?c=0&w=1\">Click this link!</a></p>";
 
    echo "<p>It's never too late to get involved!  If you have any additional ideas or questions, email\n";
@@ -846,7 +846,7 @@ function display_precon_event_form()
   // If this is a new bid, just display the header
 
   if (0 == $PreConEventId)
-    display_header ('Bid a Precon Event for ' . CON_NAME);
+    display_header ('Bid a Panel, Discussion, or Workshop for ' . CON_NAME);
   else
   {
     // Load the $_POST array from the database
@@ -882,7 +882,7 @@ function display_precon_event_form()
     if (! $can_update)
       return display_access_error();
 
-    display_header ('Update Precon Event <i>' . $_POST['Title'] . '</i>');
+    display_header ('Update Panel <i>' . $_POST['Title'] . '</i>');
   }
 
   echo "<form method=\"POST\" action=\"Thursday.php\">\n";
