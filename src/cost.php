@@ -87,7 +87,7 @@ function show_cost ()
 	    $prices[count($prices)-1]);
   else
   {
-    if (($price < $max_price) && ($k < $max_index))
+    if (($price <= $max_price) && ($k < $max_index))
     printf ("<h1>%s is only $%d.00!</h1>\n",
 	    CON_NAME,
 	    $price);
