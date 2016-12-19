@@ -1,5 +1,5 @@
 <?php
-if (strstr($_SERVER["SERVER_NAME"], "interactiveliterature.org")) {
+if (strstr($_SERVER["HTTP_HOST"], "interactiveliterature.org")) {
     session_set_cookie_params(0, '/', '.interactiveliterature.org');
 }
 

@@ -354,7 +354,7 @@ function log_referrer ()
   // Make sure this isn't coming from one of OUR pages...
 
   $url = $_SERVER['HTTP_REFERER'];
-  $host = 'http://' . $_SERVER['SERVER_NAME'];
+  $host = 'http://' . $_SERVER['HTTP_HOST'];
 
   //  echo "referrer: $referrer<br>\n";
   //  echo "host:     $host<br>\n";
@@ -4337,8 +4337,8 @@ function paypal_test ()
 {
   // Build the URL for the PayPal links
 
-  $return_url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
-  $cancel_url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
+  $return_url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+  $cancel_url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
 
   $url = 'https://www.paypal.com/cgi-bin/webscr?';
   $url .= build_url_string ('cmd', '_xclick');

@@ -482,7 +482,7 @@ function build_paypal_url($OrderId, $cost)
     $dirname = $path_parts['dirname'];
 
   $return_url = sprintf ('http://%s%s/index.php',
-			 $_SERVER['SERVER_NAME'],
+			 $_SERVER['HTTP_HOST'],
 			 $dirname);
   //  echo "dirname: $dirname<br>\n";
   //  echo "return_url: $return_url<br>\n";
