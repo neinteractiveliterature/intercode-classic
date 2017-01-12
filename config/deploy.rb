@@ -1,4 +1,4 @@
-set :application, "intercon-q"
+set :application, "intercon-r"
 set :user, "deploy"
 set :domain, "#{user}@vps1.interconlarp.org"
 set :repository, "git@vps1.interconlarp.org:intercode1.git"
