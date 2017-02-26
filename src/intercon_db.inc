@@ -741,12 +741,16 @@ function attendees_at_max() {
  * Displays a section header for the form being built
  */
 
-function form_section ($text, $leading_blank_line=TRUE)
+function form_section ($text, $leading_blank_line=TRUE, $subhead = null)
 {
   if ($leading_blank_line)
     echo"  <TR><TD COLSPAN=2>&nbsp;</TD></TR>\n";
 
-  echo "<TR><TD COLSPAN=2 BGCOLOR=\"#CCFFFF\"><B>&nbsp;<BR>$text</B></TD></TR>\n";
+  echo "<TR><TD COLSPAN=2 BGCOLOR=\"#CCFFFF\"><B>&nbsp;<BR>$text</B>";
+  if ($subhead)
+    echo "<BR><I>$subhead</I>";
+
+  echo "</TD></TR>\n";
 }
 
 /*

@@ -812,11 +812,11 @@ function display_bid_form ($first_try)
     $thingstring = 'event';
 
   if ($gametype == 'Other')
-    form_section ('Event Information');
+    form_section ('Event Information', TRUE, 'This will be shown on the Public description of the game.');
   else if ($gametype == 'Panel')
-    form_section ('Panel Information');
+    form_section ('Panel Information', TRUE, 'This will be shown on the Public description of the game.');
   else
-    form_section ('Game Information');
+    form_section ('Game Information', TRUE, 'This will be shown on the Public description of the game.');
 
   form_hidden_value ('GameType', $gametype);
 
@@ -844,16 +844,18 @@ function display_bid_form ($first_try)
     form_text (64, 'Event or organization homepage', 'Homepage', 128);
     form_text (64, 'EMail for event inquiries', 'GameEMail', 0, TRUE);
     form_text (2, 'Event Length', 'Hours', 0, TRUE,
-	       '(Hours) - Note that this time includes game wrap.');
+	       '(Hours) - This is time that players will be participating in the LARP, from introduction to game wrap.');
 
     $text = "<b>Description</b> for use on the " . CON_NAME . " website.\n";
     $text .= "This information will displayed \n";
-    $text .= "on the page users see for the game.  The description should be\n";
+    $text .= "on the page users see for the game.  The description should be at least\n";
     $text .= "a couple of paragraphs, but can be as long as you like.</p>\n";
+    $text .= "<p>The game description is used to promote your game and attract players who will enjoy it. Be reasonably clear on where and when the game is set, and what the game is about. Let your players know what can they expect to be doing during the LARP, and make them excited to play your game! (We can offer suggestions if you would like advice on this.)</p>\n";
     $text .= "<p><b>Per NEIL policy, game descriptions must include either a\n";
     $text .= "content warning or an explicit statement that no content warnings\n";
     $text .= "are applicable.</b> For more information,\n";
     $text .= "<a href=\"http://interactiveliterature.org/NEIL/communityPolicies.html\" target=\"_blank\">see the NEIL policies page</a>.</p>";
+    $text .= "<p>Please also include the preferred ages of players for your larp. Examples are \"Players must be 18 or older\", or \"players under 16 must check with the GMs before playing\", to \"children at least [age] years old are welcome in this game\".</p>\n";
     $text .= "<p>The description will be displayed in the user's browser.\n";
     $text .= "You must use HTML tags for formatting.  A quick primer on\n";
     $text .= "a couple of useful HTML tags is available\n";
@@ -865,7 +867,7 @@ function display_bid_form ($first_try)
 
     $text = "A <b>Short Blurb</b> (50 words or less) for the game to be\n";
     $text .= "used for the List of Events page and the convention\n";
-    $text .= "program.</p>\n";
+    $text .= "program. Information in the Short Blurb must also be present in the (full) description!</p>\n";
     $text .= "<p>The short blurb will be displayed in the user's browser.\n";
     $text .= "You must use HTML tags for formatting.  A quick primer on\n";
     $text .= "a couple of useful HTML tags is available\n";
@@ -877,7 +879,7 @@ function display_bid_form ($first_try)
 
     if ($gametype != 'Panel')
     {
-      form_section ('Character Counts');
+      form_section ('Character Counts', TRUE, 'This will be shown on the Public description of the game.');
       echo "  <tr>\n";
       echo "    <td colspan=2>\n";
       echo "Enter the minimum, preferred and maximum number of characters\n";
@@ -956,11 +958,11 @@ function display_bid_form ($first_try)
   }
 
   if ($gametype == 'Other')
-    form_section ('Other Event Information');
+    form_section ('Other Event Information', TRUE, 'This information will only be used by the Proposals Committee.');
   else if ($gametype == 'Panel')
-    form_section ('Other Panel Information');
+    form_section ('Other Panel Information', TRUE, 'This information will only be used by the Proposals Committee.');
   else
-    form_section ('Other Game Information');
+    form_section ('Other Game Information', TRUE, 'This information will only be used by the Proposals Committee.');
 
   if ($gametype == 'LARP' || $gametype == 'Tabletop RPG')
   {
@@ -1021,7 +1023,7 @@ function display_bid_form ($first_try)
   if ($gametype != 'Board Game')
   {
       form_textarea ('Please enter any additional background information here, or any other information you wish to tell the Bid Committee. This information will be shown only to the Bid Committee.', 'Premise', 5, TRUE, TRUE);
-      form_textarea ("Are there any special setup or teardown requirements for this $thingstring? This information will be shown only to the Bid Committee.", 'SetupTeardown', 5);
+      form_textarea ("Are there any special setup or teardown requirements for this $thingstring? For example, do you need extra time to set up or tear down a complex set? (Requests for standard furniture will be handled separately closer to the convention. Intercon can not provide unusual setup materials for your game.)", 'SetupTeardown', 5);
   }
   else
   {
@@ -1029,7 +1031,7 @@ function display_bid_form ($first_try)
     form_hidden_value ('SetupTeardown', 'X');
   }
 
-  form_section ('GMs/Author Information');
+  form_section ('GMs/Author Information', TRUE, 'This information will only be used by the Proposals Committee.');
 
   if ($gametype == 'LARP' || $gametype == 'Tabletop RPG')
   {
@@ -1069,7 +1071,7 @@ function display_bid_form ($first_try)
       form_hidden_value ('OtherGames', '');
   }
 
-  form_section ('Restrictions');
+  form_section ('Restrictions', TRUE, 'This information will only be used by the Proposals Committee.');
 
   echo "  <TR>\n";
   echo "    <TD COLSPAN=2>\n";
@@ -1120,7 +1122,7 @@ function display_bid_form ($first_try)
  else
     form_hidden_value ('Fee', 'N');
 
-  form_section ('Scheduling Information');
+  form_section ('Scheduling Information', TRUE, 'This information will only be used by the Proposals Committee.');
 
   echo "  <tr>\n";
   echo "    <td colspan=\"2\">\n";
@@ -1176,10 +1178,8 @@ function display_bid_form ($first_try)
   form_yn ("Are you willing to hold this {$thingstring} more than once at this convention?",
 	   'MultipleRuns');
 
-  $text = "Are there any other scheduling constraints on your {$thingstring}?  For\n";
-  //$text .= "example, are you a GM for another game?  Any times your game\n";
-  $text .= "example, are you proposing another event?  Any times your {$thingstring}\n";
-  $text .= "cannot be scheduled?";
+  $text = "If you are willing to hold the LARP more than once, please discuss your preferences here.\n";
+  $text .= "In addition, if there are scheduling constraints on your LARP (for example, if are you proposing another event), or there are times your LARP cannot be scheduled, please discuss them as well.\n";
   form_textarea ($text, 'SchedulingConstraints', 5);
 
   form_textarea ('Space Requirements', 'SpaceRequirements', 2);
