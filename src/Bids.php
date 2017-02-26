@@ -1178,7 +1178,7 @@ function display_bid_form ($first_try)
   form_yn ("Are you willing to hold this {$thingstring} more than once at this convention?",
 	   'MultipleRuns');
 
-  $text = "If you are willing to hold the LARP more than once, please discuss your preferences here.\n";
+  $text = "If you are willing to hold the LARP more than once, please discuss your preferences here.<br>\n";
   $text .= "In addition, if there are scheduling constraints on your LARP (for example, if are you proposing another event), or there are times your LARP cannot be scheduled, please discuss them as well.\n";
   form_textarea ($text, 'SchedulingConstraints', 5);
 
