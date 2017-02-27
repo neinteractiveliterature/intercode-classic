@@ -854,7 +854,7 @@ function display_bid_form ($first_try)
     $text .= "<p><b>Per NEIL policy, game descriptions must include either a\n";
     $text .= "content warning or an explicit statement that no content warnings\n";
     $text .= "are applicable.</b> For more information,\n";
-    $text .= "<a href=\"http://interactiveliterature.org/NEIL/communityPolicies.html\" target=\"_blank\">see the NEIL policies page</a>.</p>";
+    $text .= "<a href=\"http://interactiveliterature.org/NEIL/communityPolicies.html#contentWarningsPolicy\" target=\"_blank\">see the NEIL policies page</a>.</p>";
     $text .= "<p>Please also include the preferred ages of players for your larp. Examples are \"Players must be 18 or older\", or \"players under 16 must check with the GMs before playing\", to \"children at least [age] years old are welcome in this game\".</p>\n";
     $text .= "<p>The description will be displayed in the user's browser.\n";
     $text .= "You must use HTML tags for formatting.  A quick primer on\n";
