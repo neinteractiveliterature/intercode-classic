@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.1.50, for apple-darwin10.3.0 (i386)
+-- MySQL dump 10.13  Distrib 5.7.11, for osx10.11 (x86_64)
 --
--- Host: localhost    Database: ideploy
+-- Host: localhost    Database: itest
 -- ------------------------------------------------------
--- Server version	5.1.50
+-- Server version	5.7.11
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -83,18 +83,13 @@ CREATE TABLE `Away` (
   `Sun16` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `UpdatedById` int(10) unsigned NOT NULL DEFAULT '0',
   `TimeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Fri08` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `Fri09` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `Fri10` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `Fri11` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`AwayId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Away`
---
-
-LOCK TABLES `Away` WRITE;
-/*!40000 ALTER TABLE `Away` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Away` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `BidFeedback`
@@ -108,19 +103,10 @@ CREATE TABLE `BidFeedback` (
   `BidStatusId` int(10) unsigned NOT NULL DEFAULT '0',
   `UserId` int(10) unsigned NOT NULL DEFAULT '0',
   `Vote` enum('Strong Yes','Yes','Weak Yes','No Comment','Weak No','No','Strong No','Undecided','Author') NOT NULL DEFAULT 'Undecided',
-  `Issues` char(64) NOT NULL DEFAULT '',
+  `Issues` text NOT NULL,
   PRIMARY KEY (`FeedbackId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `BidFeedback`
---
-
-LOCK TABLES `BidFeedback` WRITE;
-/*!40000 ALTER TABLE `BidFeedback` DISABLE KEYS */;
-/*!40000 ALTER TABLE `BidFeedback` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `BidInfo`
@@ -145,16 +131,6 @@ CREATE TABLE `BidInfo` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `BidInfo`
---
-
-LOCK TABLES `BidInfo` WRITE;
-/*!40000 ALTER TABLE `BidInfo` DISABLE KEYS */;
-INSERT INTO `BidInfo` VALUES (2,'','','','','','','<p>\r\nIntercon solicits bids for games in rounds, as needed, based on the\r\nnumber of registrants we get. It\'s our goal to have a great schedule\r\nof games up as  early as possible!</p>\r\n<p>\r\nGame bids received before the deadline will be evaluated in a timely\r\nmanner.\r\n<i>Early bids will get an early decision!</i></p>',36,'2011-02-09 19:12:24');
-/*!40000 ALTER TABLE `BidInfo` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `BidStatus`
 --
 
@@ -165,20 +141,29 @@ CREATE TABLE `BidStatus` (
   `BidStatusId` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `BidId` int(10) unsigned NOT NULL DEFAULT '0',
   `Consensus` enum('Discuss','Accept','Early Accepted','Reject','Drop') NOT NULL DEFAULT 'Discuss',
-  `Issues` char(128) NOT NULL DEFAULT '',
+  `Issues` text,
   `LastUpdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`BidStatusId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=91 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `BidStatus`
+-- Table structure for table `BidTimes`
 --
 
-LOCK TABLES `BidStatus` WRITE;
-/*!40000 ALTER TABLE `BidStatus` DISABLE KEYS */;
-/*!40000 ALTER TABLE `BidStatus` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `BidTimes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `BidTimes` (
+  `BidTimeId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `BidId` int(10) unsigned NOT NULL,
+  `Day` enum('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday') NOT NULL,
+  `Slot` enum('Morning','Lunch','Afternoon','Dinner','Evening','After Midnight') NOT NULL,
+  `Pref` char(1) NOT NULL DEFAULT '',
+  PRIMARY KEY (`BidTimeId`),
+  KEY `BidId` (`BidId`)
+) ENGINE=MyISAM AUTO_INCREMENT=2581 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `Bids`
@@ -189,7 +174,6 @@ DROP TABLE IF EXISTS `Bids`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Bids` (
   `BidId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `GameType` varchar(30) NOT NULL DEFAULT '',
   `Status` enum('Pending','Under Review','Accepted','Rejected','Dropped') NOT NULL DEFAULT 'Pending',
   `UserId` int(10) unsigned NOT NULL DEFAULT '0',
   `FirstName` varchar(30) NOT NULL DEFAULT '',
@@ -225,7 +209,6 @@ CREATE TABLE `Bids` (
   `PrefPlayersNeutral` int(10) unsigned NOT NULL DEFAULT '0',
   `Hours` int(10) unsigned NOT NULL DEFAULT '0',
   `CanPlayConcurrently` enum('Y','N') DEFAULT NULL,
-  `Fee` enum('Y','N') DEFAULT NULL,
   `Description` text,
   `Genre` varchar(64) NOT NULL DEFAULT '',
   `OngoingCampaign` enum('Y','N') DEFAULT NULL,
@@ -233,59 +216,27 @@ CREATE TABLE `Bids` (
   `RunBefore` text NOT NULL,
   `GameSystem` text,
   `CombatResolution` enum('Physical','NonPhysical','NoCombat','Other') DEFAULT NULL,
-  `OtherDetails` text,
   `OtherGMs` text NOT NULL,
   `OtherGames` text NOT NULL,
   `Offensive` text,
   `PhysicalRestrictions` text,
-  `AgeRestrictions` text,
   `SchedulingConstraints` text,
   `SpaceRequirements` text NOT NULL,
+  `SetupTeardown` text NOT NULL,
   `MultipleRuns` enum('Y','N') DEFAULT NULL,
   `ShortSentence` text,
   `ShortBlurb` text,
-  `ShamelessPlugs` text,
-  `GMGameAdvertising` text,
-  `GMInterconAdvertising` text,
-  `SendFlyers` enum('Y','N') DEFAULT NULL,
   `IsSmallGameContestEntry` enum('Y','N') NOT NULL DEFAULT 'N',
   `UpdatedById` int(11) NOT NULL DEFAULT '0',
   `LastUpdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `Created` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `Created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `GameType` varchar(30) NOT NULL DEFAULT '',
+  `Fee` enum('Y','N') DEFAULT NULL,
+  `AgeAppropriate` text,
+  `PlayerCommunications` text,
   PRIMARY KEY (`BidId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=101 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Bids`
---
-
-LOCK TABLES `Bids` WRITE;
-/*!40000 ALTER TABLE `Bids` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Bids` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `BidTimes`
---
-
-CREATE TABLE `BidTimes` (
-  `BidTimeId` int(10) unsigned NOT NULL auto_increment,
-  `BidId` int(10) unsigned NOT NULL,
-  `Day` enum('Monday','Tuesday','Wednesday','Thursday','Friday', 'Saturday', 'Sunday') NOT NULL,
-  `Slot` enum('Morning', 'Lunch', 'Afternoon', 'Dinner', 'Evening', 'After Midnight' ) NOT NULL,
-  `Pref` char(1) NOT NULL default '',
-  PRIMARY KEY  (`BidTimeId`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
---
--- Dumping data for table `BidTimes`
---
-
-LOCK TABLES `BidTimes` WRITE;
-/*!40000 ALTER TABLE `BidTimes` DISABLE KEYS */;
-/*!40000 ALTER TABLE `BidTimes` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `Bios`
@@ -302,17 +253,8 @@ CREATE TABLE `Bios` (
   `ShowNickname` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `LastUpdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`BioId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=54 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Bios`
---
-
-LOCK TABLES `Bios` WRITE;
-/*!40000 ALTER TABLE `Bios` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Bios` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `Con`
@@ -334,16 +276,6 @@ CREATE TABLE `Con` (
   PRIMARY KEY (`ConId`)
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Con`
---
-
-LOCK TABLES `Con` WRITE;
-/*!40000 ALTER TABLE `Con` DISABLE KEYS */;
-INSERT INTO `Con` VALUES (1,'NotYet','No','No news is good news',36,'2011-02-23 14:11:12','Stay tuned to this station for more exciting details','Yes','Yes');
-/*!40000 ALTER TABLE `Con` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `DeadDog`
@@ -369,15 +301,6 @@ CREATE TABLE `DeadDog` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `DeadDog`
---
-
-LOCK TABLES `DeadDog` WRITE;
-/*!40000 ALTER TABLE `DeadDog` DISABLE KEYS */;
-/*!40000 ALTER TABLE `DeadDog` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `Events`
 --
 
@@ -388,7 +311,6 @@ CREATE TABLE `Events` (
   `EventId` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Title` varchar(128) NOT NULL DEFAULT '',
   `Author` varchar(128) DEFAULT '',
-  `GameType` varchar(30) NOT NULL DEFAULT '',
   `GameEMail` varchar(64) NOT NULL DEFAULT '',
   `Organization` varchar(64) DEFAULT '',
   `Homepage` text,
@@ -404,7 +326,6 @@ CREATE TABLE `Events` (
   `MinPlayersNeutral` int(10) unsigned NOT NULL DEFAULT '0',
   `MaxPlayersNeutral` int(10) unsigned NOT NULL DEFAULT '0',
   `PrefPlayersNeutral` int(10) unsigned NOT NULL DEFAULT '0',
-  `Fee` varchar(30) DEFAULT '',
   `Hours` int(10) unsigned NOT NULL DEFAULT '0',
   `SpecialEvent` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `CanPlayConcurrently` enum('Y','N') NOT NULL DEFAULT 'N',
@@ -417,18 +338,12 @@ CREATE TABLE `Events` (
   `ShortBlurb` text NOT NULL,
   `UpdatedById` int(11) NOT NULL DEFAULT '0',
   `LastUpdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `GameType` varchar(30) NOT NULL DEFAULT '',
+  `Fee` varchar(30) DEFAULT '',
+  `PlayerCommunications` text,
   PRIMARY KEY (`EventId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=123 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Events`
---
-
-LOCK TABLES `Events` WRITE;
-/*!40000 ALTER TABLE `Events` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Events` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `GMs`
@@ -448,18 +363,10 @@ CREATE TABLE `GMs` (
   `ReceiveSignupEMail` enum('Y','N') NOT NULL DEFAULT 'N',
   `UpdatedById` int(11) NOT NULL DEFAULT '0',
   `LastUpdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`GMId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`GMId`),
+  KEY `UserId` (`UserId`)
+) ENGINE=MyISAM AUTO_INCREMENT=198 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `GMs`
---
-
-LOCK TABLES `GMs` WRITE;
-/*!40000 ALTER TABLE `GMs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `GMs` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `IronGm`
@@ -479,15 +386,6 @@ CREATE TABLE `IronGm` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `IronGm`
---
-
-LOCK TABLES `IronGm` WRITE;
-/*!40000 ALTER TABLE `IronGm` DISABLE KEYS */;
-/*!40000 ALTER TABLE `IronGm` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `IronGmTeam`
 --
 
@@ -502,15 +400,6 @@ CREATE TABLE `IronGmTeam` (
   PRIMARY KEY (`TeamId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `IronGmTeam`
---
-
-LOCK TABLES `IronGmTeam` WRITE;
-/*!40000 ALTER TABLE `IronGmTeam` DISABLE KEYS */;
-/*!40000 ALTER TABLE `IronGmTeam` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `Plugs`
@@ -530,17 +419,8 @@ CREATE TABLE `Plugs` (
   `UpdatedById` int(10) unsigned NOT NULL DEFAULT '0',
   `LastUpdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`PlugId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=94 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Plugs`
---
-
-LOCK TABLES `Plugs` WRITE;
-/*!40000 ALTER TABLE `Plugs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Plugs` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `Poll`
@@ -557,15 +437,6 @@ CREATE TABLE `Poll` (
   UNIQUE KEY `UserId` (`UserId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Poll`
---
-
-LOCK TABLES `Poll` WRITE;
-/*!40000 ALTER TABLE `Poll` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Poll` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `PreConEvents`
@@ -600,17 +471,8 @@ CREATE TABLE `PreConEvents` (
   `UpdatedById` int(10) unsigned NOT NULL DEFAULT '0',
   `LastUpdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`PreConEventId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `PreConEvents`
---
-
-LOCK TABLES `PreConEvents` WRITE;
-/*!40000 ALTER TABLE `PreConEvents` DISABLE KEYS */;
-/*!40000 ALTER TABLE `PreConEvents` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `PreConRuns`
@@ -624,21 +486,12 @@ CREATE TABLE `PreConRuns` (
   `PreConEventId` int(10) unsigned NOT NULL DEFAULT '0',
   `Day` enum('Thu','Fri') NOT NULL DEFAULT 'Fri',
   `StartHour` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `Rooms` set('Alcott','Belmont','Cambridge East','Cambridge West','Concord','Eden Vale A1','Eden Vale A2','Eden Vale A3','Eden Vale B','Eden Vale C1','Eden Vale C2','Eden Vale C3','Emerson','Hawthorne','Lincoln East','Lincoln West','Livermore','Pool','Thoreau','Waltham','Wellesley','Wellington','Weston') NOT NULL DEFAULT '',
+  `Rooms` set('Boardroom','Carlisle','Chelmsford','Concord','Drawing','Hawthorne','Heritage A','Heritage B','Merrimack','Middlesex','Pool','Salon A','Salon B','Salon C','Private Suite','2 Private Suites','3 Private Suites') NOT NULL DEFAULT '',
   `UpdatedById` int(10) unsigned NOT NULL DEFAULT '0',
   `LastUpdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`PreConRunId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `PreConRuns`
---
-
-LOCK TABLES `PreConRuns` WRITE;
-/*!40000 ALTER TABLE `PreConRuns` DISABLE KEYS */;
-/*!40000 ALTER TABLE `PreConRuns` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `Referrers`
@@ -654,17 +507,22 @@ CREATE TABLE `Referrers` (
   `NewUser` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `AtSite` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`ReferrerId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=5547 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Referrers`
+-- Table structure for table `Rooms`
 --
 
-LOCK TABLES `Referrers` WRITE;
-/*!40000 ALTER TABLE `Referrers` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Referrers` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `Rooms`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Rooms` (
+  `RoomId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `RoomName` char(40) DEFAULT '',
+  PRIMARY KEY (`RoomId`)
+) ENGINE=MyISAM AUTO_INCREMENT=66 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `Runs`
@@ -678,25 +536,31 @@ CREATE TABLE `Runs` (
   `EventId` int(11) NOT NULL DEFAULT '0',
   `Track` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `Span` tinyint(3) unsigned NOT NULL DEFAULT '1',
-  `Day` enum('Fri','Sat','Sun') NOT NULL DEFAULT 'Fri',
+  `Day` char(32) NOT NULL DEFAULT '',
   `StartHour` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `TitleSuffix` char(32) DEFAULT '',
   `ScheduleNote` char(32) NOT NULL DEFAULT '',
-  `Rooms` set('Alcott','Belmont','Cambridge','Concord','Eden Vale A1','Eden Vale A2','Eden Vale A3','Eden Vale B','Eden Vale C1','Eden Vale C2','Eden Vale C3','Emerson','Garfield','Hawthorne','Lincoln East','Lincoln West','Livermore','Pool','Thoreau','Waltham','Wellesley','Wellington','Weston') NOT NULL DEFAULT '',
   `UpdatedById` int(11) NOT NULL DEFAULT '0',
   `LastUpdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`RunId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`RunId`),
+  KEY `IndexRunsOnDayAndEventId` (`Day`,`EventId`)
+) ENGINE=MyISAM AUTO_INCREMENT=247 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Runs`
+-- Table structure for table `RunsRooms`
 --
 
-LOCK TABLES `Runs` WRITE;
-/*!40000 ALTER TABLE `Runs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Runs` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `RunsRooms`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `RunsRooms` (
+  `RoomId` int(10) unsigned NOT NULL,
+  `RunId` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`RunId`,`RoomId`),
+  KEY `RoomId` (`RoomId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `Signup`
@@ -717,17 +581,75 @@ CREATE TABLE `Signup` (
   `TimeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`SignupId`),
   KEY `State` (`State`)
+) ENGINE=MyISAM AUTO_INCREMENT=1455 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `StoreItems`
+--
+
+DROP TABLE IF EXISTS `StoreItems`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `StoreItems` (
+  `ItemId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Available` enum('Y','N') NOT NULL DEFAULT 'Y',
+  `Gender` enum('Men''s','Women''s','Unisex') NOT NULL DEFAULT 'Unisex',
+  `PriceCents` int(10) unsigned NOT NULL DEFAULT '0',
+  `Singular` varchar(64) NOT NULL DEFAULT '',
+  `Plural` varchar(64) NOT NULL DEFAULT '',
+  `Style` varchar(64) NOT NULL DEFAULT '',
+  `Color` varchar(32) NOT NULL DEFAULT '',
+  `Sizes` varchar(128) NOT NULL DEFAULT '',
+  `ThumbnailFilename` varchar(128) NOT NULL DEFAULT '',
+  `ImageFilename` varchar(128) NOT NULL DEFAULT '',
+  `UpdatedById` int(10) unsigned NOT NULL DEFAULT '0',
+  `LastUpdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ItemId`),
+  UNIQUE KEY `ItemId` (`ItemId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Signup`
+-- Table structure for table `StoreOrderEntries`
 --
 
-LOCK TABLES `Signup` WRITE;
-/*!40000 ALTER TABLE `Signup` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Signup` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `StoreOrderEntries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `StoreOrderEntries` (
+  `OrderEntryId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `OrderId` int(10) unsigned NOT NULL DEFAULT '0',
+  `ItemId` int(10) unsigned NOT NULL DEFAULT '0',
+  `PricePerItemCents` int(10) unsigned NOT NULL DEFAULT '0',
+  `Quantity` int(10) unsigned NOT NULL DEFAULT '0',
+  `Size` varchar(32) NOT NULL DEFAULT '',
+  `UpdatedById` int(10) unsigned NOT NULL DEFAULT '0',
+  `LastUpdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`OrderEntryId`),
+  UNIQUE KEY `OrderEntryId` (`OrderEntryId`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `StoreOrders`
+--
+
+DROP TABLE IF EXISTS `StoreOrders`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `StoreOrders` (
+  `OrderId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `UserId` int(10) unsigned NOT NULL DEFAULT '0',
+  `Status` enum('Unpaid','Paid','Cancelled') NOT NULL DEFAULT 'Unpaid',
+  `PaymentCents` int(11) NOT NULL DEFAULT '0',
+  `PaymentNote` text NOT NULL,
+  `UpdatedById` int(10) unsigned NOT NULL DEFAULT '0',
+  `LastUpdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`OrderId`),
+  UNIQUE KEY `OrderId` (`OrderId`)
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `TShirts`
@@ -764,15 +686,6 @@ CREATE TABLE `TShirts` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `TShirts`
---
-
-LOCK TABLES `TShirts` WRITE;
-/*!40000 ALTER TABLE `TShirts` DISABLE KEYS */;
-/*!40000 ALTER TABLE `TShirts` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `Thursday`
 --
 
@@ -789,15 +702,6 @@ CREATE TABLE `Thursday` (
   PRIMARY KEY (`UserId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Thursday`
---
-
-LOCK TABLES `Thursday` WRITE;
-/*!40000 ALTER TABLE `Thursday` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Thursday` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `Users`
@@ -840,18 +744,37 @@ CREATE TABLE `Users` (
   `CanSignupModified` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `Created` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`UserId`),
-  KEY `CanSignup` (`CanSignup`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  KEY `CanSignup` (`CanSignup`),
+  KEY `Priv` (`Priv`)
+) ENGINE=MyISAM AUTO_INCREMENT=2064 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Users`
+-- Dumping routines for database 'itest'
 --
-
-LOCK TABLES `Users` WRITE;
-/*!40000 ALTER TABLE `Users` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Users` ENABLE KEYS */;
-UNLOCK TABLES;
+/*!50003 DROP FUNCTION IF EXISTS `room_names` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `room_names`(RunId INT(11)) RETURNS text CHARSET utf8
+BEGIN
+  DECLARE RoomNames TEXT;
+  SELECT GROUP_CONCAT(RoomName ORDER BY RoomName SEPARATOR ',') INTO RoomNames
+    FROM RunsRooms INNER JOIN Rooms ON RunsRooms.RoomId = Rooms.RoomId
+    WHERE RunsRooms.RunId = RunId;
+  RETURN RoomNames;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -862,4 +785,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-02-23  9:13:55
+-- Dump completed on 2017-02-26 16:39:27
