@@ -536,6 +536,7 @@ function show_bid ()
   show_text ('Game System', $bid_row['GameSystem']);
   show_text ('Combat Resolution', $bid_row['CombatResolution']);
   show_text ('Space Requirements', $bid_row['SpaceRequirements']);
+  show_text ('Player Communications', $bid_row['PlayerCommunications']);
 
   show_section ('Game Restrictions');
 
@@ -876,6 +877,10 @@ function display_bid_form ($first_try)
     else
         $text .= "<A HREF=".TEXT_DIR."/HtmlPrimer.html TARGET=_blank>here</A>.\n";
     form_textarea ($text, 'ShortBlurb', 4, TRUE, TRUE);
+
+    $text = "<b>Player Communications</b><br>\n";
+    $text .= "How will you distribute game information to your players? Will you be using a casting form? Will character roles be cast and distributed before the convention or on site, or will characters be developed as part of the game?\n";
+    form_textarea($text, 'PlayerCommunications', 4, TRUE, TRUE);
 
     if ($gametype != 'Panel')
     {
@@ -1288,6 +1293,7 @@ function process_bid_form ()
     $form_ok &= validate_int ('Hours', 1, 12, 'Hours');
     $form_ok &= validate_string ('Description');
     $form_ok &= validate_string ('ShortBlurb', 'Short blurb');
+    $form_ok &= validate_string ('PlayerCommunications', 'Player communications info');
   }
 
   // Game Details
@@ -1372,6 +1378,7 @@ function process_bid_form ()
     $sql .= build_sql_string ('CanPlayConcurrently');
     $sql .= build_sql_string ('Description', '', true, true);
     $sql .= build_sql_string ('ShortBlurb', '', true, true);
+    $sql .= build_sql_string ('PlayerCommunications', '', true, true);
 
     $sql .= " WHERE BidId=$BidId";
 
@@ -2368,6 +2375,7 @@ function add_event ($bid_row)
 
   $sql .= build_sql_string ('Description');
   $sql .= build_sql_string ('ShortBlurb');
+  $sql .= build_sql_string ('PlayerCommunications');
 
 /*  $sql .= build_sql_string ('IsSmallGameContestEntry'); */
 

@@ -1757,6 +1757,10 @@ function show_game ()
 		     "<a href=\"$homepage\" target=\"_blank\">$homepage</a>");
   }
 
+  if ('' != $game_row->PlayerCommunications) {
+    display_one_col('Player Communications', $game_row->PlayerCommunications);
+  }
+
   if ($max_signups > 0)
   {
     if (! $volunteer_event)
