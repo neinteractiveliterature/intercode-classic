@@ -536,7 +536,6 @@ function show_bid ()
   show_text ('Game System', $bid_row['GameSystem']);
   show_text ('Combat Resolution', $bid_row['CombatResolution']);
   show_text ('Space Requirements', $bid_row['SpaceRequirements']);
-  show_text ('Player Communications', $bid_row['PlayerCommunications']);
 
   show_section ('Game Restrictions');
 
@@ -585,6 +584,7 @@ function show_bid ()
   //  show_text ('Tweetable Blurb', $bid_row['ShortSentence']);
   show_text ('Short Blurb', $bid_row['ShortBlurb']);
   show_text ('Description', $bid_row['Description']);
+  show_text ('Player Communications', $bid_row['PlayerCommunications']);
 
   echo "</TABLE>\n";
   echo "<P>\n";
