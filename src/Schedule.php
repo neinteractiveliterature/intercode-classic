@@ -2075,7 +2075,7 @@ function show_game ()
   echo "<p>\n<hr>\n";
 
   if ('' != $game_row->PlayerCommunications) {
-    echo "<b>Player Communications</b>\n";
+    echo "<b>Player Communications</b><br>\n";
     echo $game_row->PlayerCommunications;
     echo "<hr>\n";
   }
