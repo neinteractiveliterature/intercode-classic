@@ -4047,7 +4047,7 @@ function who_is_who ()
 {
   echo "<H1>Who's Who at " . CON_NAME . "</H1>\n";
   echo "<p>These are the self-provided bios of the GMs and Staff who bring you Intercon.</p>\n";
-  echo "<hr>\n"
+  echo "<hr>\n";
   $bio_users = array ();
 
   // Start by gathering the list of GMs
