@@ -2906,6 +2906,7 @@ function add_game ()
 
   $sql .= build_sql_string ('Description', '', true, true);
   $sql .= build_sql_string ('ShortBlurb', '', true, true);
+  $sql .= build_sql_string ('PlayerCommunications', '', true, true);
 
   $sql .= build_sql_string ('UpdatedById', $_SESSION[SESSION_LOGIN_USER_ID]);
 
@@ -3278,6 +3279,7 @@ function display_game_form ()
 
   form_textarea ('Short paragraph (50 words or less) displayed in game list', 'ShortBlurb', 4, TRUE, TRUE);
   form_textarea ('Description.  <FONT COLOR=red>The description must contain HTML tags for formatting.  Line breaks will be ignored by browsers.', 'Description', 20, TRUE, TRUE);
+  form_textarea ('Player communications description', 'PlayerCommunications', 4, TRUE, TRUE);
   form_submit ('Update Game');
 
   print ("</TABLE>\n");
