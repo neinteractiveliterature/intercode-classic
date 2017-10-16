@@ -4215,7 +4215,7 @@ function who_is_who ()
 	  case "Outreach":
 	    if ($staff_positions++ > 0)
 	      echo ', ';
-	    echo 'Outreach';
+	    echo 'Communications';
 	    break;
 	}
       }

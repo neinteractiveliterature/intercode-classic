@@ -85,7 +85,7 @@ function DisplayContactsPage ()
   DisplayContact ('Iron GM',       NAME_IRON_GM,       EMAIL_IRON_GM);
 //  DisplayContact ('Operations',    NAME_OPS,           EMAIL_OPS);
   DisplayContact2 ('Operations', NAME_OPS, EMAIL_OPS, NAME_OPS2, EMAIL_OPS2);
-  DisplayContact ('Outreach',      NAME_OUTREACH,      EMAIL_OUTREACH);
+  DisplayContact ('Communications',      NAME_COMMUNICATIONS,      EMAIL_COMMUNICATIONS);
   DisplayContact ('Registration and<br>Event Signup',
 		                   NAME_REGISTRAR,     EMAIL_REGISTRAR);
   DisplayContact ('Panel Coordinator',NAME_THURSDAY,      EMAIL_THURSDAY);
