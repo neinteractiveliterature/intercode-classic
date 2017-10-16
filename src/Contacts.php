@@ -78,6 +78,7 @@ function DisplayContactsPage ()
   DisplayContact ('Attendee Coordinator',
 		                   NAME_ATTENDEE_COORDINATOR,
 		                                       EMAIL_ATTENDEE_COORDINATOR);
+  DisplayContact ('Communications',      NAME_COMMUNICATIONS,      EMAIL_COMMUNICATIONS);
   DisplayContact ('Hospitality',   NAME_CON_SUITE,     EMAIL_CON_SUITE);
   DisplayContact ('Game Proposals',     NAME_BID_CHAIR,     EMAIL_BID_CHAIR);
   DisplayContact ('GM Coordinator',NAME_GM_COORDINATOR,EMAIL_GM_COORDINATOR);
@@ -85,7 +86,6 @@ function DisplayContactsPage ()
   DisplayContact ('Iron GM',       NAME_IRON_GM,       EMAIL_IRON_GM);
 //  DisplayContact ('Operations',    NAME_OPS,           EMAIL_OPS);
   DisplayContact2 ('Operations', NAME_OPS, EMAIL_OPS, NAME_OPS2, EMAIL_OPS2);
-  DisplayContact ('Communications',      NAME_COMMUNICATIONS,      EMAIL_COMMUNICATIONS);
   DisplayContact ('Registration and<br>Event Signup',
 		                   NAME_REGISTRAR,     EMAIL_REGISTRAR);
   DisplayContact ('Panel Coordinator',NAME_THURSDAY,      EMAIL_THURSDAY);
