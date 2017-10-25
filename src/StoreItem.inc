@@ -297,8 +297,9 @@ class StoreItem
       case "Men's": break;
       case "Women's": break;
       case 'Unisex': break;
+      case '': break;
       default:
-	display_error("Gender must be Men's, Women's or Unisex");
+	display_error("Gender must be Men's, Women's, Unisex or Blank");
 	$ok = false;
     }
 
