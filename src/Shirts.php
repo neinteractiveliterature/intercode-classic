@@ -187,7 +187,8 @@ function form_gender($display, $key='')
 
   $list = array ("Men's" => "Men's",
 		 "Women's" => "Women's",
-		 "Unisex" => "Unisex");
+		 "Unisex" => "Unisex",
+     "(none)" => "");
 
   if (! array_key_exists($key, $_POST))
     $_POST[$key] = "Unisex";
