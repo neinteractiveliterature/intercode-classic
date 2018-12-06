@@ -19,4 +19,4 @@ initial setup instructions.
 
 # License
 
-Intercode 2 is released under the terms and conditions of the MIT license.  Please see the LICENSE file for the full legalese.
+Intercode 2 is released under the terms and conditions of the BSD license.  Please see the LICENSE file for the full legalese.
